@@ -1,0 +1,285 @@
+<!doctype html>
+<!--
+  nexpill.superdavelab.com. Built by tool/deploy_site.sh, which fills in the
+  double-brace placeholders from the latest release in dist/release/ and adds
+  the logo, screenshots and APK. Edit this file, not the copy in dist/site/.
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Nexpill — medication reminders that arrive on time</title>
+  <meta name="description" content="Nexpill is a free medication timing app for Android caregivers. Know when each dose was given and when the next one can be, with reminders the phone itself keeps. No account, no internet permission." />
+  <link rel="canonical" href="https://nexpill.superdavelab.com/" />
+  <link rel="icon" href="assets/logo.png" type="image/png" />
+  <meta property="og:title" content="Nexpill — medication reminders that arrive on time" />
+  <meta property="og:description" content="Free, no account, and no internet permission. Know exactly when the next dose can be given." />
+  <meta property="og:image" content="https://nexpill.superdavelab.com/assets/screenshots/1_care.png" />
+  <meta property="og:url" content="https://nexpill.superdavelab.com/" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Fraunces:opsz,wght,SOFT@9..144,500..700,50&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand pill" href="#top" aria-label="Nexpill home">
+        <img src="assets/logo.png" alt="" width="44" height="44" />
+        <span>Nexpill</span>
+      </a>
+      <nav class="pill" aria-label="Sections">
+        <a href="#features">Features</a>
+        <a href="#privacy">Your data</a>
+        <a href="#ledgersprout">LedgerSprout</a>
+        <a href="https://github.com/SuperDaveLab/Nexpill">GitHub</a>
+        <a class="nav-cta" href="#download">Download</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero wrap">
+      <div>
+        <p class="eyebrow">Free medication reminders for Android · Public beta</p>
+        <h1>Know exactly when the next dose can be given.</h1>
+        <p class="lede">
+          Nexpill keeps track of every dose for the people you care for — when
+          it was given, when the next one is due — and reminds you on the
+          minute, with alarms the phone keeps itself. No account, no server,
+          and no permission to use the internet.
+        </p>
+        <div class="hero-cta">
+          <a class="btn" href="#download">Download the beta <small>v{{VERSION}}</small></a>
+          <a class="btn btn-ghost" href="#features">See how it works</a>
+        </div>
+        <ul class="hero-points">
+          <li>Free, no ads</li>
+          <li>No account</li>
+          <li>No internet permission</li>
+          <li>Reminders on the minute</li>
+        </ul>
+      </div>
+      <div class="hero-shot">
+        <img src="assets/screenshots/1_care.png" alt="Nexpill's home screen: one patient's medications, an overdue dose at the top in red, the next due in 7 minutes in amber" width="1080" height="2424" />
+      </div>
+    </section>
+
+    <section class="story">
+      <div class="wrap">
+        <div class="story-card">
+          <p class="eyebrow">Why Nexpill exists</p>
+          <p>
+            Nexpill was written by a caregiver, for caregivers. It grew out of
+            looking after a family member through a serious illness, where
+            keeping ahead of pain meant giving medication on a strict schedule
+            — and where tired people doing time arithmetic in the middle of the
+            night, with nothing to remind them, sometimes got it wrong. Then
+            came a taper from one medication to another, on a schedule that
+            changed by the day.
+          </p>
+          <p>
+            So Nexpill does one job carefully, and it will always be
+            <strong>free and open source</strong>: no price, no premium tier,
+            no ads. Nobody caring for someone should have to pay for a tool
+            that keeps a dose from being late.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="alt" id="features">
+      <div class="wrap">
+        <h2>The one thing you need to know, at a glance</h2>
+        <p class="section-lede">
+          Each medication says where it stands right now — due in 8 minutes,
+          overdue by 25, can be given again at 8:19 — with what needs doing
+          first at the top, and a button to log the dose.
+        </p>
+
+        <div class="shots">
+          <figure>
+            <img src="assets/screenshots/1_care.png" alt="Medications sorted by what needs doing first" width="1080" height="2424" loading="lazy" />
+            <figcaption>What's due, first</figcaption>
+          </figure>
+          <figure>
+            <img src="assets/screenshots/2_reminder.png" alt="A reminder in the notification shade with Mark given and Snooze buttons" width="1080" height="2424" loading="lazy" />
+            <figcaption>Mark given from the reminder</figcaption>
+          </figure>
+          <figure>
+            <img src="assets/screenshots/3_history.png" alt="Dose history for the day, with a corrected entry struck through" width="1080" height="2424" loading="lazy" />
+            <figcaption>Every dose, on the record</figcaption>
+          </figure>
+          <figure>
+            <img src="assets/screenshots/4_taper.png" alt="Editing a taper: two steps with dates and intervals" width="1080" height="2424" loading="lazy" />
+            <figcaption>Tapers, step by step</figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
+        <div class="grid">
+          <div class="card">
+            <span class="mark"></span>
+            <h3>Every kind of schedule</h3>
+            <p>Every few hours (odd intervals like 4 h 45 min too), at set times of day, as needed with a minimum gap, or a taper whose interval changes by date.</p>
+          </div>
+          <div class="card">
+            <span class="mark"></span>
+            <h3>Reminders that arrive on time</h3>
+            <p>Exact alarms held by the phone, so they come on the minute — with no signal, in airplane mode, after a restart. Mark the dose given or snooze it straight from the notification.</p>
+          </div>
+          <div class="card">
+            <span class="mark"></span>
+            <h3>An alarm when it matters</h3>
+            <p>For the doses that can't be missed, a reminder can ring like an alarm clock, repeating until someone deals with it.</p>
+          </div>
+          <div class="card">
+            <span class="mark"></span>
+            <h3>No time arithmetic</h3>
+            <p>Nexpill works out when the next dose can be given, counting across midnight and clock changes, and asks before you log one early.</p>
+          </div>
+          <div class="card">
+            <span class="mark"></span>
+            <h3>A record you can trust</h3>
+            <p>Fix a mistaken time with a correction that keeps the original, note who gave each dose, and save the history as a spreadsheet or a summary for the doctor.</p>
+          </div>
+          <div class="card">
+            <span class="mark"></span>
+            <h3>More than one person</h3>
+            <p>Caring for a parent and a child? Each gets their own medications and reminders; switch between them with a tap.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="alt" id="privacy">
+      <div class="wrap">
+        <h2>Your records stay on your phone</h2>
+        <p class="section-lede">
+          The question “what do they do with my data?” has a boring answer:
+          nothing, because it never reaches us.
+        </p>
+        <div class="grid four">
+          <div class="card">
+            <span class="mark"></span>
+            <h3>No internet permission</h3>
+            <p>Nexpill is built without permission to use the internet, so Android itself stops it from sending anything anywhere. Check the permission list yourself.</p>
+          </div>
+          <div class="card">
+            <span class="mark"></span>
+            <h3>No account, no server</h3>
+            <p>Everything you log lives in a database on your phone. It only goes somewhere else if you move it yourself, as a backup file or an export.</p>
+          </div>
+          <div class="card">
+            <span class="mark"></span>
+            <h3>Nothing watching</h3>
+            <p>No analytics, advertising or tracking in the app, and it's excluded from Android's cloud backup. Delete your data in Settings and it's gone.</p>
+          </div>
+          <div class="card">
+            <span class="mark"></span>
+            <h3>Check our work</h3>
+            <p>Nexpill is open source under the MIT licence. <a href="https://github.com/SuperDaveLab/Nexpill">Read exactly what it does on GitHub</a>.</p>
+          </div>
+        </div>
+        <p class="note" style="margin-top: 26px">
+          The only permissions Nexpill asks for: notifications, for reminders;
+          exact alarms, so they arrive on the minute; restarting reminders after
+          your phone reboots; and vibration. Nexpill tracks timing — it doesn't
+          give medical advice.
+        </p>
+      </div>
+    </section>
+
+    <section id="download">
+      <div class="wrap download">
+        <div class="release">
+          <span class="badge">Public beta</span>
+          <h2>Nexpill {{VERSION}} for Android</h2>
+          <p class="note">Released {{RELEASE_DATE}} · Android {{MIN_ANDROID}} or newer</p>
+          <a class="btn" href="downloads/{{APK_FILE}}" download>Download APK <small>{{APK_SIZE}}</small></a>
+          <dl>
+            <dt>File</dt><dd>{{APK_FILE}}</dd>
+            <dt>SHA-256</dt><dd><code>{{APK_SHA256}}</code></dd>
+            <dt>Signed by</dt><dd>SuperDaveLab</dd>
+            <dt>Source</dt><dd><a href="https://github.com/SuperDaveLab/Nexpill/tree/v{{VERSION}}">Built from tag v{{VERSION}}</a></dd>
+          </dl>
+        </div>
+        <div>
+          <h3>Installing</h3>
+          <ol class="steps">
+            <li>Download the APK on your phone and open it.</li>
+            <li>If asked, allow your browser or Files app to <strong>install unknown apps</strong>.</li>
+            <li>If Play Protect says the developer is unknown, tap <strong>More details → Install anyway</strong>. Nexpill is new, so Google hasn't seen it yet.</li>
+            <li>Open Nexpill and allow notifications, so reminders can reach you. Settings has a <strong>test reminder</strong> to check.</li>
+          </ol>
+          <p class="note">
+            Updates install over the top and keep your records. Uninstalling
+            erases them — use <em>Back up to a file</em> in Settings first.
+            Coming to F-Droid.
+          </p>
+          <p class="note">
+            Used the old web version of Nexpill? It's been retired; this app
+            replaces it, with reminders the web version couldn't make reliable.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section id="ledgersprout" class="alt">
+      <div class="wrap">
+        <div class="promo">
+          <div class="promo-text">
+            <p class="eyebrow">Also from SuperDaveLab</p>
+            <div class="promo-title">
+              <img src="https://ledgersprout.superdavelab.com/assets/logo.png" alt="" width="64" height="64" loading="lazy" />
+              <h2>LedgerSprout</h2>
+            </div>
+            <p class="section-lede">
+              Turn bank and credit card statement PDFs into clean spreadsheet
+              data. Built on the same idea as Nexpill: it runs on your own
+              computer, so your financial records never leave it.
+            </p>
+            <ul class="ticks">
+              <li>Import statements and review every extracted row before export</li>
+              <li>Export to CSV and Excel for bookkeeping and tax prep</li>
+              <li>A desktop app for Windows, macOS and Linux</li>
+            </ul>
+            <p class="price-line">
+              <span>Free to try on your own statements</span>
+              <span>$129 one-time — no subscription</span>
+            </p>
+            <div class="hero-cta">
+              <a class="btn" href="https://ledgersprout.superdavelab.com/">Visit LedgerSprout</a>
+              <a class="btn btn-ghost" href="https://ledgersprout.superdavelab.com/#pricing">See pricing</a>
+            </div>
+            <p class="note">
+              LedgerSprout is how SuperDaveLab pays for free apps like Nexpill.
+            </p>
+          </div>
+          <a class="promo-shot" href="https://ledgersprout.superdavelab.com/" aria-label="Visit LedgerSprout">
+            <img src="https://ledgersprout.superdavelab.com/assets/screenshot-review.png" alt="LedgerSprout reviewing rows extracted from a bank statement" width="1460" height="900" loading="lazy" />
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <span>© {{YEAR}} SuperDaveLab · Nexpill is free and MIT licensed.</span>
+      <span>
+        <a href="#download">Download</a> ·
+        <a href="#privacy">Your data</a> ·
+        <a href="https://github.com/SuperDaveLab/Nexpill">Source on GitHub</a> ·
+        <a href="https://ledgersprout.superdavelab.com/">LedgerSprout</a> ·
+        <a href="https://ebb.superdavelab.com/">Ebb</a>
+      </span>
+    </div>
+  </footer>
+
+</body>
+</html>

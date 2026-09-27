@@ -1,0 +1,26 @@
+Nexpill keeps track of every dose for the people you care for: when it was given, when the next one can be, and a reminder on the minute when it's due. It was written by a caregiver, for caregivers, and it does all of that on your phone.
+
+<b>The one thing to know, at a glance</b>
+Each medication says where it stands right now: due in 8 minutes, overdue by 25, can be given again at 8:19. What needs doing first is at the top, with a button to log the dose. Nexpill does the time arithmetic, across midnight and clock changes, and asks before you log a dose early.
+
+<b>Every kind of schedule</b>
+• Every few hours, including odd intervals like 4 h 45 min
+• At set times of day
+• As needed, with a minimum gap between doses
+• Tapers whose interval changes by date
+
+<b>Reminders that arrive on time</b>
+Exact alarms held by the phone itself, so they come on the minute: with no signal, in airplane mode, after a restart. Mark a dose given or snooze it straight from the notification. For the doses that can't be missed, a reminder can ring like an alarm clock until someone deals with it.
+
+<b>A record you can trust</b>
+Fix a mistaken time with a correction that keeps the original. Note who gave each dose. Track how much is left. Save the history as a spreadsheet, or a plain summary for the doctor.
+
+<b>Your records stay on your phone</b>
+• No account, no server, no sync
+• No internet permission: Android itself stops Nexpill from sending anything anywhere
+• No analytics, advertising or tracking, and excluded from Android's cloud backup
+• Back up to a file wherever you choose
+
+Nexpill tracks timing. It doesn't give medical advice, recommend doses or check interactions.
+
+Nexpill is free and open source under the MIT licence, with no ads or premium tier, and it always will be.

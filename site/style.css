@@ -1,0 +1,294 @@
+/* Nexpill — nexpill.superdavelab.com. The SuperDaveLab family palette and
+   Ebb's type, as in the app. */
+
+:root {
+  --navy: #0e7490;          /* family --accent */
+  --ink: #112031;
+  --muted: #5b6b7a;
+  --cream: #f5f1e8;         /* family --paper */
+  --card: #ffffff;
+  --line: #d9e2ec;
+  --amber: #b45309;         /* family --warn: "due soon" in the app */
+  --cyan: #06b6d4;          /* family --accent-cyan */
+  --teal: #1a8783;          /* the logo's teal */
+  --deep: #14344b;          /* the logo's navy */
+  --radius: 22px;
+  --paper: #f8f5ee;         /* family --paper-2 */
+  --glass: rgba(255, 255, 255, 0.82);
+  --glass-line: rgba(17, 32, 49, 0.1);
+  --shadow: 0 8px 20px rgba(17, 32, 49, 0.08);
+  --band: rgba(255, 255, 255, 0.55);
+  --wash-accent: rgba(14, 116, 144, 0.16);
+  --wash-cyan: rgba(6, 182, 212, 0.14);
+  --wash-amber: rgba(180, 83, 9, 0.06);
+  --serif: "Fraunces", Georgia, serif;
+  --sans: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --navy: #22d3ee;
+    --ink: #e2e8f0;
+    --muted: #94a3b8;
+    --cream: #0f1620;
+    --card: #1e2939;
+    --line: rgba(226, 232, 240, 0.16);
+    --amber: #fbbf24;
+    --paper: #0b111a;
+    --glass: rgba(30, 41, 57, 0.82);
+    --glass-line: rgba(226, 232, 240, 0.1);
+    --shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    --band: rgba(30, 41, 57, 0.55);
+    --wash-accent: rgba(34, 211, 238, 0.12);
+    --wash-cyan: rgba(14, 116, 144, 0.22);
+    --wash-amber: rgba(251, 191, 36, 0.05);
+  }
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+/* Soft washes of the family teal and cyan, as on LedgerSprout's and Ebb's
+   pages, over a light-to-cream fade. */
+body {
+  margin: 0;
+  background:
+    radial-gradient(circle at 8% 4%, var(--wash-accent), transparent 30%),
+    radial-gradient(circle at 90% 10%, var(--wash-cyan), transparent 32%),
+    radial-gradient(circle at 50% 60%, var(--wash-amber), transparent 45%),
+    linear-gradient(180deg, var(--paper) 0%, var(--cream) 100%);
+  background-color: var(--cream);
+  color: var(--ink);
+  font: 17px/1.6 var(--sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+img { max-width: 100%; height: auto; display: block; }
+
+a { color: var(--navy); }
+
+h1, h2, h3 {
+  font-family: var(--serif);
+  font-variation-settings: "SOFT" 50;
+  font-weight: 560;
+  line-height: 1.15;
+  margin: 0 0 0.5em;
+}
+
+h1 { font-size: clamp(2.3rem, 5vw, 3.6rem); letter-spacing: -0.01em; }
+h2 { font-size: clamp(1.7rem, 3.4vw, 2.4rem); }
+h3 { font-size: 1.3rem; }
+
+.wrap { width: min(1120px, 100% - 40px); margin: 0 auto; }
+
+/* Header */
+
+/* Sticky, like LedgerSprout's: the brand and the menu ride along as
+   frosted pills over the page. */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  padding: 12px 0;
+}
+.site-header .wrap { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.pill {
+  border-radius: 999px;
+  border: 1px solid var(--glass-line);
+  background: var(--glass);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: var(--shadow);
+}
+.brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink); padding: 6px 16px 6px 6px; }
+.brand img { width: 38px; height: 38px; }
+.brand span { font: 600 1.45rem/1 var(--serif); }
+.site-header nav { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; padding: 6px; }
+.site-header nav a { text-decoration: none; color: var(--ink); font-weight: 600; font-size: 0.93rem; padding: 7px 14px; border-radius: 999px; }
+.site-header nav a:hover { background: var(--wash-accent); }
+.site-header nav a.nav-cta { background: var(--navy); color: #fff; }
+.site-header nav a.nav-cta:hover { filter: brightness(1.12); }
+
+/* Jumping to a section shouldn't tuck its heading under the sticky bar. */
+section[id], main[id] { scroll-margin-top: 90px; }
+
+/* Hero */
+
+.hero {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 48px;
+  align-items: center;
+  padding: 40px 0 64px;
+}
+.eyebrow {
+  display: inline-block;
+  font-weight: 700;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--teal);
+  margin: 0 0 14px;
+}
+.lede { font-size: 1.2rem; color: var(--muted); max-width: 34em; }
+.hero-cta { display: flex; gap: 14px; flex-wrap: wrap; margin: 28px 0 18px; }
+.hero-points { list-style: none; padding: 0; margin: 0; display: flex; gap: 8px 22px; flex-wrap: wrap; color: var(--muted); font-size: 0.95rem; }
+.hero-points li::before { content: "●"; color: var(--teal); margin-right: 8px; font-size: 0.7em; vertical-align: 2px; }
+.hero-shot { justify-self: center; width: min(340px, 100%); filter: drop-shadow(0 24px 40px rgba(17, 32, 49, 0.18)); }
+.hero-shot img { border-radius: 34px; border: 1px solid var(--line); }
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 15px 26px;
+  border-radius: 18px;
+  background: var(--navy);
+  color: #fff;
+  font-weight: 650;
+  text-decoration: none;
+  border: 2px solid var(--navy);
+}
+.btn:hover { filter: brightness(1.12); }
+.btn-ghost { background: transparent; color: var(--navy); }
+.btn small { font-weight: 500; opacity: 0.8; }
+
+/* Sections */
+
+section { padding: 64px 0; }
+section.alt { background: var(--band); border-block: 1px solid var(--line); }
+.section-lede { color: var(--muted); max-width: 40em; margin: 0 0 36px; font-size: 1.08rem; }
+
+.shots { display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; }
+.shots figure { margin: 0; }
+.shots img { border-radius: 24px; border: 1px solid var(--line); }
+.shots figcaption { text-align: center; color: var(--muted); font-size: 0.9rem; margin-top: 10px; }
+
+.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+.grid.four { grid-template-columns: repeat(4, 1fr); }
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 26px;
+}
+section.alt .card { background: var(--cream); }
+.card p { margin: 0; color: var(--muted); }
+.card h3 { margin-bottom: 0.4em; }
+.card .mark { display: block; width: 34px; height: 6px; border-radius: 3px; background: var(--navy); margin-bottom: 18px; }
+.card:nth-child(3n + 2) .mark { background: var(--teal); }
+.card:nth-child(3n + 3) .mark { background: var(--amber); }
+
+/* Download */
+
+.download { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; align-items: start; }
+.release {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 30px;
+}
+.badge {
+  display: inline-block;
+  background: var(--teal);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 999px;
+  margin-bottom: 14px;
+}
+.release dl { display: grid; grid-template-columns: auto 1fr; gap: 6px 18px; margin: 22px 0 0; font-size: 0.92rem; }
+.release dt { color: var(--muted); }
+.release dd { margin: 0; }
+.release code { font-size: 0.78rem; word-break: break-all; }
+.steps { margin: 0; padding-left: 1.3em; }
+.steps li { margin-bottom: 10px; }
+.note { color: var(--muted); font-size: 0.95rem; }
+
+/* Why Nexpill exists */
+
+section.story { padding: 0 0 56px; }
+.story-card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-left: 6px solid var(--teal);
+  border-radius: var(--radius);
+  padding: 28px 32px;
+  max-width: 52em;
+}
+.story-card p { margin: 0 0 12px; }
+.story-card p:last-child { margin-bottom: 0; }
+
+/* LedgerSprout: SuperDaveLab's paid app, and what keeps Nexpill free */
+
+.promo {
+  display: grid;
+  grid-template-columns: 1fr 1.05fr;
+  gap: 40px;
+  align-items: center;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: calc(var(--radius) + 6px);
+  padding: 40px;
+  box-shadow: var(--shadow);
+}
+.promo .eyebrow { color: #196741; }
+.promo-title { display: flex; align-items: center; gap: 16px; margin-bottom: 8px; }
+.promo-title img { width: 64px; height: 64px; border-radius: 16px; background: #fff; padding: 6px; }
+.promo-title h2 { margin: 0; }
+.promo .section-lede { margin-bottom: 18px; }
+.ticks { list-style: none; padding: 0; margin: 0 0 20px; color: var(--muted); }
+.ticks li { position: relative; padding-left: 28px; margin-bottom: 8px; }
+.ticks li::before { content: "✓"; position: absolute; left: 0; color: #196741; font-weight: 700; }
+.price-line { display: flex; flex-wrap: wrap; gap: 10px; margin: 0 0 6px; }
+.price-line span {
+  font-weight: 650;
+  font-size: 0.92rem;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: rgba(25, 103, 65, 0.1);
+  color: #196741;
+}
+.promo .hero-cta { margin: 18px 0 10px; }
+.promo-shot img {
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  box-shadow: 0 20px 40px rgba(17, 32, 49, 0.16);
+}
+@media (prefers-color-scheme: dark) {
+  .promo .eyebrow, .ticks li::before { color: #4ade80; }
+  .price-line span { background: rgba(74, 222, 128, 0.12); color: #4ade80; }
+}
+
+/* Footer */
+
+.site-footer { padding: 40px 0 56px; color: var(--muted); font-size: 0.92rem; }
+.site-footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; border-top: 1px solid var(--line); padding-top: 28px; }
+.site-footer a { color: var(--muted); }
+
+/* Narrow screens */
+
+@media (max-width: 900px) {
+  .hero, .download, .promo { grid-template-columns: 1fr; }
+  .hero-shot { order: -1; width: min(280px, 80%); }
+  .grid, .grid.four { grid-template-columns: 1fr 1fr; }
+  .shots { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 600px) {
+  body { font-size: 16px; }
+  /* One slim row on phones, like LedgerSprout's: just the menu. */
+  .site-header .wrap { justify-content: center; }
+  .brand { display: none; }
+  .site-header nav { gap: 0; flex-wrap: wrap; justify-content: center; padding: 4px; }
+  .site-header nav a { padding: 6px 6px; font-size: 0.76rem; white-space: nowrap; }
+  .site-header nav { flex-wrap: nowrap; }
+  .grid, .grid.four { grid-template-columns: 1fr; }
+  .promo { padding: 26px; }
+  .story-card { padding: 22px; }
+  section { padding: 48px 0; }
+}

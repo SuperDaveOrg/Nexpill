@@ -9,6 +9,8 @@ turns that section into the release's own when it's cut.
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-09-27
+
 ### Changed
 - Rebuilt as a native Android app in Flutter, replacing the web app, so
   reminders can be real alarms scheduled by the phone. The optional cloud
@@ -39,5 +41,7 @@ turns that section into the release's own when it's cut.
   and LedgerSprout: medications sorted by what needs doing first, a warning
   before giving a dose early, undo, dose history by day, and a test reminder
   in Settings.
+- A new site at nexpill.superdavelab.com, replacing the web app, with
+  downloads, screenshots and where your data lives.
 - A new logo in the family style: a pill clock, with a capsule as the hand
   of a clock face.
