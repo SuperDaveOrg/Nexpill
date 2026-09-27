@@ -1,4 +1,8 @@
-# Nexpill
+<div align="center">
+  <img src="assets/brand/nexpill_logo_512.png" alt="Nexpill logo: a pill clock, a capsule as the hand of a clock face" width="112">
+  <h1>Nexpill</h1>
+  <p>Medication reminders that arrive on time. Your records stay on your phone.</p>
+</div>
 
 A medication timing tracker for caregivers. It answers, at a glance:
 
@@ -10,10 +14,18 @@ A medication timing tracker for caregivers. It answers, at a glance:
 Everything stays on your phone: no account, no server, and no internet
 permission.
 
-> **Work in progress.** Nexpill is being rebuilt as a native Android app from
-> an earlier web-app version, whose notifications couldn't be relied on. The
-> app is feature-complete for a first release and is being tested on real
-> phones. See [docs/port-from-pwa.md](docs/port-from-pwa.md).
+<p align="center">
+  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/1_care.png" alt="Home screen: one patient's medications, an overdue dose at the top in red, the next due in 7 minutes in amber" width="200">
+  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/2_reminder.png" alt="A reminder in the notification shade with Mark given and Snooze buttons" width="200">
+  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/3_history.png" alt="Dose history for the day, with a corrected entry struck through" width="200">
+  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/4_taper.png" alt="Editing a taper: two steps with dates and intervals" width="200">
+</p>
+<p align="center"><sub>Screenshots use fictional data.</sub></p>
+
+**Public beta.** Download the latest release from
+[nexpill.superdavelab.com](https://nexpill.superdavelab.com/). Nexpill replaces
+an earlier web version whose reminders couldn't be relied on; see
+[docs/port-from-pwa.md](docs/port-from-pwa.md) for how the port went.
 
 ## Why Nexpill exists
 

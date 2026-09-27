@@ -122,6 +122,30 @@ section[id], main[id] { scroll-margin-top: 90px; }
   align-items: center;
   padding: 40px 0 64px;
 }
+/* The logo and name, large, above the eyebrow: the lockup LedgerSprout's and
+   LedgerDock's pages open with. The logo is a round badge, so its shadow
+   follows the circle. */
+.hero-brand-lockup {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.95rem;
+  margin-bottom: 0.9rem;
+}
+.hero-mark {
+  width: clamp(110px, 14vw, 165px);
+  height: auto;
+  filter: drop-shadow(0 14px 24px rgba(17, 32, 49, 0.22));
+}
+.hero-name {
+  font-family: var(--serif);
+  font-variation-settings: "SOFT" 50;
+  font-size: clamp(2.4rem, 5.4vw, 4.2rem);
+  font-weight: 700;
+  line-height: 0.93;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+}
+
 .eyebrow {
   display: inline-block;
   font-weight: 700;
@@ -274,7 +298,8 @@ section.story { padding: 0 0 56px; }
 
 @media (max-width: 900px) {
   .hero, .download, .promo { grid-template-columns: 1fr; }
-  .hero-shot { order: -1; width: min(280px, 80%); }
+  /* The logo and name lead on phones too; the screenshot follows. */
+  .hero-shot { width: min(280px, 80%); }
   .grid, .grid.four { grid-template-columns: 1fr 1fr; }
   .shots { grid-template-columns: 1fr 1fr; }
 }
