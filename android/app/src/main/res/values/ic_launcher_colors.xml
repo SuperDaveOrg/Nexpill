@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- The badge cream from the logo; also the launch screen. -->
+    <color name="ic_launcher_background">#F5F1EA</color>
+</resources>

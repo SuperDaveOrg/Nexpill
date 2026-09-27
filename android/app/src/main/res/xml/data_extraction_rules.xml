@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Excludes Nexpill from Android's cloud backup and device-to-device transfer.
+
+  This is not about hiding anything. It is that "your data stays on this phone"
+  has to be literally true: if Android silently copied the database into the
+  user's Google Drive backup, that promise would be false. Explicit backups to
+  a file of the user's choosing are a separate, deliberate feature.
+-->
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="root" />
+        <exclude domain="database" />
+        <exclude domain="sharedpref" />
+        <exclude domain="file" />
+        <exclude domain="external" />
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="root" />
+        <exclude domain="database" />
+        <exclude domain="sharedpref" />
+        <exclude domain="file" />
+        <exclude domain="external" />
+    </device-transfer>
+</data-extraction-rules>

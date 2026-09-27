@@ -1,0 +1,61 @@
+# Checks every push to main and every pull request.
+#
+# The important step is the last one: a release build run through
+# tool/build_release.sh, which fails if any dependency has merged a
+# permission outside the allow-list — INTERNET above all. It signs with the
+# throwaway debug key and publishes nothing; the real signing key never
+# leaves the release machine (docs/RELEASING.md).
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: gradle
+
+      # Pinned on purpose: upgrade Flutter deliberately, here and locally
+      # together (docs/RELEASING.md, "Keeping up to date").
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: "3.47.5"
+          cache: true
+
+      - name: Dependencies
+        run: flutter pub get
+
+      - name: Analyze
+        run: flutter analyze
+
+      - name: Test
+        run: flutter test
+
+      # Timing mixes instants with wall-clock times, so the engine tests run
+      # again in zones either side of UTC, one of them half an hour off.
+      - name: Engine tests in other time zones
+        run: |
+          TZ=America/Chicago flutter test test/domain
+          TZ=Asia/Kolkata flutter test test/domain
+
+      - name: Release build and permission check
+        run: tool/build_release.sh --ref HEAD --skip-tests --allow-debug-signing

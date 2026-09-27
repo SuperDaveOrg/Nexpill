@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Notification icons are looked up by name at runtime, which resource
+     shrinking can't see; without this they'd be removed from release builds
+     and notifications would fail to post. -->
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:keep="@drawable/ic_stat_nexpill" />

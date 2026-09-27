@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Status-bar icon: a capsule, drawn in one colour as Android requires. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M16.24,3.76a6,6 0,0 0,-8.49 0L3.76,7.76a6,6 0,0 0,8.49 8.49l3.99,-4a6,6 0,0 0,0 -8.49zM10.83,14.83a4,4 0,0 1,-5.66 -5.66L7.17,7.17 12.83,12.83z"/>
+</vector>

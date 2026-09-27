@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <title>Nexpill logo</title>
+  <desc>A pill clock: a capsule as the hand of a clock face, pointing to the next dose. SuperDaveLab family style, as Ebb: flat shapes on a cream badge, in the family navy and teal.</desc>
+  <!-- Badge, as Ebb and LedgerDock -->
+  <circle cx="256" cy="256" r="236" fill="#F5F1EA" stroke="#D3CCC1" stroke-width="8"/>
+  <!-- The clock face: navy at the quarters, teal between -->
+  <g>
+    <line x1="256.0" y1="106.0" x2="256.0" y2="68.0" stroke="#14344B" stroke-width="18" stroke-linecap="round"/>
+    <line x1="338.0" y1="114.0" x2="348.0" y2="96.7" stroke="#1A8783" stroke-width="15" stroke-linecap="round"/>
+    <line x1="398.0" y1="174.0" x2="415.3" y2="164.0" stroke="#1A8783" stroke-width="15" stroke-linecap="round"/>
+    <line x1="406.0" y1="256.0" x2="444.0" y2="256.0" stroke="#14344B" stroke-width="18" stroke-linecap="round"/>
+    <line x1="398.0" y1="338.0" x2="415.3" y2="348.0" stroke="#1A8783" stroke-width="15" stroke-linecap="round"/>
+    <line x1="338.0" y1="398.0" x2="348.0" y2="415.3" stroke="#1A8783" stroke-width="15" stroke-linecap="round"/>
+    <line x1="256.0" y1="406.0" x2="256.0" y2="444.0" stroke="#14344B" stroke-width="18" stroke-linecap="round"/>
+    <line x1="174.0" y1="398.0" x2="164.0" y2="415.3" stroke="#1A8783" stroke-width="15" stroke-linecap="round"/>
+    <line x1="114.0" y1="338.0" x2="96.7" y2="348.0" stroke="#1A8783" stroke-width="15" stroke-linecap="round"/>
+    <line x1="106.0" y1="256.0" x2="68.0" y2="256.0" stroke="#14344B" stroke-width="18" stroke-linecap="round"/>
+    <line x1="114.0" y1="174.0" x2="96.7" y2="164.0" stroke="#1A8783" stroke-width="15" stroke-linecap="round"/>
+    <line x1="174.0" y1="114.0" x2="164.0" y2="96.7" stroke="#1A8783" stroke-width="15" stroke-linecap="round"/>
+  </g>
+  <!-- The capsule, as the hand; a cream edge between the halves -->
+  <g transform="rotate(40 256 256)" stroke="#F5F1EA" stroke-width="10" paint-order="stroke" stroke-linejoin="round">
+    <path d="M 210 256 V 182 A 46 46 0 0 1 302 182 V 256 Z" fill="#1A8783"/>
+    <path d="M 210 256 V 330 A 46 46 0 0 0 302 330 V 256 Z" fill="#14344B"/>
+  </g>
+</svg>

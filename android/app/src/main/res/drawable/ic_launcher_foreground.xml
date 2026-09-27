@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generated from assets/brand/nexpill_logo.svg. Adaptive icon foreground.
+     The capsule's halves are drawn cream and wider first for the edge between
+     them, since vector drawables have no paint-order. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- The 512-unit logo, scaled so the outer ticks sit inside the 66dp
+         safe zone; the cream badge is the icon's background colour. -->
+    <group android:scaleX="0.165" android:scaleY="0.165"
+        android:translateX="11.76" android:translateY="11.76">
+        <path android:pathData="M 256.0 106.0 L 256.0 68.0"
+            android:strokeColor="#FF14344B" android:strokeWidth="18"
+            android:strokeLineCap="round"/>
+        <path android:pathData="M 338.0 114.0 L 348.0 96.7"
+            android:strokeColor="#FF1A8783" android:strokeWidth="15"
+            android:strokeLineCap="round"/>
+        <path android:pathData="M 398.0 174.0 L 415.3 164.0"
+            android:strokeColor="#FF1A8783" android:strokeWidth="15"
+            android:strokeLineCap="round"/>
+        <path android:pathData="M 406.0 256.0 L 444.0 256.0"
+            android:strokeColor="#FF14344B" android:strokeWidth="18"
+            android:strokeLineCap="round"/>
+        <path android:pathData="M 398.0 338.0 L 415.3 348.0"
+            android:strokeColor="#FF1A8783" android:strokeWidth="15"
+            android:strokeLineCap="round"/>
+        <path android:pathData="M 338.0 398.0 L 348.0 415.3"
+            android:strokeColor="#FF1A8783" android:strokeWidth="15"
+            android:strokeLineCap="round"/>
+        <path android:pathData="M 256.0 406.0 L 256.0 444.0"
+            android:strokeColor="#FF14344B" android:strokeWidth="18"
+            android:strokeLineCap="round"/>
+        <path android:pathData="M 174.0 398.0 L 164.0 415.3"
+            android:strokeColor="#FF1A8783" android:strokeWidth="15"
+            android:strokeLineCap="round"/>
+        <path android:pathData="M 114.0 338.0 L 96.7 348.0"
+            android:strokeColor="#FF1A8783" android:strokeWidth="15"
+            android:strokeLineCap="round"/>
+        <path android:pathData="M 106.0 256.0 L 68.0 256.0"
+            android:strokeColor="#FF14344B" android:strokeWidth="18"
+            android:strokeLineCap="round"/>
+        <path android:pathData="M 114.0 174.0 L 96.7 164.0"
+            android:strokeColor="#FF1A8783" android:strokeWidth="15"
+            android:strokeLineCap="round"/>
+        <path android:pathData="M 174.0 114.0 L 164.0 96.7"
+            android:strokeColor="#FF1A8783" android:strokeWidth="15"
+            android:strokeLineCap="round"/>
+        <group android:rotation="40" android:pivotX="256" android:pivotY="256">
+            <path android:pathData="M 210 256 V 182 A 46 46 0 0 1 302 182 V 256 Z" android:fillColor="#FFF5F1EA"
+                android:strokeColor="#FFF5F1EA" android:strokeWidth="10"
+                android:strokeLineJoin="round"/>
+            <path android:pathData="M 210 256 V 330 A 46 46 0 0 0 302 330 V 256 Z" android:fillColor="#FFF5F1EA"
+                android:strokeColor="#FFF5F1EA" android:strokeWidth="10"
+                android:strokeLineJoin="round"/>
+            <path android:pathData="M 210 256 V 182 A 46 46 0 0 1 302 182 V 256 Z" android:fillColor="#FF1A8783"/>
+            <path android:pathData="M 210 256 V 330 A 46 46 0 0 0 302 330 V 256 Z" android:fillColor="#FF14344B"/>
+            <path android:pathData="M 205 256 H 307" android:strokeColor="#FFF5F1EA"
+                android:strokeWidth="7"/>
+        </group>
+    </group>
+</vector>
