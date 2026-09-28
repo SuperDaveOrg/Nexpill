@@ -18,7 +18,7 @@ Concretely:
 - The release build ships without the `INTERNET` permission, so Android itself
   prevents the app from sending anything anywhere. The promise is enforced by
   the operating system, not by our good intentions.
-- The app is MIT-licensed and open source, so anyone can check the claim.
+- The app is open source under the GNU GPL, so anyone can check the claim.
 
 Nexpill once had an optional cloud account. It was removed rather than ported:
 see [port-from-pwa.md](port-from-pwa.md).
