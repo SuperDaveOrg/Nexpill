@@ -9,6 +9,7 @@ import 'package:nexpill/models/care_snapshot.dart';
 import 'package:nexpill/models/patient.dart';
 import 'package:nexpill/services/app_info.dart';
 import 'package:nexpill/services/document_service.dart';
+import 'package:nexpill/services/links.dart';
 import 'package:nexpill/services/preferences.dart';
 import 'package:nexpill/ui/about_screen.dart';
 import 'package:nexpill/ui/care_store.dart';
@@ -67,6 +68,12 @@ class _SettingsScreenState extends State<SettingsScreen>
         _notificationsAllowed = n;
         _exactAllowed = e;
       });
+    }
+  }
+
+  Future<void> _openLink(Uri uri) async {
+    if (!await openInBrowser(uri)) {
+      _say('No browser to open it with. Visit $websiteLabel instead.');
     }
   }
 
@@ -292,6 +299,20 @@ class _SettingsScreenState extends State<SettingsScreen>
               trailing: const Icon(Icons.chevron_right),
               onTap: () => Navigator.push(context,
                   MaterialPageRoute(builder: (_) => AboutScreen(version: _version))),
+            ),
+            ListTile(
+              leading: const Icon(Icons.public),
+              title: const Text('Website'),
+              subtitle: const Text(websiteLabel),
+              trailing: const Icon(Icons.open_in_new),
+              onTap: () => _openLink(websiteUri),
+            ),
+            ListTile(
+              leading: const Icon(Icons.feedback_outlined),
+              title: const Text('Send feedback'),
+              subtitle: const Text('A form on the website, in your browser.'),
+              trailing: const Icon(Icons.open_in_new),
+              onTap: () => _openLink(feedbackUri),
             ),
             if (_version != null)
               ListTile(title: const Text('Version'), subtitle: Text(_version!)),
