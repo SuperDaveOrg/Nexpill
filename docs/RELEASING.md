@@ -123,6 +123,23 @@ certificate. Builds from an untagged commit are named
 `build_release.sh` uploads nothing. Publishing is separate and deliberate —
 see "Not yet".
 
+## The website
+
+`tool/deploy_site.sh` builds nexpill.superdavelab.com from `site/`: the logo, the screenshots in `fastlane/.../phoneScreenshots`, and the
+newest release APK from `dist/release/`, whose version, date, size, SHA-256
+and minimum Android version fill the page's placeholders. It rsyncs to
+`/var/www/nexpill` on the server and never deletes anything there.
+
+```bash
+tool/deploy_site.sh --build-only   # preview dist/site/index.html; works before any release
+tool/deploy_site.sh --dry-run      # what would be sent
+tool/deploy_site.sh                # deploy
+```
+
+The page promotes LedgerSprout, which pays for Nexpill staying free; keep
+that section when editing.
+
+
 ## Reproducible builds
 
 F-Droid rebuilds each release from source and publishes the developer-signed
@@ -162,9 +179,9 @@ constantly.
 
 ## Not yet
 
-- **Publishing scripts.** Ebb's `tool/deploy_site.sh` (APK and page on its
-  own site) and `tool/github_release.sh` (the same APK as a GitHub release,
-  which IzzyOnDroid can pick up) come across in step 5 of the port.
+- **GitHub releases.** Ebb's `tool/github_release.sh` (the same APK as a
+  GitHub release, which IzzyOnDroid can pick up) comes across in step 5 of
+  the port.
 
 - **Release builds in CI.** CI already checks every push, debug-signed. A
   tag-triggered signed build would need the signing key
