@@ -9,6 +9,10 @@ turns that section into the release's own when it's cut.
 
 ## [Unreleased]
 
+### Changed
+- Nexpill is now licensed under the GNU General Public License, version 3
+  or later. Version 0.1.0 remains available under the MIT licence.
+
 ## [0.1.0] - 2026-09-27
 
 ### Changed

@@ -23,4 +23,4 @@ Fix a mistaken time with a correction that keeps the original. Note who gave eac
 
 Nexpill tracks timing. It doesn't give medical advice, recommend doses or check interactions.
 
-Nexpill is free and open source under the MIT licence, with no ads or premium tier, and it always will be.
+Nexpill is free and open source under the GNU General Public License, with no ads or premium tier, and it always will be.
