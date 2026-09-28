@@ -7,7 +7,7 @@ security problem, please tell us privately first.
 
 ## How to report
 
-Use GitHub's private form: **[Report a vulnerability](https://github.com/SuperDaveLab/Nexpill/security/advisories/new)**
+Use GitHub's private form: **[Report a vulnerability](https://github.com/SuperDaveOrg/Nexpill/security/advisories/new)**
 (Security tab → *Report a vulnerability*). Only the maintainers can see it.
 
 Please don't open a public issue for these until there's a fix.
