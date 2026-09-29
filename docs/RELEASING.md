@@ -53,8 +53,10 @@ Keep it outside the repository, with a backup somewhere safe (an encrypted
 USB stick, a password manager's file storage). The build refuses to use the
 debug key for a release.
 
-F-Droid signs its own builds with its own key, so this key covers APKs you
-distribute yourself (GitHub releases, IzzyOnDroid, sideloading).
+F-Droid publishes APKs signed with this key too: it rebuilds each release
+and ships the one from the GitHub release if the two match (see
+"Reproducible builds"). So one key covers every copy of Nexpill — F-Droid,
+GitHub releases, the website — and people can update from any of them.
 
 ### Creating it (once)
 
@@ -92,7 +94,14 @@ git switch main && git pull
 git switch -c release-0.2.0
 tool/bump_version.sh minor          # or patch / major / an exact X.Y.Z
 
-# 3. Commit, open a pull request, and merge it once CI passes.
+# 2b. Write the store's release notes: a short, user-facing summary of the
+#     CHANGELOG.md section, 500 characters at most, in
+#     fastlane/metadata/android/en-US/changelogs/<versionCode>.txt (200.txt
+#     for 0.2.0). build_release.sh refuses to build without it.
+
+# 3. Commit, open a pull request, and merge it once CI passes. The notes are
+#    a new file, so add them first: `commit -a` skips untracked files.
+git add fastlane/metadata/android/en-US/changelogs/
 git commit -am "Release v0.2.0"
 git push -u origin release-0.2.0
 gh pr create --fill && gh pr merge --rebase   # after CI is green
@@ -104,6 +113,16 @@ git push origin v0.2.0
 
 # 5. Build from the tag.
 tool/build_release.sh --ref v0.2.0
+
+# 6. Check F-Droid's build of the tag matches it (see "F-Droid").
+tool/fdroid_build_test.sh --ref v0.2.0
+
+# 7. Publish the same APK as a GitHub release; F-Droid takes it from there.
+tool/github_release.sh --dry-run 0.2.0
+tool/github_release.sh 0.2.0
+
+# 8. Update the page at nexpill.superdavelab.com.
+tool/deploy_site.sh
 ```
 
 `tool/build_release.sh` builds in a clean temporary checkout of exactly that
@@ -120,8 +139,13 @@ and a `BUILD-INFO.txt` recording the commit, Flutter version and signing
 certificate. Builds from an untagged commit are named
 `nexpill-X.Y.Z-<commit>.apk` so they can't pass for a release.
 
-`build_release.sh` uploads nothing. Publishing is separate and deliberate —
-see "Not yet".
+`build_release.sh` uploads nothing; publishing is steps 7 and 8, separate
+and deliberate.
+
+`tool/github_release.sh` attaches that same APK and its `.sha256` to a GitHub
+release for the tag, with the version's CHANGELOG.md section and the signing
+certificate's fingerprint as the notes. It checks the APK was built from the
+commit the tag points to on GitHub.
 
 ## The website
 
@@ -154,6 +178,40 @@ APK only if its own build matches byte for byte. What makes that work:
   dependency-metadata signing block, which F-Droid rejects.
 - `android/reproducible.cmake` drops the linker build ID from any native
   plugin code.
+- F-Droid deletes the `signingConfigs` block and the `signingConfig =` line
+  from `build.gradle.kts` before building, one whole line at a time, so its
+  APK comes out unsigned. Keep that line a single line (the choice of key is
+  made in `releaseSigning` above it): split over several lines, the leftover
+  pieces stop the file compiling, which is how Ebb's first F-Droid build
+  failed.
+
+## F-Droid
+
+The recipe is drafted in [fdroid/com.superdavelab.nexpill.yml](fdroid/com.superdavelab.nexpill.yml),
+the same as Ebb's apart from names. It follows fdroiddata's
+`templates/build-flutter.yml` and has no comments, because fdroiddata wants
+none, so the reasoning lives here:
+
+- Flutter comes from F-Droid's `flutter` srclib, checked out at the version
+  pinned in `.github/workflows/ci.yml`.
+- The source is moved to `/tmp/nexpill-build` for `pub get` and the build,
+  the same path `build_release.sh` uses, then moved back.
+- `PUB_CACHE` is inside the source, so F-Droid's scanner checks every
+  package; `scandelete` removes any binary it flags.
+- One universal APK (no `--split-per-abi`), because it has to match the APK
+  on the GitHub release byte for byte.
+
+Before submitting or changing the recipe, test it locally:
+`tool/fdroid_build_test.sh --ref <commit>` runs F-Droid's own build of that
+commit in the Docker image fdroiddata's CI uses, and, if `dist/release/` has
+a signed APK from the same commit, checks F-Droid's build matches it.
+
+To submit: in your fork of https://gitlab.com/fdroid/fdroiddata, add the
+recipe as `metadata/com.superdavelab.nexpill.yml` with the version fields
+and `commit` (the full hash the tag points to) set to a real release, and
+open a merge request. After that, F-Droid finds new versions from the tags
+on its own. Store text, screenshots and per-version changelogs come from
+`fastlane/metadata/android/` in this repo, keyed by version code.
 
 ## Keeping up to date
 
@@ -179,15 +237,12 @@ constantly.
 
 ## Not yet
 
-- **GitHub releases.** Ebb's `tool/github_release.sh` (the same APK as a
-  GitHub release, which IzzyOnDroid can pick up) comes across in step 5 of
-  the port.
-
 - **Release builds in CI.** CI already checks every push, debug-signed. A
   tag-triggered signed build would need the signing key
   as a repository secret. Worth it once releases are regular; until then the
   key stays on one machine.
-- **Per-processor APKs.** The script builds one universal APK. F-Droid builds
-  its own per-processor APKs and adjusts version codes itself.
-- **F-Droid metadata.** Store text, screenshots and per-version changelogs in
-  `fastlane/metadata/android/`, generated from `CHANGELOG.md`.
+- **Per-processor APKs.** The script builds one universal APK, and so does
+  F-Droid's recipe, since it must match it.
+- **Generated changelogs.** The per-version files in
+  `fastlane/metadata/android/en-US/changelogs/` are written by hand;
+  generating them from `CHANGELOG.md` would keep the two in step.
