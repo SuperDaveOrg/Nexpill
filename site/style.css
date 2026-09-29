@@ -317,3 +317,47 @@ section.story { padding: 0 0 56px; }
   .story-card { padding: 22px; }
   section { padding: 48px 0; }
 }
+
+/* Feedback form */
+
+.feedback { display: grid; grid-template-columns: 1fr 1.2fr; gap: 40px; align-items: start; }
+.feedback-form {
+  position: relative;
+  display: grid;
+  gap: 16px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 26px;
+  box-shadow: var(--shadow);
+}
+.feedback-form label { display: grid; gap: 6px; font-weight: 600; font-size: 0.95rem; }
+.feedback-form label small { font-size: inherit; font-weight: 400; color: var(--muted); }
+.feedback-form input,
+.feedback-form textarea {
+  font: inherit;
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 10px 12px;
+  width: 100%;
+}
+.feedback-form textarea { resize: vertical; min-height: 140px; }
+.feedback-form input:focus,
+.feedback-form textarea:focus { outline: 2px solid var(--navy); outline-offset: 1px; }
+.feedback-form .row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.feedback-form .hp { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
+.feedback-form button { justify-self: start; font: inherit; font-weight: 650; cursor: pointer; }
+.feedback-form button[disabled] { opacity: 0.6; cursor: progress; }
+.form-status { margin: 0; min-height: 1.4em; font-size: 0.95rem; color: var(--muted); }
+.form-status[data-kind="ok"] { color: var(--navy); font-weight: 600; }
+.form-status[data-kind="error"] { color: var(--amber); font-weight: 600; }
+
+@media (max-width: 900px) {
+  .feedback { grid-template-columns: 1fr; }
+}
+@media (max-width: 600px) {
+  .feedback-form { padding: 20px; }
+  .feedback-form .row { grid-template-columns: 1fr; }
+}

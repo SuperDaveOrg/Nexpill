@@ -20,6 +20,12 @@ val keyProperties = Properties().apply {
     if (source.exists()) FileInputStream(source).use { load(it) }
 }
 
+// F-Droid's build deletes the `signingConfigs` block and the `signingConfig =`
+// line below, so its APK comes out unsigned for it to compare with ours. Its
+// cleaner only removes whole lines, so that line must stay a single line with
+// no spaces after the `=`; the choice is made here instead.
+val releaseSigning = if (keyProperties.isEmpty) "debug" else "release"
+
 android {
     namespace = "com.superdavelab.nexpill"
     compileSdk = flutter.compileSdkVersion
@@ -58,9 +64,7 @@ android {
 
     buildTypes {
         release {
-            signingConfig = signingConfigs.getByName(
-                if (keyProperties.isEmpty) "debug" else "release"
-            )
+            signingConfig = signingConfigs.getByName(releaseSigning)
             // Leave out the git commit AGP would record: a worktree build
             // finds no repository and F-Droid's clone does, so the APKs would
             // differ by that one file.

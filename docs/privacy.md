@@ -47,6 +47,7 @@ A reminder says plainly what it is for: "Amoxicillin for Sam is due now."
 | No analytics, crash reporting or ad SDKs | Those are exactly the channels that leak health data to third parties. |
 | Local-only reminders | Push would need a server that knows the medication schedule. The phone schedules its own alarms, which is also what makes them reliable. |
 | Explicit, user-initiated export | The user can move their own data; we just never do it for them. |
+| Links to the website | Settings → Website and Send feedback hand the address to the phone's browser, only when tapped. Nexpill itself still can't use the network, and nothing from the app goes with the link. The feedback form is part of the website: only what the user types there is sent. |
 | Unused plugin permissions stripped | So the permission list reads as exactly what the app does. |
 
 Out of scope unless real users ask:

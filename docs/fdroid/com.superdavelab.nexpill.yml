@@ -1,0 +1,54 @@
+Categories:
+  - Sports & Health
+License: GPL-3.0-or-later
+AuthorName: SuperDaveLab
+WebSite: https://nexpill.superdavelab.com/
+SourceCode: https://github.com/SuperDaveOrg/Nexpill
+IssueTracker: https://github.com/SuperDaveOrg/Nexpill/issues
+Changelog: https://github.com/SuperDaveOrg/Nexpill/blob/HEAD/CHANGELOG.md
+
+AutoName: Nexpill
+
+RepoType: git
+Repo: https://github.com/SuperDaveOrg/Nexpill.git
+Binaries: https://github.com/SuperDaveOrg/Nexpill/releases/download/v%v/nexpill-%v.apk
+
+Builds:
+  - versionName: 0.2.0
+    versionCode: 200
+    commit: TO-BE-FILLED-AFTER-TAGGING-v0.2.0
+    output: build/app/outputs/flutter-apk/app-release.apk
+    srclibs:
+      - flutter@stable
+    prebuild:
+      - flutterVersion=$(sed -n -E "s/.*flutter-version:\ \"(.*)\"/\1/p" .github/workflows/ci.yml)
+      - '[[ $flutterVersion ]]'
+      - git -C $$flutter$$ checkout -f $flutterVersion
+      - export repo=/tmp/nexpill-build
+      - cd ..
+      - mv com.superdavelab.nexpill $repo
+      - pushd $repo
+      - export PUB_CACHE=$(pwd)/.pub-cache
+      - $$flutter$$/bin/flutter config --no-analytics
+      - $$flutter$$/bin/flutter pub get --enforce-lockfile
+      - popd
+      - mv $repo com.superdavelab.nexpill
+    scandelete:
+      - .pub-cache
+    build:
+      - export repo=/tmp/nexpill-build
+      - cd ..
+      - mv com.superdavelab.nexpill $repo
+      - pushd $repo
+      - export PUB_CACHE=$(pwd)/.pub-cache
+      - $$flutter$$/bin/flutter build apk --release
+      - popd
+      - mv $repo com.superdavelab.nexpill
+
+AllowedAPKSigningKeys: 2f37b86a50d13d2d43c9c0b39f71016ed899b2eb89f4673991febe46beca5c0d
+
+AutoUpdateMode: Version
+UpdateCheckMode: Tags
+UpdateCheckData: pubspec.yaml|version:\s.+\+(\d+)|.|version:\s(.+)\+
+CurrentVersion: 0.2.0
+CurrentVersionCode: 200
