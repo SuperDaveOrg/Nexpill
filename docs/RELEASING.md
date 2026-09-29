@@ -102,10 +102,12 @@ tool/bump_version.sh minor          # or patch / major / an exact X.Y.Z
 #     see "ABI splits"). bump_version.sh prints the exact commands.
 #     build_release.sh refuses to build without all three.
 
-# 3. Commit, open a pull request, and merge it once CI passes. The notes are
-#    a new file, so add them first: `commit -a` skips untracked files.
+# 3. Commit the release's files by name, open a pull request, and merge it
+#    once CI passes. Naming them keeps anything else in the working tree out
+#    of the release. The notes are new files, so add them first.
 git add fastlane/metadata/android/en-US/changelogs/
-git commit -am "Release v0.2.0"
+git commit -m "Release v0.2.0" -- pubspec.yaml CHANGELOG.md \
+  fastlane/metadata/android/en-US/changelogs/
 git push -u origin release-0.2.0
 gh pr create --fill && gh pr merge --rebase   # after CI is green
 
