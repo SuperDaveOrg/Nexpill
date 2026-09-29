@@ -9,6 +9,12 @@ turns that section into the release's own when it's cut.
 
 ## [Unreleased]
 
+### Changed
+- Smaller downloads from F-Droid: it now offers an APK built for your phone's
+  processor, about a third of the size of the one that runs on any phone.
+  The website still offers that universal APK, and each release's APKs are
+  all on its GitHub release page.
+
 ## [0.2.0] - 2026-09-29
 
 ### Added

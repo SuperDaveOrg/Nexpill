@@ -1,18 +1,22 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Build a release APK from an exact git commit, and prove it's what it claims.
+# Build release APKs from an exact git commit, and prove they're what they
+# claim: one universal APK (the website's download) and one per ABI (what
+# F-Droid ships; see "ABI splits" in docs/RELEASING.md).
 #
 # Builds in a git worktree at a fixed path, so uncommitted changes can't leak
 # in and the result depends only on the commit. The path is fixed because
 # Flutter writes it into the compiled app: F-Droid rebuilds at the same path
-# and publishes this APK only if its build matches byte for byte (see
-# "Reproducible builds" in docs/RELEASING.md). Then refuses to hand back an
-# APK that
+# and publishes each per-ABI APK only if its build matches ours byte for byte
+# (see "Reproducible builds" in docs/RELEASING.md). Then refuses to hand back
+# the APKs if any one
 #   - asks for any permission beyond the allow-list below (INTERNET above all),
 #   - is signed with the debug key (unless --allow-debug-signing),
-#   - has a version that disagrees with the tag it was built from.
-# Output goes to dist/release/: the APK, SHA256SUMS and BUILD-INFO.txt.
+#   - has a version that disagrees with the tag it was built from,
+#   - is signed by a different key from the others.
+# Output goes to dist/release/: the APKs, a .sha256 for each, and
+# BUILD-INFO.txt.
 #
 # Nothing is uploaded anywhere. See docs/RELEASING.md.
 #
@@ -39,6 +43,15 @@ ALLOWED_PERMISSIONS=(
   android.permission.SCHEDULE_EXACT_ALARM    # the same, on Android 12
   android.permission.VIBRATE                 # reminders
   "$PACKAGE.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"  # AndroidX, app-private
+)
+
+# The per-ABI APKs: Flutter's --target-platform, the ABI, and the digit that
+# ends its version code (android/app/build.gradle.kts, and VercodeOperation in
+# F-Droid's recipe). The universal APK's digit is 0.
+ABIS=(
+  "android-arm   armeabi-v7a 1"
+  "android-arm64 arm64-v8a   2"
+  "android-x64   x86_64      3"
 )
 
 REF="HEAD"
@@ -127,11 +140,19 @@ else
 fi
 
 # F-Droid shows this as the release's "what's new", and caps it at 500
-# characters.
+# characters. It looks the file up by each APK's own version code, so every
+# ABI needs an identical copy.
 if [[ $KIND == release ]]; then
-  notes="fastlane/metadata/android/en-US/changelogs/$CODE.txt"
-  [[ -f $notes ]] || die "no $notes: write a short \"what's new\" for $VERSION"
-  (( $(tr -d '\n' < "$notes" | wc -m) <= 500 )) || die "$notes is over F-Droid's 500 characters"
+  dir="fastlane/metadata/android/en-US/changelogs"
+  first="$dir/$((CODE * 10 + 1)).txt"
+  [[ -f $first ]] || die "no $first: write a short \"what's new\" for $VERSION
+       there and copy it for the other ABIs (docs/RELEASING.md, step 2)"
+  (( $(tr -d '\n' < "$first" | wc -m) <= 500 )) || die "$first is over F-Droid's 500 characters"
+  for abi in "${ABIS[@]}"; do
+    read -r _ _ digit <<< "$abi"
+    notes="$dir/$((CODE * 10 + digit)).txt"
+    cmp -s "$first" "$notes" || die "$notes is missing or differs from $first"
+  done
 fi
 
 # --- Build -------------------------------------------------------------------
@@ -149,71 +170,120 @@ if (( RUN_TESTS )); then
   flutter test
 fi
 
-step "flutter build apk --release"
+STAGE="$WORKTREE/build/release-apks"
+mkdir -p "$STAGE"
+
+# Each ABI is built on its own, the way F-Droid's recipe builds it, so its
+# rebuild can match ours byte for byte.
+for abi in "${ABIS[@]}"; do
+  read -r platform name _ <<< "$abi"
+  step "flutter build apk --release --split-per-abi --target-platform $platform"
+  flutter build apk --release --split-per-abi --target-platform "$platform"
+  apk="build/app/outputs/flutter-apk/app-$name-release.apk"
+  [[ -f $apk ]] || die "build produced no $name APK"
+  cp "$apk" "$STAGE/$name.apk"
+done
+
+step "flutter build apk --release (universal)"
 flutter build apk --release
 APK="build/app/outputs/flutter-apk/app-release.apk"
-[[ -f $APK ]] || die "build produced no APK"
+[[ -f $APK ]] || die "build produced no universal APK"
+cp "$APK" "$STAGE/universal.apk"
 
 # --- Verify ------------------------------------------------------------------
 
-step "Verifying the APK"
+# Checks one APK's version code, permissions and signature. Leaves its
+# permissions in $perms and its signer in $dn and $cert_sha.
+verify_apk() {
+  local apk="$1" label="$2" code="$3"
+  local badging certs p a ok
+  local -a bad=()
 
-badging="$("$AAPT" dump badging "$APK")"
-grep -q "package: name='$PACKAGE' versionCode='$CODE' versionName='$VERSION'" <<< "$badging" ||
-  die "APK version doesn't match pubspec ($VERSION+$CODE)"
-echo "  version     $VERSION ($CODE)"
+  badging="$("$AAPT" dump badging "$apk")"
+  grep -q "package: name='$PACKAGE' versionCode='$code' versionName='$VERSION'" <<< "$badging" ||
+    die "$label APK version doesn't match pubspec ($VERSION, APK code $code)"
 
-mapfile -t perms < <("$AAPT" dump permissions "$APK" |
-  sed -n "s/^uses-permission: name='\([^']*\)'.*/\1/p" | sort -u)
-bad=()
-for p in "${perms[@]}"; do
-  ok=0
-  for a in "${ALLOWED_PERMISSIONS[@]}"; do [[ $p == "$a" ]] && ok=1; done
-  (( ok )) || bad+=("$p")
-done
-(( ${#bad[@]} == 0 )) || die "APK asks for permissions outside the allow-list:
+  mapfile -t perms < <("$AAPT" dump permissions "$apk" |
+    sed -n "s/^uses-permission: name='\([^']*\)'.*/\1/p" | sort -u)
+  for p in "${perms[@]}"; do
+    ok=0
+    for a in "${ALLOWED_PERMISSIONS[@]}"; do [[ $p == "$a" ]] && ok=1; done
+    (( ok )) || bad+=("$p")
+  done
+  (( ${#bad[@]} == 0 )) || die "$label APK asks for permissions outside the allow-list:
 $(printf '         %s\n' "${bad[@]}")
        A dependency probably merged them in. Remove them in AndroidManifest.xml
        with tools:node=\"remove\" — never widen the allow-list for INTERNET."
-echo "  permissions ${#perms[@]}, all allowed, no INTERNET"
 
-certs="$("$APKSIGNER" verify --print-certs "$APK")" || die "signature doesn't verify"
-# apksigner's line prefix varies between versions ("Signer #1 …", "Signer
-# (minSdkVersion=…) …"), so match on the field name alone. If the signer
-# can't be read, stop: an unreadable signer must never pass as a real one.
-dn="$(grep -m1 'certificate DN: ' <<< "$certs" | sed 's/.*certificate DN: //')"
-cert_sha="$(grep -m1 'certificate SHA-256 digest: ' <<< "$certs" | sed 's/.*SHA-256 digest: //')"
-[[ -n $dn && -n $cert_sha ]] || die "couldn't read the signing certificate from apksigner:
+  certs="$("$APKSIGNER" verify --print-certs "$apk")" || die "$label APK signature doesn't verify"
+  # apksigner's line prefix varies between versions ("Signer #1 …", "Signer
+  # (minSdkVersion=…) …"), so match on the field name alone. If the signer
+  # can't be read, stop: an unreadable signer must never pass as a real one.
+  dn="$(grep -m1 'certificate DN: ' <<< "$certs" | sed 's/.*certificate DN: //')"
+  cert_sha="$(grep -m1 'certificate SHA-256 digest: ' <<< "$certs" | sed 's/.*SHA-256 digest: //')"
+  [[ -n $dn && -n $cert_sha ]] || die "couldn't read the signing certificate from apksigner:
 $certs"
+
+  printf '  %-12s %s (%s), %d permissions, all allowed\n' "$label" "$VERSION" "$code" "${#perms[@]}"
+}
+
+step "Verifying the APKs"
+
+for abi in "${ABIS[@]}"; do
+  read -r _ name digit <<< "$abi"
+  verify_apk "$STAGE/$name.apk" "$name" $((CODE * 10 + digit))
+  signer_sha="${signer_sha:-$cert_sha}"
+  [[ $cert_sha == "$signer_sha" ]] || die "$name APK is signed by a different key from the others"
+done
+verify_apk "$STAGE/universal.apk" universal $((CODE * 10))
+[[ $cert_sha == "$signer_sha" ]] || die "universal APK is signed by a different key from the others"
+echo "  no INTERNET in any of them"
+
 if [[ $dn == *"Android Debug"* ]]; then
-  (( ALLOW_DEBUG )) || die "APK is debug-signed"
+  (( ALLOW_DEBUG )) || die "APKs are debug-signed"
   NAME="$NAME-debugsigned"
-  echo "  signature   DEBUG KEY — not for distribution"
+  echo "  signature    DEBUG KEY — not for distribution"
 else
-  echo "  signature   $dn"
+  echo "  signature    $dn"
 fi
 
 # --- Output ------------------------------------------------------------------
 
 OUT="$REPO/dist/release"
 mkdir -p "$OUT"
-cp "$APK" "$OUT/$NAME.apk"
-( cd "$OUT" && sha256sum "$NAME.apk" > "$NAME.apk.sha256" )
-cat > "$OUT/$NAME.BUILD-INFO.txt" <<EOF
-name          $NAME.apk
-kind          $KIND
-version       $VERSION ($CODE)
-commit        $COMMIT
-ref           $REF
-built         $(date -u +%Y-%m-%dT%H:%M:%SZ)
-flutter       $(flutter --version 2>/dev/null | head -1)
-signer        $dn
-signer-sha256 $cert_sha
-apk-sha256    $(cut -d' ' -f1 "$OUT/$NAME.apk.sha256")
-permissions   ${perms[*]}
-EOF
+# The universal APK keeps the plain name; the website's deploy script finds it
+# through BUILD-INFO.txt's "name" line.
+FILES=("$NAME.apk")
+cp "$STAGE/universal.apk" "$OUT/$NAME.apk"
+for abi in "${ABIS[@]}"; do
+  read -r _ name _ <<< "$abi"
+  FILES+=("$NAME-$name.apk")
+  cp "$STAGE/$name.apk" "$OUT/$NAME-$name.apk"
+done
+for f in "${FILES[@]}"; do
+  ( cd "$OUT" && sha256sum "$f" > "$f.sha256" )
+done
+
+sha_of() { cut -d' ' -f1 "$OUT/$1.sha256"; }
+{
+  echo "name          $NAME.apk"
+  echo "kind          $KIND"
+  echo "version       $VERSION ($CODE)"
+  echo "commit        $COMMIT"
+  echo "ref           $REF"
+  echo "built         $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+  echo "flutter       $(flutter --version 2>/dev/null | head -1)"
+  echo "signer        $dn"
+  echo "signer-sha256 $cert_sha"
+  echo "apk-sha256    $(sha_of "$NAME.apk")"
+  echo "apks          $((CODE * 10)) $NAME.apk $(sha_of "$NAME.apk")"
+  for abi in "${ABIS[@]}"; do
+    read -r _ name digit <<< "$abi"
+    echo "              $((CODE * 10 + digit)) $NAME-$name.apk $(sha_of "$NAME-$name.apk")"
+  done
+  echo "permissions   ${perms[*]}"
+} > "$OUT/$NAME.BUILD-INFO.txt"
 
 step "Done"
-echo "  $OUT/$NAME.apk"
-echo "  $OUT/$NAME.apk.sha256"
+for f in "${FILES[@]}"; do echo "  $OUT/$f (and .sha256)"; done
 echo "  $OUT/$NAME.BUILD-INFO.txt"
