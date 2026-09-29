@@ -9,6 +9,8 @@ turns that section into the release's own when it's cut.
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-09-29
+
 ### Added
 - Settings → About has links to Nexpill's website and its feedback form. They
   open in your browser; Nexpill itself still has no internet permission.
