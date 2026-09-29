@@ -16,7 +16,7 @@ Binaries: https://github.com/SuperDaveOrg/Nexpill/releases/download/v%v/nexpill-
 Builds:
   - versionName: 0.2.0
     versionCode: 200
-    commit: TO-BE-FILLED-AFTER-TAGGING-v0.2.0
+    commit: 38dc9a464e07ea5670e054cb0d9094ee8e9ba1b9
     output: build/app/outputs/flutter-apk/app-release.apk
     srclibs:
       - flutter@stable
