@@ -67,7 +67,10 @@ Next (docs/RELEASING.md, "Cutting a release"):
        cd fastlane/metadata/android/en-US/changelogs &&
          cp $((code * 10 + 1)).txt $((code * 10 + 2)).txt && cp $((code * 10 + 1)).txt $((code * 10 + 3)).txt
      Release builds refuse to run without all three.
-  2. git commit -am "Release v$new", push, open a PR, merge once CI passes.
+  2. Commit the release's files by name, push, open a PR, merge once CI passes:
+       git add fastlane/metadata/android/en-US/changelogs/
+       git commit -m "Release v$new" -- pubspec.yaml CHANGELOG.md \\
+         fastlane/metadata/android/en-US/changelogs/
   3. On main: git tag -a v$new -m "Release v$new" && git push origin v$new
   4. tool/build_release.sh --ref v$new, then publish (docs/RELEASING.md)
 EOF
