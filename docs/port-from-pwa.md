@@ -155,7 +155,7 @@ Decisions made here, all new since the PWA polled once a minute while open:
 - **People**, **Settings** (notification and exact-alarm status, test
   reminder, backup, restore, summary, delete all, sample data in debug) and
   **About**.
-- Colours are the SuperDaveLab family tokens (LedgerDock's `web/app.css`),
+- Colours are the SuperDaveLab family tokens (GridDock's `web/app.css`),
   light and dark; fonts as in Ebb.
 
 Checked on the emulator: a real overdue reminder arrived with its buttons,
