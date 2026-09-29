@@ -9,6 +9,8 @@ turns that section into the release's own when it's cut.
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-09-29
+
 ### Changed
 - Smaller downloads from F-Droid: it now offers an APK built for your phone's
   processor, about a third of the size of the one that runs on any phone.
