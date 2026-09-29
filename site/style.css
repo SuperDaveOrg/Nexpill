@@ -123,7 +123,7 @@ section[id], main[id] { scroll-margin-top: 90px; }
   padding: 40px 0 64px;
 }
 /* The logo and name, large, above the eyebrow: the lockup LedgerSprout's and
-   LedgerDock's pages open with. The logo is a round badge, so its shadow
+   GridDock's pages open with. The logo is a round badge, so its shadow
    follows the circle. */
 .hero-brand-lockup {
   display: inline-flex;

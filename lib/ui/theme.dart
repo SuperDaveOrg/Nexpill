@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 
 /// Nexpill's look: the SuperDaveLab family palette.
 ///
-/// Every app in the family — LedgerDock, LedgerSprout, Ebb, Nexpill — shares
+/// Every app in the family — GridDock, LedgerSprout, Ebb, Nexpill — shares
 /// one look, so these colours are the family's design tokens (navy ink on
 /// warm paper, a cyan-teal accent, amber and red for attention), copied
-/// from LedgerDock's `web/app.css`. Change them there first, then here; don't
+/// from GridDock's `web/app.css`. Change them there first, then here; don't
 /// give Nexpill colours of its own.
 ///
 /// Legibility comes first: Nexpill is read by tired people, often at night,
