@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Publish a built release to GitHub Releases: the same signed APK the site
-# offers, its SHA-256, and the version's CHANGELOG.md section as the notes.
+# Publish a built release to GitHub Releases: the universal APK the site
+# offers, the per-ABI APKs F-Droid checks its builds against, a SHA-256 for
+# each, and the version's CHANGELOG.md section as the notes.
 #
 # Run after tool/build_release.sh --ref vX.Y.Z and after pushing the tag. It
 # builds nothing: it only uploads what dist/release/ already holds, and only
@@ -40,17 +41,25 @@ command -v gh >/dev/null || die "gh not on PATH"
 TAG="v$VERSION"
 APK="dist/release/nexpill-$VERSION.apk"
 INFO="dist/release/nexpill-$VERSION.BUILD-INFO.txt"
-[[ -f $APK && -f $APK.sha256 && -f $INFO ]] ||
-  die "no release build of $VERSION in dist/release/ — run tool/build_release.sh --ref $TAG"
+# Same names as tool/build_release.sh; F-Droid's recipe fetches the per-ABI
+# ones from the release by these names.
+APKS=("$APK")
+for abi in armeabi-v7a arm64-v8a x86_64; do APKS+=("dist/release/nexpill-$VERSION-$abi.apk"); done
+[[ -f $INFO ]] || die "no release build of $VERSION in dist/release/ — run tool/build_release.sh --ref $TAG"
 grep -q '^kind *release$' "$INFO" || die "$APK isn't a release build"
-[[ "$(sha256sum "$APK" | cut -d' ' -f1)" == "$(cut -d' ' -f1 "$APK.sha256")" ]] ||
-  die "$APK doesn't match its .sha256"
+FILES=()
+for f in "${APKS[@]}"; do
+  [[ -f $f && -f $f.sha256 ]] || die "$f or its .sha256 is missing — rerun tool/build_release.sh --ref $TAG"
+  [[ "$(sha256sum "$f" | cut -d' ' -f1)" == "$(cut -d' ' -f1 "$f.sha256")" ]] ||
+    die "$f doesn't match its .sha256"
+  FILES+=("$f" "$f.sha256")
+done
 
-# The APK must come from the tag GitHub has, not a local one that was moved.
+# The APKs must come from the tag GitHub has, not a local one that was moved.
 commit="$(sed -n 's/^commit *//p' "$INFO")"
 remote="$(git ls-remote origin "refs/tags/$TAG^{}" | cut -f1)"
 [[ -n $remote ]] || die "$TAG isn't on GitHub yet — git push origin $TAG"
-[[ $remote == "$commit" ]] || die "$APK was built from $commit, but $TAG on GitHub is $remote"
+[[ $remote == "$commit" ]] || die "the APKs were built from $commit, but $TAG on GitHub is $remote"
 
 # This version's CHANGELOG section, without its heading.
 notes="$(awk -v v="$VERSION" '
@@ -66,24 +75,25 @@ notes+="
 
 **Verify the download**
 
-\`\`\`
-SHA-256  $(cut -d' ' -f1 "$APK.sha256")  nexpill-$VERSION.apk
-Signer   $(sed -n 's/^signer-sha256 *//p' "$INFO")
-\`\`\`
+\`nexpill-$VERSION.apk\` works on any phone and is the one offered at
+https://nexpill.superdavelab.com. The others are smaller, each for one kind of
+processor; nearly every current phone is \`arm64-v8a\`. All are built from tag
+\`$TAG\` by \`tool/build_release.sh\`, which refuses any build asking for a
+permission outside the allow-list — \`INTERNET\` above all.
 
-The same APK is offered at https://nexpill.superdavelab.com. It is built from
-tag \`$TAG\` by \`tool/build_release.sh\`, which refuses any build asking for
-a permission outside the allow-list — \`INTERNET\` above all."
+\`\`\`
+$(for f in "${APKS[@]}"; do printf 'SHA-256  %s  %s\n' "$(cut -d' ' -f1 "$f.sha256")" "${f##*/}"; done)
+Signer   $(sed -n 's/^signer-sha256 *//p' "$INFO")
+\`\`\`"
 
 if (( DRY )); then
   say "Dry run: would create GitHub release $TAG with"
-  echo "    $APK"
-  echo "    $APK.sha256"
+  printf '    %s\n' "${FILES[@]}"
   echo
   echo "$notes"
   exit 0
 fi
 
 say "Creating GitHub release $TAG"
-gh release create "$TAG" "$APK" "$APK.sha256" \
+gh release create "$TAG" "${FILES[@]}" \
   --verify-tag --title "Nexpill $VERSION" --notes "$notes"

@@ -62,8 +62,11 @@ cat <<EOF
 
 Next (docs/RELEASING.md, "Cutting a release"):
   1. Check CHANGELOG.md reads well for $new, and write a short summary for
-     F-Droid in fastlane/metadata/android/en-US/changelogs/$code.txt
-     (500 characters at most; release builds refuse to run without it).
+     F-Droid in fastlane/metadata/android/en-US/changelogs/$((code * 10 + 1)).txt
+     (500 characters at most), then copy it for the other two ABIs:
+       cd fastlane/metadata/android/en-US/changelogs &&
+         cp $((code * 10 + 1)).txt $((code * 10 + 2)).txt && cp $((code * 10 + 1)).txt $((code * 10 + 3)).txt
+     Release builds refuse to run without all three.
   2. git commit -am "Release v$new", push, open a PR, merge once CI passes.
   3. On main: git tag -a v$new -m "Release v$new" && git push origin v$new
   4. tool/build_release.sh --ref v$new, then publish (docs/RELEASING.md)
