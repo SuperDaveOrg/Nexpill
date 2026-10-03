@@ -81,6 +81,7 @@ class _CareScreenState extends State<CareScreen> with WidgetsBindingObserver {
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text('${m.name} logged, ${whenText(dose.givenAt, DateTime.now())}'),
+      persist: false,
       action: SnackBarAction(
         label: 'Undo',
         onPressed: () => _store.change((repo) => repo.deleteDose(dose.id)),
@@ -99,6 +100,7 @@ class _CareScreenState extends State<CareScreen> with WidgetsBindingObserver {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text('${m.name} stopped. Its history is kept.'),
+          persist: false,
           action: SnackBarAction(
             label: 'Undo',
             onPressed: () =>
