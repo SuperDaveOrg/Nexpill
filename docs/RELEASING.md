@@ -225,8 +225,9 @@ version needs identical changelogs at `<code>1.txt`, `<code>2.txt` and
 
 ## F-Droid
 
-The recipe is drafted in [fdroid/com.superdavelab.nexpill.yml](fdroid/com.superdavelab.nexpill.yml),
-the same as Ebb's apart from names. It follows fdroiddata's
+The recipe is drafted locally in `dist/fdroid/com.superdavelab.nexpill.yml`
+(gitignored; the copy that counts is the one in fdroiddata), the same as
+Ebb's apart from names. It follows fdroiddata's
 `templates/build-flutter.yml` and has no comments, because fdroiddata wants
 none, so the reasoning lives here:
 

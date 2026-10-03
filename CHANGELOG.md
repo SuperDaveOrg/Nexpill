@@ -9,6 +9,8 @@ turns that section into the release's own when it's cut.
 
 ## [Unreleased]
 
+## [0.2.2] - 2026-10-02
+
 ### Fixed
 - The "logged" and "stopped" messages with an Undo button now go away by
   themselves after a few seconds. They stayed on screen until you tapped
