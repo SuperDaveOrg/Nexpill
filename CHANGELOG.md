@@ -9,6 +9,11 @@ turns that section into the release's own when it's cut.
 
 ## [Unreleased]
 
+### Fixed
+- The "logged" and "stopped" messages with an Undo button now go away by
+  themselves after a few seconds. They stayed on screen until you tapped
+  Undo, covering the buttons at the bottom of the next screen.
+
 ## [0.2.1] - 2026-09-29
 
 ### Changed

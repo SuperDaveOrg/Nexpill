@@ -62,6 +62,12 @@ void main() {
     expect(find.textContaining('logged'), findsOneWidget, reason: 'snackbar');
     // The dose was planned into reminders: due in 4 hours.
     expect(notifications.lastPlan!.notifications.first.title, 'Amoxicillin due now');
+
+    // An action no longer makes a snackbar persist, so it goes by itself
+    // rather than covering the next screen's buttons.
+    await tester.pump(const Duration(seconds: 5));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('logged'), findsNothing);
   });
 
   testWidgets('giving a dose early asks first', (tester) async {
