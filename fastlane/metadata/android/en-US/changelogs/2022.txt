@@ -1,0 +1,1 @@
+• Fixed: after logging a dose or stopping a medication, the message with an Undo button stayed on screen and could cover the buttons on the next screen. It now goes away by itself after a few seconds.

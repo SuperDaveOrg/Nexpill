@@ -5,7 +5,7 @@ publish_to: 'none'
 # NAME+CODE, and the only place the version lives. CODE is derived from NAME
 # (major*10000 + minor*100 + patch). Change it with tool/bump_version.sh, not
 # by hand. See docs/RELEASING.md.
-version: 0.2.1+201
+version: 0.2.2+202
 
 environment:
   sdk: ^3.13.4
