@@ -11,16 +11,27 @@ in one step: a file with a problem anywhere is refused whole.
 
 ## Versioning
 
-`nexpillBackup` is the format version, currently **1**. Adding an optional
+`nexpillBackup` is the format version, currently **2**. Adding an optional
 field doesn't change it. Changing what a field means, or adding a required
 one, needs a new version, a section here, and a reader that still accepts the
 old versions. Nexpill refuses a file whose version it doesn't know.
+
+An optional field that older versions of Nexpill would silently drop, where
+dropping it would change what the app does, also gets a new version, so an
+older app refuses the file instead of half-restoring it.
+
+### Version history
+
+| Version | |
+|---|---|
+| 1 | The first format. |
+| 2 | Adds the medication's optional `course`. Without the version change, an older Nexpill would drop a course and keep reminding after it ended. A version 1 file is read as version 2 with no courses. |
 
 ## Example
 
 ```json
 {
-  "nexpillBackup": 1,
+  "nexpillBackup": 2,
   "exportedAt": "2026-06-10T14:30:00.000Z",
   "patients": [
     {

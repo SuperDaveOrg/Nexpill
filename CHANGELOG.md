@@ -15,6 +15,9 @@ turns that section into the release's own when it's cut.
   ("10 doses"). Its card shows what's left, and when the course is over its
   reminders stop by themselves and it moves to the bottom of the list,
   history kept. Open it there to make the course longer.
+- Backups are now format version 2, to carry courses. Older backups still
+  restore; an older Nexpill refuses a new backup and asks to be updated,
+  rather than restoring it without its courses.
 
 ### Changed
 - A taper now finishes when its last step ends: from midnight on the end

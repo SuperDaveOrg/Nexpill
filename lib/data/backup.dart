@@ -11,7 +11,9 @@ import 'package:nexpill/models/patient.dart';
 ///
 /// Plain, documented JSON on purpose: a backup should be readable in a text
 /// editor and importable by some other app one day, so nobody is locked in.
-const backupFormatVersion = 1;
+///
+/// Version 2 added `course`. Files of every earlier version still restore.
+const backupFormatVersion = 2;
 
 /// A file that can't be restored, with a reason fit to show the user.
 class BackupFormatException implements Exception {

@@ -69,6 +69,20 @@ void main() {
     expect(text, matches(RegExp(r'"givenAt": "\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d\.\d{3}Z"')));
   });
 
+  test('writes version 2, and still restores version 1', () {
+    final json = sampleJson();
+    expect(json['nexpillBackup'], 2);
+    json['nexpillBackup'] = 1;
+    for (final p in json['patients'] as List) {
+      for (final m in p['medications'] as List) {
+        (m as Map).remove('course');
+      }
+    }
+    final back = decodeBackup(jsonEncode(json));
+    expect(back.medications.length, sample.medications.length);
+    expect(back.medications.every((m) => m.course == null), isTrue);
+  });
+
   test('accepts an instant with an offset', () {
     final json = sampleJson();
     ((firstMed(json)['doses'] as List).first as Map)['givenAt'] =
@@ -88,7 +102,7 @@ void main() {
               (e) => e.message, 'message', contains('isn\'t a Nexpill backup'))));
     });
 
-    test('a newer format', () => refuses((j) => j['nexpillBackup'] = 2, 'newer version'));
+    test('a newer format', () => refuses((j) => j['nexpillBackup'] = 3, 'newer version'));
 
     test('a time without an offset', () => refuses(
         (j) => ((firstMed(j)['doses'] as List).first as Map)['givenAt'] = '2026-06-10T08:00:00',
