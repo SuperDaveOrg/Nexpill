@@ -103,6 +103,11 @@ Map<String, Object?> _encodeMedication(Medication m, List<DoseEvent> doses) {
       'unit': ?m.doseUnit,
       'lowAt': ?_number(m.lowSupplyThreshold),
     },
+    'course': ?switch (m.course) {
+      EndsAfterDay(:final lastDay) => {'lastDay': isoDate(lastDay)},
+      EndsAfterDoses(:final doses) => {'doses': doses},
+      null => null,
+    },
     'doses': [
       for (final d in ordered)
         {
@@ -185,6 +190,7 @@ CareSnapshot decodeBackup(String text) {
         doseAmount: inventory.optionalNumber('perDose'),
         doseUnit: inventory.optionalString('unit'),
         lowSupplyThreshold: inventory.optionalNumber('lowAt'),
+        course: _decodeCourse(m),
       ));
 
       for (final d in m.list('doses')) {
@@ -227,6 +233,17 @@ void _checkCorrections(Iterable<DoseEvent> doses, String medicationName) {
       c = target;
     }
   }
+}
+
+CourseEnd? _decodeCourse(_Reader m) {
+  final c = m.optionalObject('course');
+  if (c == null) return null;
+  return switch ((c.optionalDate('lastDay'), c.optionalCount('doses'))) {
+    (final day?, null) => EndsAfterDay(day),
+    (null, final doses?) => EndsAfterDoses(doses),
+    _ => throw BackupFormatException(
+        '${c.where} needs either "lastDay" or "doses", not both.'),
+  };
 }
 
 MedicationSchedule _decodeSchedule(_Reader s) {
@@ -303,6 +320,16 @@ class _Reader {
     return v;
   }
 
+  /// A positive whole number of things, such as doses.
+  int? optionalCount(String key) {
+    if (_json[key] == null) return null;
+    final v = value<int>(key);
+    if (v < 1 || v > 100000) {
+      throw BackupFormatException('$where has an impossible "$key": $v.');
+    }
+    return v;
+  }
+
   DateTime date(String key) =>
       tryParseIsoDate(value<String>(key)) ??
       (throw BackupFormatException(
@@ -337,6 +364,8 @@ class _Reader {
       : items;
 
   _Reader object(String key) => _Reader(_json[key], '$where, "$key"');
+
+  _Reader? optionalObject(String key) => _json[key] == null ? null : object(key);
 
   List<_Reader> list(String key) {
     final items = value<List<Object?>>(key);

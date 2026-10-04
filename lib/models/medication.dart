@@ -17,6 +17,7 @@ class Medication {
     this.doseAmount,
     this.doseUnit,
     this.lowSupplyThreshold,
+    this.course,
   });
 
   final String id;
@@ -42,6 +43,11 @@ class Medication {
   final String? doseUnit;
   final double? lowSupplyThreshold;
 
+  /// When the course ends on its own, so its reminders stop without anyone
+  /// having to stop it; null for one that carries on until stopped.
+  final CourseEnd? course;
+
+  /// Every field but [course], which is kept as it is.
   Medication copyWith({
     String? name,
     String? strengthText,
@@ -71,6 +77,7 @@ class Medication {
         doseAmount: doseAmount ?? this.doseAmount,
         doseUnit: doseUnit ?? this.doseUnit,
         lowSupplyThreshold: lowSupplyThreshold ?? this.lowSupplyThreshold,
+        course: course,
       );
 
   /// The `medications` row. Taper steps live in their own table; see
@@ -102,6 +109,14 @@ class Medication {
         'dose_amount': doseAmount,
         'dose_unit': doseUnit,
         'low_supply_threshold': lowSupplyThreshold,
+        'course_last_day': switch (course) {
+          EndsAfterDay(:final lastDay) => isoDate(lastDay),
+          _ => null,
+        },
+        'course_doses': switch (course) {
+          EndsAfterDoses(:final doses) => doses,
+          _ => null,
+        },
       };
 
   factory Medication.fromRow(
@@ -139,8 +154,33 @@ class Medication {
       doseAmount: (row['dose_amount'] as num?)?.toDouble(),
       doseUnit: row['dose_unit'] as String?,
       lowSupplyThreshold: (row['low_supply_threshold'] as num?)?.toDouble(),
+      course: switch ((row['course_last_day'], row['course_doses'])) {
+        (final String day, _) => EndsAfterDay(tryParseIsoDate(day)!),
+        (_, final int doses) => EndsAfterDoses(doses),
+        _ => null,
+      },
     );
   }
+}
+
+/// How a course of a medication ends by itself.
+sealed class CourseEnd {
+  const CourseEnd();
+}
+
+/// Given through [lastDay], a calendar day: the course finishes at local
+/// midnight at the end of it.
+class EndsAfterDay extends CourseEnd {
+  const EndsAfterDay(this.lastDay);
+  final DateTime lastDay;
+}
+
+/// Finished once [doses] doses have been given, counting all the
+/// medication's history: a correction counts in place of what it replaced,
+/// not as another dose.
+class EndsAfterDoses extends CourseEnd {
+  const EndsAfterDoses(this.doses);
+  final int doses;
 }
 
 /// Per-medication reminder preferences. There is no "unset": see

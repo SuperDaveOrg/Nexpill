@@ -16,6 +16,7 @@ class ScheduleResult {
     required this.tooEarlyByMinutes,
     required this.overdueByMinutes,
     required this.reminderAt,
+    this.finished = false,
   });
 
   /// The most recent dose that still counts, or null if none.
@@ -39,6 +40,11 @@ class ScheduleResult {
   /// When the first reminder for [nextEligibleAt] is due — the early heads-up,
   /// or the due time itself without one — or null when reminders are off.
   final DateTime? reminderAt;
+
+  /// A course that has ended, or a taper whose last step has: nothing more
+  /// is due, so nothing is overdue and there's no reminder. [nextEligibleAt]
+  /// is when it finished. See [finishesAt].
+  final bool finished;
 }
 
 /// Works out [medication]'s timing as of [now] from its dose history.
@@ -50,6 +56,18 @@ ScheduleResult calculateSchedule(
   DateTime now,
 ) {
   final latest = latestDose(medication.id, doseEvents);
+  final end = finishesAt(medication, doseEvents);
+  if (end != null && !now.isBefore(end)) {
+    return ScheduleResult(
+      lastGivenAt: latest?.givenAt,
+      nextEligibleAt: end,
+      eligibleNow: true,
+      tooEarlyByMinutes: null,
+      overdueByMinutes: null,
+      reminderAt: null,
+      finished: true,
+    );
+  }
   final due = _nextEligibleAt(medication.schedule, latest, now);
   final sinceDue = now.difference(due);
   final eligibleNow = !sinceDue.isNegative;
@@ -64,6 +82,35 @@ ScheduleResult calculateSchedule(
         : floorMinutes(sinceDue),
     reminderAt: _reminderAt(due, medication.reminders),
   );
+}
+
+/// When [medication] finishes by itself: at the end of its course's last
+/// day, at the dose that completes its course, or when a taper's last step
+/// ends — whichever comes first. Null if none of those applies, or the
+/// doses that would complete the course haven't all been given.
+///
+/// [doseEvents] may hold any medication's doses; only this one's count.
+DateTime? finishesAt(Medication medication, Iterable<DoseEvent> doseEvents) {
+  final ends = [
+    if (medication.schedule case TaperSchedule(:final rules)) ?taperEndsAt(rules),
+    if (medication.course case final course?) ?_courseEndsAt(course, medication.id, doseEvents),
+  ];
+  return ends.isEmpty ? null : ends.reduce((a, b) => a.isBefore(b) ? a : b);
+}
+
+DateTime? _courseEndsAt(
+    CourseEnd course, String medicationId, Iterable<DoseEvent> doseEvents) {
+  switch (course) {
+    case EndsAfterDay(:final lastDay):
+      return DateTime(lastDay.year, lastDay.month, lastDay.day + 1);
+    case EndsAfterDoses(:final doses):
+      final given = effectiveDoses(medicationId, doseEvents)
+        ..sort((a, b) {
+          final byTime = a.givenAt.compareTo(b.givenAt);
+          return byTime != 0 ? byTime : a.id.compareTo(b.id);
+        });
+      return doses >= 1 && given.length >= doses ? given[doses - 1].givenAt : null;
+  }
 }
 
 DateTime _nextEligibleAt(
@@ -140,17 +187,37 @@ DateTime _taperDue(List<TaperRule> rules, DoseEvent? latest, DateTime now) {
   return from.add(interval);
 }
 
-/// The step in force at [now]; before the first step, the first; after the
-/// last has ended or in a gap between steps, the one that starts last.
-TaperRule? activeTaperRule(List<TaperRule> rules, DateTime now) {
-  if (rules.isEmpty) return null;
-  // Stable, so of two steps starting the same day the first listed wins.
+/// A taper's steps in the order they run: by start date, and of two steps
+/// starting the same day, the one listed first.
+List<TaperRule> orderedTaperRules(List<TaperRule> rules) {
   final sorted = rules.indexed.toList()
     ..sort((a, b) {
       final byStart = a.$2.startDate.compareTo(b.$2.startDate);
       return byStart != 0 ? byStart : a.$1 - b.$1;
     });
-  final ordered = [for (final (_, rule) in sorted) rule];
+  return [for (final (_, rule) in sorted) rule];
+}
+
+/// When the taper's last step ends, after which no more doses are due; null
+/// if a step is open-ended, or there are no steps.
+DateTime? taperEndsAt(List<TaperRule> rules) {
+  if (rules.isEmpty || rules.any((r) => r.endDate == null)) return null;
+  return _ruleBoundary(
+      rules.map((r) => r.endDate!).reduce((a, b) => a.isAfter(b) ? a : b));
+}
+
+/// Whether the taper's last step has ended by [now].
+bool taperFinished(List<TaperRule> rules, DateTime now) {
+  final end = taperEndsAt(rules);
+  return end != null && !now.isBefore(end);
+}
+
+/// The step in force at [now]; before the first step, the first; after the
+/// last has ended or in a gap between steps, the one that starts last. (Once
+/// the last step has ended the taper is [taperFinished] and nothing is due.)
+TaperRule? activeTaperRule(List<TaperRule> rules, DateTime now) {
+  if (rules.isEmpty) return null;
+  final ordered = orderedTaperRules(rules);
 
   for (final rule in ordered) {
     final end = rule.endDate;

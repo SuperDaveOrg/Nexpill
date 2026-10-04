@@ -25,6 +25,13 @@ below is what the PWA did and the Flutter app must do before a first release.
 | Alarm mode for interval and fixed-time meds | Done: alarm sound until dealt with, Mark given / Snooze |
 | Per-patient and per-medication reminder switches | Done |
 
+## Since the PWA
+
+| Feature | State |
+|---|---|
+| A course with an end, by last day or number of doses: reminders stop on their own, history kept | Done |
+| Tapers finish when their last step ends | Done |
+
 ---
 
 ## Next

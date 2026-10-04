@@ -106,6 +106,47 @@ void main() {
     expect(m.lowSupplyThreshold, 5);
   });
 
+  group('how long', () {
+    test('until stopped by default, a week if a date is chosen', () {
+      final d = named();
+      expect(d.build(() => 'x').course, isNull);
+      d.courseKind = CourseKind.lastDay;
+      expect(d.build(() => 'x').course,
+          isA<EndsAfterDay>().having((c) => c.lastDay, 'lastDay', DateTime(2026, 6, 16)));
+    });
+
+    test('a new course of doses needs at least one', () {
+      final d = named()..courseKind = CourseKind.doses;
+      expect(d.validate().keys, ['course']);
+      d.dosesLeft = '0';
+      expect(d.validate().keys, ['course']);
+      d.dosesLeft = ' 10 ';
+      expect(d.validate(), isEmpty);
+      expect((d.build(() => 'x').course as EndsAfterDoses).doses, 10);
+    });
+
+    test('once doses are given, it\'s set as the doses still to give', () {
+      final m = (named()
+            ..courseKind = CourseKind.doses
+            ..dosesLeft = '10')
+          .build(() => 'id');
+      final d = MedicationDraft.of(m, givenSoFar: 4);
+      expect(d.dosesLeft, '6');
+      d.dosesLeft = '0';
+      expect(d.validate(), isEmpty, reason: 'nothing left: the course is done');
+      d.dosesLeft = '3';
+      expect((d.build(() => 'id').course as EndsAfterDoses).doses, 7);
+    });
+
+    test('a taper has none: its steps say when it ends', () {
+      final d = named()
+        ..courseKind = CourseKind.lastDay
+        ..setKind(ScheduleKind.taper);
+      expect(d.courseAvailable, isFalse);
+      expect(d.build(() => 'x').course, isNull);
+    });
+  });
+
   test('editing keeps everything, and round-trips', () {
     final original = named()
       ..setKind(ScheduleKind.fixedTimes)

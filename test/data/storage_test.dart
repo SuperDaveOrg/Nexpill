@@ -93,18 +93,77 @@ void main() {
     expect(await d.query('taper_rules'), isEmpty);
   });
 
+  test('a course with an end round-trips', () async {
+    await repo.savePatient(sam);
+    final m = med('a', const IntervalSchedule(480));
+    await repo.saveMedication(Medication(
+        id: 'day', patientId: 'sam', name: 'day', defaultDoseText: '1',
+        schedule: m.schedule, reminders: m.reminders,
+        course: EndsAfterDay(DateTime(2026, 6, 14))));
+    await repo.saveMedication(Medication(
+        id: 'doses', patientId: 'sam', name: 'doses', defaultDoseText: '1',
+        schedule: m.schedule, reminders: m.reminders,
+        course: const EndsAfterDoses(10)));
+    await repo.saveMedication(m);
+
+    expect((await repo.medication('day'))!.course,
+        isA<EndsAfterDay>().having((c) => c.lastDay, 'lastDay', DateTime(2026, 6, 14)));
+    expect((await repo.medication('doses'))!.course,
+        isA<EndsAfterDoses>().having((c) => c.doses, 'doses', 10));
+    expect((await repo.medication('a'))!.course, isNull);
+  });
+
+  test('a version 1 database upgrades, keeping its medications', () async {
+    final path = '${dir.path}/old.db';
+    final old = await databaseFactoryFfi.openDatabase(path,
+        options: OpenDatabaseOptions(
+            version: 1, onCreate: (d, _) => NexpillDatabase.createVersion1(d)));
+    await old.insert('patients', sam.toRow());
+    final row = med('a', const IntervalSchedule(480)).toRow()
+      ..remove('course_last_day')
+      ..remove('course_doses');
+    await old.insert('medications', row);
+    await old.close();
+
+    final upgraded = NexpillDatabase(path: path, factory: databaseFactoryFfi);
+    final upgradedRepo = CareRepository(db: upgraded);
+    expect((await upgradedRepo.medication('a'))!.course, isNull);
+    await upgradedRepo.saveMedication(Medication(
+        id: 'b', patientId: 'sam', name: 'b', defaultDoseText: '1',
+        schedule: const IntervalSchedule(60),
+        reminders: const ReminderSettings(enabled: true),
+        course: const EndsAfterDoses(3)));
+    expect((await upgradedRepo.medication('b'))!.course, isA<EndsAfterDoses>());
+    await upgraded.close();
+  });
+
   test('doses: log, correct, and read back newest first', () async {
     await repo.savePatient(sam);
     await repo.saveMedication(med('a', const IntervalSchedule(60)));
     final first = await repo.logDose('a', givenAt: DateTime.utc(2026, 6, 10, 8), givenBy: 'Jo');
     await repo.logDose('a', givenAt: DateTime.utc(2026, 6, 10, 9));
-    final fix = await repo.correctDose(first, givenAt: DateTime.utc(2026, 6, 10, 7, 45));
+    final fix = await repo.correctDose(first,
+        givenAt: DateTime.utc(2026, 6, 10, 7, 45), givenBy: 'Jo');
 
     expect(fix.supersedesId, first.id);
-    expect(fix.givenBy, 'Jo', reason: 'details carry over');
+    expect(fix.givenBy, 'Jo');
     final doses = await repo.doses(medicationId: 'a');
     expect([for (final d in doses) d.givenAt.hour], [9, 8, 7]);
     expect(doses.first.givenAt.isUtc, isTrue);
+  });
+
+  test('a correction can clear details the original had', () async {
+    await repo.savePatient(sam);
+    await repo.saveMedication(med('a', const IntervalSchedule(60)));
+    final at = DateTime.utc(2026, 6, 10, 8);
+    final first = await repo.logDose('a',
+        givenAt: at, doseText: '2 tablets', givenBy: 'Jo', notes: 'With food');
+    final fix = await repo.correctDose(first, givenAt: at);
+
+    final saved = await repo.dose(fix.id);
+    expect(saved!.doseText, isNull, reason: 'back to the usual dose');
+    expect(saved.givenBy, isNull);
+    expect(saved.notes, isNull);
   });
 
   test('deleting a dose takes its corrections with it', () async {

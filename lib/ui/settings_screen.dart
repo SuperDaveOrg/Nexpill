@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 import 'package:nexpill/data/backup.dart';
 import 'package:nexpill/data/sample_data.dart';
-import 'package:nexpill/domain/dates.dart';
+import 'package:nexpill/export/file_names.dart';
 import 'package:nexpill/export/patient_summary.dart';
 import 'package:nexpill/models/care_snapshot.dart';
 import 'package:nexpill/models/patient.dart';
@@ -13,6 +13,7 @@ import 'package:nexpill/services/links.dart';
 import 'package:nexpill/services/preferences.dart';
 import 'package:nexpill/ui/about_screen.dart';
 import 'package:nexpill/ui/care_store.dart';
+import 'package:nexpill/ui/dialogs.dart';
 import 'package:nexpill/ui/layout.dart';
 import 'package:nexpill/ui/patients_screen.dart';
 import 'package:nexpill/ui/section.dart';
@@ -80,19 +81,12 @@ class _SettingsScreenState extends State<SettingsScreen>
   void _say(String message) => ScaffoldMessenger.of(context)
       .showSnackBar(SnackBar(content: Text(message)));
 
-  Future<void> _save(String name, String text, String mimeType, String done) async {
-    try {
-      if (await _documents.save(name, text, mimeType: mimeType)) _say(done);
-    } catch (_) {
-      _say('Couldn\'t save the file.');
-    }
-  }
-
-  Future<void> _backUp() => _save(
-        backupFileName(DateTime.now()),
-        encodeBackup(_store.care, exportedAt: DateTime.now()),
-        'application/json',
-        'Backup saved',
+  Future<void> _backUp() => saveToFile(
+        context,
+        name: backupFileName(DateTime.now()),
+        text: encodeBackup(_store.care, exportedAt: DateTime.now()),
+        mimeType: 'application/json',
+        done: 'Backup saved',
       );
 
   Future<void> _restore() async {
@@ -124,27 +118,16 @@ class _SettingsScreenState extends State<SettingsScreen>
     }
     if (!mounted) return;
     final people = backup.patients.length;
-    final ok = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Replace everything with this backup?'),
-        content: Text(
-          'It has $people ${people == 1 ? 'person' : 'people'}, '
+    final ok = await confirmAction(
+      context,
+      title: 'Replace everything with this backup?',
+      message: 'It has $people ${people == 1 ? 'person' : 'people'}, '
           '${backup.medications.length} medications and '
           '${backup.doses.length} doses logged. Everything now on this phone '
           'will be replaced by it.',
-        ),
-        actions: [
-          TextButton(
-              onPressed: () => Navigator.pop(context, false),
-              child: const Text('Cancel')),
-          TextButton(
-              onPressed: () => Navigator.pop(context, true),
-              child: const Text('Replace')),
-        ],
-      ),
+      action: 'Replace',
     );
-    if (ok != true) return;
+    if (!ok) return;
     await _store.change((repo) => repo.replaceAll(backup));
     _say('Restored');
   }
@@ -167,36 +150,27 @@ class _SettingsScreenState extends State<SettingsScreen>
               ],
             ),
           );
-    if (patient == null) return;
+    if (patient == null || !mounted) return;
     final now = DateTime.now();
-    await _save(
-      'nexpill-summary-${patient.displayName.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]+'), '-')}-${isoDate(now)}.txt',
-      patientSummary(_store.care, patient, now: now),
-      'text/plain',
-      'Summary saved',
+    await saveToFile(
+      context,
+      name: patientSummaryFileName(patient, now),
+      text: patientSummary(_store.care, patient, now: now),
+      mimeType: 'text/plain',
+      done: 'Summary saved',
     );
   }
 
   Future<void> _deleteAll() async {
-    final ok = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Delete all data?'),
-        content: const Text(
-            'Every person, medication and dose on this phone, and every '
-            'reminder. This can\'t be undone; if you might want it back, save '
-            'a backup first.'),
-        actions: [
-          TextButton(
-              onPressed: () => Navigator.pop(context, false),
-              child: const Text('Cancel')),
-          TextButton(
-              onPressed: () => Navigator.pop(context, true),
-              child: const Text('Delete everything')),
-        ],
-      ),
+    final ok = await confirmAction(
+      context,
+      title: 'Delete all data?',
+      message: 'Every person, medication and dose on this phone, and every '
+          'reminder. This can\'t be undone; if you might want it back, save '
+          'a backup first.',
+      action: 'Delete everything',
     );
-    if (ok != true) return;
+    if (!ok) return;
     await _store.change((repo) => repo.deleteAllData());
     await _store.notifications.cancelAll();
     await Preferences.clear();

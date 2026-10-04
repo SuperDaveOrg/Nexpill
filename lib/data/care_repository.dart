@@ -17,8 +17,10 @@ class CareRepository {
 
   // --- Patients ------------------------------------------------------------
 
-  Future<List<Patient>> patients() async {
-    final db = await _db.database;
+  /// Everyone, in name order.
+  Future<List<Patient>> patients() async => _patients(await _db.database);
+
+  static Future<List<Patient>> _patients(DatabaseExecutor db) async {
     final rows =
         await db.query('patients', orderBy: 'display_name COLLATE NOCASE');
     return rows.map(Patient.fromRow).toList();
@@ -162,10 +164,11 @@ class CareRepository {
   }
 
   /// Replaces [original] with a corrected entry, leaving the original in
-  /// history. Details not given are carried over.
+  /// history. The correction says exactly what it's given: a detail left
+  /// out is cleared, not carried over, so a caregiver can remove one.
   Future<DoseEvent> correctDose(
     DoseEvent original, {
-    DateTime? givenAt,
+    required DateTime givenAt,
     String? doseText,
     String? givenBy,
     String? notes,
@@ -173,10 +176,10 @@ class CareRepository {
     final correction = DoseEvent(
       id: newId(),
       medicationId: original.medicationId,
-      givenAt: (givenAt ?? original.givenAt).toUtc(),
-      doseText: doseText ?? original.doseText,
-      givenBy: givenBy ?? original.givenBy,
-      notes: notes ?? original.notes,
+      givenAt: givenAt.toUtc(),
+      doseText: doseText,
+      givenBy: givenBy,
+      notes: notes,
       supersedesId: original.id,
     );
     final db = await _db.database;
@@ -194,12 +197,8 @@ class CareRepository {
 
   Future<CareSnapshot> snapshot() async {
     final db = await _db.database;
-    final patients =
-        (await db.query('patients', orderBy: 'display_name COLLATE NOCASE'))
-            .map(Patient.fromRow)
-            .toList();
     return CareSnapshot(
-      patients: patients,
+      patients: await _patients(db),
       medications: await _medications(db),
       doses: (await db.query('dose_events', orderBy: 'given_at DESC, id DESC'))
           .map(DoseEvent.fromRow)

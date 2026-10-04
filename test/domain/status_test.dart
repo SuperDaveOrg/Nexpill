@@ -76,4 +76,27 @@ void main() {
     expect(at('2026-03-28T17:59:00Z'), MedicationStatusLabel.overdue);
     expect(at('2026-03-28T18:00:00Z'), MedicationStatusLabel.missed);
   });
+
+  test('a taper whose last step has ended is finished, never late', () {
+    final taper = Medication(
+      id: 'med-1',
+      patientId: 'patient-1',
+      name: 'Prednisone',
+      defaultDoseText: '10 mg',
+      schedule: TaperSchedule([
+        TaperRule(
+            startDate: DateTime(2026, 3, 1),
+            endDate: DateTime(2026, 3, 29),
+            intervalMinutes: 480),
+      ]),
+      reminders: const ReminderSettings(enabled: true),
+    );
+    MedicationStatusLabel at(DateTime now, List<DoseEvent> given) =>
+        computeMedicationStatus(taper, given, now).label;
+    expect(at(DateTime(2026, 3, 28, 23, 59), doses), MedicationStatusLabel.missed);
+    expect(at(DateTime(2026, 3, 29), doses), MedicationStatusLabel.finished);
+    expect(at(DateTime(2026, 4, 20), doses), MedicationStatusLabel.finished);
+    expect(at(DateTime(2026, 4, 20), []), MedicationStatusLabel.finished,
+        reason: 'even if never given');
+  });
 }

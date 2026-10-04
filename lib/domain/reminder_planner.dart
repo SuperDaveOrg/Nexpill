@@ -22,6 +22,8 @@ import 'package:nexpill/models/patient.dart';
 /// - Overdue reminders repeat every `overdueRepeatMinutes` — at most
 ///   [maxOverdueRepeats] times, and only until the next dose is due.
 /// - As-needed medications get only "can be given again", once per dose.
+/// - A course stops reminding when it ends, and a taper when its last step
+///   does.
 /// - An interval or as-needed medication never given has no reminders:
 ///   there's nothing to count from.
 /// - Everything due for one patient at the same minute is one notification.
@@ -110,8 +112,8 @@ class ReminderPlanner {
       final end = points[i + 1];
       final last = i == points.length - 2;
       final s = calculateSchedule(m, doses, start);
-      if (s.lastGivenAt == null &&
-          (m.schedule is IntervalSchedule || prn)) {
+      if (s.finished ||
+          (s.lastGivenAt == null && (m.schedule is IntervalSchedule || prn))) {
         continue;
       }
       final due = s.nextEligibleAt;
@@ -188,6 +190,9 @@ class ReminderPlanner {
       case IntervalSchedule() || PrnSchedule():
         break;
     }
+    // A course running out on its last day. (One that ends on a dose ends
+    // only when a dose is logged, which replans.)
+    if (finishesAt(m, doses) case final end?) add(end);
     return points.toList()..sort();
   }
 }
@@ -284,8 +289,9 @@ PlannedNotification? snoozedNotification(
   for (final id in medicationIds) {
     final m = care.medication(id);
     if (m == null || !m.active) continue;
-    patient ??= care.patient(m.patientId);
     final s = calculateSchedule(m, care.doses, now);
+    if (s.finished) continue;
+    patient ??= care.patient(m.patientId);
     final kind = m.schedule is PrnSchedule
         ? ReminderKind.available
         : !s.eligibleNow

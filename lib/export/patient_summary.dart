@@ -8,8 +8,8 @@ import 'package:nexpill/models/patient.dart';
 /// visit or a handover to another caregiver.
 String patientSummary(CareSnapshot care, Patient patient, {required DateTime now}) {
   final medications = [
-    for (final m in care.medications)
-      if (m.patientId == patient.id && m.active) m,
+    for (final m in care.medicationsFor(patient.id))
+      if (m.active) m,
   ];
 
   final lines = <String>[
@@ -24,14 +24,17 @@ String patientSummary(CareSnapshot care, Patient patient, {required DateTime now
   for (final (i, m) in medications.indexed) {
     final status = computeMedicationStatus(m, care.doses, now);
     final last = status.schedule.lastGivenAt;
+    final finished = status.label == MedicationStatusLabel.finished;
     final inventory = computeInventoryStatus(m, care.doses);
     lines.addAll([
       '${i + 1}. ${m.name}${m.strengthText == null ? '' : ' (${m.strengthText})'}',
       '   Dose: ${m.defaultDoseText}',
       '   Schedule: ${scheduleText(m.schedule)}',
+      if (courseText(m, care.doses) case final course?) '   Course: $course',
       if (m.instructions != null) '   Instructions: ${m.instructions}',
       '   Last given: ${last == null ? 'Not yet' : dateTimeText(last)}',
-      if (last != null) '   Status: ${statusText(status)}',
+      if (last != null || finished)
+        '   Status: ${finished ? finishedText(m) : statusText(status)}',
       '   Reminders: ${remindersText(m.reminders)}',
       if (inventory.configured)
         '   Remaining: ${quantityText(inventory.remaining!)}'

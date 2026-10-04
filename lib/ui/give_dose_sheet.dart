@@ -5,6 +5,7 @@ import 'package:nexpill/domain/wording.dart';
 import 'package:nexpill/models/dose_event.dart';
 import 'package:nexpill/models/medication.dart';
 import 'package:nexpill/services/preferences.dart';
+import 'package:nexpill/ui/dialogs.dart';
 
 /// What was entered in [GiveDoseSheet].
 class DoseEntry {
@@ -32,28 +33,15 @@ Future<bool> confirmEarlyDose(
   if (status.schedule.eligibleNow) return true;
   final minutes = status.minutesUntilEligible;
   final prn = medication.schedule is PrnSchedule;
-  final answer = await showDialog<bool>(
-    context: context,
-    builder: (context) => AlertDialog(
-      title: const Text('This is early'),
-      content: Text(
-        '${medication.name} ${prn ? 'can next be given' : 'is next due'} '
+  return confirmAction(
+    context,
+    title: 'This is early',
+    message: '${medication.name} ${prn ? 'can next be given' : 'is next due'} '
         '${whenText(status.schedule.nextEligibleAt, now)}, in '
         '${durationText(minutes)}. Log a dose now anyway?',
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context, false),
-          child: const Text('Not yet'),
-        ),
-        TextButton(
-          onPressed: () => Navigator.pop(context, true),
-          child: const Text('Log it now'),
-        ),
-      ],
-    ),
+    cancel: 'Not yet',
+    action: 'Log it now',
   );
-  return answer ?? false;
 }
 
 /// Logs a dose — or, given [correcting], corrects one. Opens on "now" with

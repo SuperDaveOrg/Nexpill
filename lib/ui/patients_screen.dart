@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:nexpill/data/ids.dart';
 import 'package:nexpill/models/patient.dart';
 import 'package:nexpill/ui/care_store.dart';
+import 'package:nexpill/ui/dialogs.dart';
 import 'package:nexpill/ui/layout.dart';
 
 /// Asks for a patient's name: to add someone new, or to rename [existing].
@@ -86,28 +87,16 @@ class PatientsScreen extends StatelessWidget {
   }
 
   Future<void> _delete(BuildContext context, Patient p) async {
-    final count =
-        store.care.medications.where((m) => m.patientId == p.id).length;
-    final ok = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Delete ${p.displayName}?'),
-        content: Text(
-          'Their ${count == 1 ? 'medication' : '$count medications'} and all '
+    final count = store.care.medicationsFor(p.id).length;
+    final ok = await confirmAction(
+      context,
+      title: 'Delete ${p.displayName}?',
+      message: 'Their ${count == 1 ? 'medication' : '$count medications'} and all '
           'dose history go too, and can\'t be brought back unless you have a '
           'backup file.',
-        ),
-        actions: [
-          TextButton(
-              onPressed: () => Navigator.pop(context, false),
-              child: const Text('Cancel')),
-          TextButton(
-              onPressed: () => Navigator.pop(context, true),
-              child: const Text('Delete')),
-        ],
-      ),
+      action: 'Delete',
     );
-    if (ok == true) await store.change((repo) => repo.deletePatient(p.id));
+    if (ok) await store.change((repo) => repo.deletePatient(p.id));
   }
 
   @override
@@ -173,9 +162,7 @@ class PatientsScreen extends StatelessWidget {
   }
 
   String _medCount(Patient p) {
-    final n = store.care.medications
-        .where((m) => m.patientId == p.id && m.active)
-        .length;
+    final n = store.care.medicationsFor(p.id).where((m) => m.active).length;
     return n == 1 ? '1 medication' : '$n medications';
   }
 }

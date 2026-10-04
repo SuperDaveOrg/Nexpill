@@ -89,6 +89,7 @@ the whole file; Nexpill writes random UUIDs.
 | `schedule` | object | See below. |
 | `reminders` | object | See below. |
 | `inventory` | object | See below. |
+| `course` | object, optional | When the medication stops by itself. See below. Absent for one that carries on until stopped. |
 | `doses` | array | Dose history, oldest first. |
 
 ### Schedule
@@ -125,6 +126,19 @@ All minute values are positive integers.
 
 What's left is always worked out, never stored: `startingQuantity` minus
 `perDose` for each dose that counts.
+
+### Course
+
+Exactly one of:
+
+| Field | Type | |
+|---|---|---|
+| `lastDay` | `YYYY-MM-DD` | Given through that calendar day; the course finishes at local midnight at the end of it. |
+| `doses` | positive integer | Finished once this many doses count: a dose another one `corrects` doesn't, so a correction doesn't use up a second dose. This is a total over the medication's whole history, not doses still to give. |
+
+Once finished, nothing more is due and nothing is reminded; the medication
+and its history stay. A taper's own steps end it, so Nexpill doesn't write
+a course for a taper; if one is there, whichever ends first applies.
 
 ### Dose
 

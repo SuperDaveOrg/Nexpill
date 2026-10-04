@@ -61,7 +61,7 @@ void main() {
                       as Map<String, dynamic>)[medication.id]
                   ['reminderSettings'] == null),
         );
-      }, skip: _changedSincePwa(medication, doses));
+      }, skip: _changedSincePwa(medication, doses, DateTime.parse(now)));
     }
   });
 
@@ -80,7 +80,8 @@ void main() {
 }
 
 /// Why the PWA's answer no longer applies to this case, or null if it does.
-String? _changedSincePwa(Medication medication, List<DoseEvent> doses) {
+String? _changedSincePwa(
+    Medication medication, List<DoseEvent> doses, DateTime now) {
   // Change 1: fixed-time doses now count. Without doses nothing changed.
   if (medication.schedule is FixedTimesSchedule && doses.isNotEmpty) {
     return 'fixed-time doses now count (port-from-pwa.md, 1)';
@@ -91,6 +92,11 @@ String? _changedSincePwa(Medication medication, List<DoseEvent> doses) {
       DateTime(2026, 6, 1).timeZoneOffset != Duration.zero) {
     return 'taper steps now start at local midnight; checked in UTC only '
         '(port-from-pwa.md, 2)';
+  }
+  // Change 5: once a taper's last step has ended, nothing more is due.
+  if (medication.schedule case TaperSchedule(:final rules)
+      when taperFinished(rules, now)) {
+    return 'a finished taper has nothing due (port-from-pwa.md, 5)';
   }
   return null;
 }

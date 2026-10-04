@@ -23,7 +23,7 @@ void main() {
 
   (String, String) card(MedicationSchedule s, List<DoseEvent> doses) {
     final m = med(s);
-    final (a, b) = cardText(computeMedicationStatus(m, doses, now), s, now);
+    final (a, b) = cardText(computeMedicationStatus(m, doses, now), m, now);
     return (plain(a), plain(b));
   }
 
@@ -80,6 +80,38 @@ void main() {
         TaperRule(startDate: DateTime(2026, 6, 1), endDate: DateTime(2026, 6, 3), intervalMinutes: 480),
       ]);
       expect(scheduleShortText(ended, now), 'Taper finished');
+    });
+  });
+
+  group('a course', () {
+    Medication course(CourseEnd c) => Medication(
+        id: 'm',
+        patientId: 'p',
+        name: 'M',
+        defaultDoseText: '1',
+        schedule: const IntervalSchedule(480),
+        reminders: const ReminderSettings(enabled: true),
+        course: c);
+    final doses = [at(DateTime(2026, 6, 10, 6))];
+
+    test('says how long is left', () {
+      expect(courseShortText(course(EndsAfterDay(DateTime(2026, 6, 14))), doses),
+          'last day Jun 14');
+      expect(courseShortText(course(const EndsAfterDoses(4)), doses), '3 doses left');
+      expect(courseShortText(course(const EndsAfterDoses(2)), doses), '1 dose left');
+      expect(courseText(course(const EndsAfterDoses(4)), doses),
+          '4 doses, 1 given so far');
+      expect(courseShortText(med(const IntervalSchedule(480)), doses), isNull);
+    });
+
+    test('and why it finished', () {
+      expect(finishedText(course(EndsAfterDay(DateTime(2026, 6, 14)))),
+          'Course finished: last day was Jun 14, 2026');
+      expect(finishedText(course(const EndsAfterDoses(5))),
+          'Course finished: all 5 doses given');
+      final m = course(const EndsAfterDoses(1));
+      expect(cardText(computeMedicationStatus(m, doses, now), m, now),
+          ('Finished', 'Course finished: its 1 dose given'));
     });
   });
 

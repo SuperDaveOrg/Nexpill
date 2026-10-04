@@ -1,7 +1,12 @@
 import 'package:nexpill/domain/dates.dart';
+import 'package:nexpill/domain/wording.dart';
 import 'package:nexpill/models/medication.dart';
 
 enum ScheduleKind { interval, fixedTimes, prn, taper }
+
+/// How long a medication runs: until stopped, through a last day, or for a
+/// number of doses.
+enum CourseKind { ongoing, lastDay, doses }
 
 /// One taper step as it's being edited.
 class TaperStepDraft {
@@ -18,9 +23,13 @@ class TaperStepDraft {
 class MedicationDraft {
   MedicationDraft.blank(this.patientId, DateTime today)
       : id = null,
+        givenSoFar = 0,
+        courseLastDay = _aWeekFrom(today),
         taperSteps = [TaperStepDraft(start: dateOnly(today))];
 
-  MedicationDraft.of(Medication m)
+  /// [givenSoFar] is how many of [m]'s doses count, so a course can be set
+  /// as the doses still to give.
+  MedicationDraft.of(Medication m, {this.givenSoFar = 0})
       : id = m.id,
         patientId = m.patientId,
         name = m.name,
@@ -38,7 +47,20 @@ class MedicationDraft {
         unit = m.doseUnit ?? '',
         lowAt = _num(m.lowSupplyThreshold),
         remindersTouched = true,
+        courseLastDay = switch (m.course) {
+          EndsAfterDay(:final lastDay) => lastDay,
+          _ => _aWeekFrom(DateTime.now()),
+        },
         taperSteps = [] {
+    switch (m.course) {
+      case EndsAfterDay():
+        courseKind = CourseKind.lastDay;
+      case EndsAfterDoses(:final doses):
+        courseKind = CourseKind.doses;
+        dosesLeft = '${doses - givenSoFar < 0 ? 0 : doses - givenSoFar}';
+      case null:
+        break;
+    }
     switch (m.schedule) {
       case IntervalSchedule(:final intervalMinutes):
         kind = ScheduleKind.interval;
@@ -88,7 +110,19 @@ class MedicationDraft {
   String unit = '';
   String? lowAt;
 
+  CourseKind courseKind = CourseKind.ongoing;
+  DateTime courseLastDay;
+
+  /// For a course of doses: how many are still to give.
+  String dosesLeft = '';
+
+  /// Doses of this medication already given that count.
+  final int givenSoFar;
+
   bool get isNew => id == null;
+
+  /// A taper's steps say when it ends, so it has no separate course.
+  bool get courseAvailable => kind != ScheduleKind.taper;
 
   /// Alarm mode rings for scheduled doses only.
   bool get alarmAvailable =>
@@ -116,6 +150,15 @@ class MedicationDraft {
         if (e != null) errors['schedule'] = e;
       default:
         break;
+    }
+    if (courseAvailable && courseKind == CourseKind.doses) {
+      final left = int.tryParse(dosesLeft.trim());
+      // Once doses have been given, 0 left means the course is complete.
+      if (left == null || left < (givenSoFar > 0 ? 0 : 1)) {
+        errors['course'] = givenSoFar > 0
+            ? 'Enter how many doses are still to give.'
+            : 'Enter how many doses the course has.';
+      }
     }
     if (trackSupply) {
       final start = _parse(startingQuantity);
@@ -183,15 +226,24 @@ class MedicationDraft {
       doseAmount: trackSupply ? _parse(perDose) : null,
       doseUnit: trackSupply ? opt(unit) : null,
       lowSupplyThreshold: trackSupply ? _parse(lowAt) : null,
+      course: !courseAvailable
+          ? null
+          : switch (courseKind) {
+              CourseKind.ongoing => null,
+              CourseKind.lastDay => EndsAfterDay(dateOnly(courseLastDay)),
+              CourseKind.doses =>
+                EndsAfterDoses(givenSoFar + int.parse(dosesLeft.trim())),
+            },
     );
   }
+
+  /// The last day of a week's course starting on [today]: a calendar day,
+  /// so a daylight-saving change can't shift it.
+  static DateTime _aWeekFrom(DateTime today) =>
+      DateTime(today.year, today.month, today.day + 6);
 
   static double? _parse(String? s) =>
       s == null ? null : double.tryParse(s.trim().replaceAll(',', '.'));
 
-  static String? _num(double? q) => q == null
-      ? null
-      : q == q.roundToDouble()
-          ? q.toInt().toString()
-          : q.toString();
+  static String? _num(double? q) => q == null ? null : quantityText(q);
 }

@@ -40,6 +40,7 @@ void main() {
       expect(b.reminders.earlyMinutes, m.reminders.earlyMinutes);
       expect(b.reminders.alarm, m.reminders.alarm);
       expect(b.initialQuantity, m.initialQuantity);
+      expect(b.course.runtimeType, m.course.runtimeType);
       if (m.schedule case TaperSchedule(:final rules)) {
         final back = (b.schedule as TaperSchedule).rules;
         expect([for (final r in back) r.startDate], [for (final r in rules) r.startDate]);
@@ -47,6 +48,18 @@ void main() {
     }
     expect({for (final d in back.doses) d.id: (d.givenAt, d.supersedesId)},
         {for (final d in sample.doses) d.id: (d.givenAt.toUtc(), d.supersedesId)});
+  });
+
+  test('a course: a last day or a number of doses, and none when ongoing', () {
+    final json = sampleJson();
+    final amox = ((json['patients'] as List).first['medications'] as List)
+        .firstWhere((m) => m['id'] == 'sample-amox') as Map;
+    expect(amox['course'], {'lastDay': '2026-06-14'});
+    expect(firstMed(json).containsKey('course'), isFalse, reason: 'ongoing');
+
+    amox['course'] = {'doses': 21};
+    final back = decodeBackup(jsonEncode(json)).medication('sample-amox')!;
+    expect(back.course, isA<EndsAfterDoses>().having((c) => c.doses, 'doses', 21));
   });
 
   test('is readable: pretty JSON, whole numbers, UTC instants', () {
@@ -109,6 +122,13 @@ void main() {
 
     test('a zero interval', () =>
         refuses((j) => (firstMed(j)['schedule'] as Map)['everyMinutes'] = 0, 'impossible'));
+
+    test('a course that is both a date and doses', () => refuses(
+        (j) => firstMed(j)['course'] = {'lastDay': '2026-06-14', 'doses': 3},
+        'not both'));
+
+    test('a course of no doses', () =>
+        refuses((j) => firstMed(j)['course'] = {'doses': 0}, 'impossible'));
 
     test('an empty name', () =>
         refuses((j) => (j['patients'] as List).first['name'] = '  ', 'empty "name"'));

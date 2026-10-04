@@ -198,3 +198,8 @@ the PWA.
    what the caregiver saw.
 4. **Tapers can be "missed"**, by the same rule as intervals: half the
    current step's interval past due.
+5. **A taper finishes when its last step ends.** The PWA kept the last step
+   in force for ever, so a taper that ended on 3 June read "overdue" weeks
+   later and kept reminding. Now, from midnight at the start of the last
+   step's end date, it's finished: nothing is due, overdue or reminded, and
+   the card says so. A taper whose last step is open-ended never finishes.

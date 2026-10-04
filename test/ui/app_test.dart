@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nexpill/data/sample_data.dart';
+import 'package:nexpill/models/care_snapshot.dart';
+import 'package:nexpill/models/medication.dart';
 import 'package:nexpill/services/notification_service.dart';
 import 'package:nexpill/ui/app.dart';
 import 'package:nexpill/ui/care_store.dart';
@@ -99,6 +101,34 @@ void main() {
     // Amoxicillin is overdue; acetaminophen due in minutes; prednisone hours.
     expect(names[0].$2, lessThan(names[1].$2));
     expect(names[1].$2, lessThan(names[2].$2));
+  });
+
+  testWidgets('a finished course moves below, with the stopped ones', (tester) async {
+    final sample = sampleCare(DateTime.now());
+    await repo.replaceAll(CareSnapshot(
+      patients: sample.patients,
+      medications: [
+        for (final m in sample.medications)
+          if (m.id == 'sample-amox')
+            Medication(
+                id: m.id, patientId: m.patientId, name: m.name,
+                defaultDoseText: m.defaultDoseText, schedule: m.schedule,
+                reminders: m.reminders, course: const EndsAfterDoses(1))
+          else
+            m,
+      ],
+      doses: sample.doses,
+    ));
+    await start(tester, tall: true);
+
+    expect(find.text('Finished (1)'), findsOneWidget);
+    await tester.tap(find.text('Finished (1)'));
+    await tester.pumpAndSettle();
+    expect(find.text('Course finished: its 1 dose given'), findsOneWidget);
+    await store.refresh();
+    expect(notifications.lastPlan!.notifications
+        .expand((n) => n.medicationIds)
+        .contains('sample-amox'), isFalse);
   });
 
   testWidgets('tapping a card edits it; the list ends with an add button', (tester) async {
