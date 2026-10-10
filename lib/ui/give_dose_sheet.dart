@@ -145,84 +145,88 @@ class _GiveDoseSheetState extends State<_GiveDoseSheet> {
     final theme = Theme.of(context);
     final correcting = widget.correcting != null;
     final at = _at;
-    return Padding(
-      padding: EdgeInsets.fromLTRB(
-          20, 0, 20, 20 + MediaQuery.viewInsetsOf(context).bottom),
-      child: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              correcting
-                  ? 'Correct this ${widget.medication.name} entry'
-                  : 'Give ${widget.medication.name}',
-              style: theme.textTheme.titleLarge,
-            ),
-            if (correcting)
-              Padding(
-                padding: const EdgeInsets.only(top: 6),
-                child: Text(
-                  'The original stays in history, marked as corrected.',
-                  style: theme.textTheme.bodySmall,
+    // SafeArea keeps "Log dose" above a 3-button navigation bar; its bottom
+    // padding drops to zero while the keyboard is up, which viewInsets covers.
+    return SafeArea(
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(
+            20, 0, 20, 20 + MediaQuery.viewInsetsOf(context).bottom),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                correcting
+                    ? 'Correct this ${widget.medication.name} entry'
+                    : 'Give ${widget.medication.name}',
+                style: theme.textTheme.titleLarge,
+              ),
+              if (correcting)
+                Padding(
+                  padding: const EdgeInsets.only(top: 6),
+                  child: Text(
+                    'The original stays in history, marked as corrected.',
+                    style: theme.textTheme.bodySmall,
+                  ),
                 ),
+              const SizedBox(height: 16),
+              if (!correcting)
+                SegmentedButton<bool>(
+                  segments: const [
+                    ButtonSegment(value: true, label: Text('Now')),
+                    ButtonSegment(value: false, label: Text('Earlier')),
+                  ],
+                  selected: {at == null},
+                  onSelectionChanged: (s) {
+                    if (s.single) {
+                      setState(() => _at = null);
+                    } else {
+                      _pickTime();
+                    }
+                  },
+                ),
+              if (at != null)
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: const Icon(Icons.schedule),
+                  title: Text('Given ${whenText(at, DateTime.now())}'),
+                  trailing: TextButton(
+                      onPressed: _pickTime, child: const Text('Change')),
+                ),
+              if (_error != null)
+                Text(_error!,
+                    style: theme.textTheme.bodyMedium
+                        ?.copyWith(color: theme.colorScheme.error)),
+              const SizedBox(height: 12),
+              TextField(
+                controller: _dose,
+                decoration: const InputDecoration(labelText: 'Dose'),
+                textCapitalization: TextCapitalization.sentences,
               ),
-            const SizedBox(height: 16),
-            if (!correcting)
-              SegmentedButton<bool>(
-                segments: const [
-                  ButtonSegment(value: true, label: Text('Now')),
-                  ButtonSegment(value: false, label: Text('Earlier')),
-                ],
-                selected: {at == null},
-                onSelectionChanged: (s) {
-                  if (s.single) {
-                    setState(() => _at = null);
-                  } else {
-                    _pickTime();
-                  }
-                },
+              const SizedBox(height: 12),
+              TextField(
+                controller: _givenBy,
+                decoration: const InputDecoration(
+                    labelText: 'Given by', hintText: 'Optional'),
+                textCapitalization: TextCapitalization.words,
               ),
-            if (at != null)
-              ListTile(
-                contentPadding: EdgeInsets.zero,
-                leading: const Icon(Icons.schedule),
-                title: Text('Given ${whenText(at, DateTime.now())}'),
-                trailing: TextButton(
-                    onPressed: _pickTime, child: const Text('Change')),
+              const SizedBox(height: 12),
+              TextField(
+                controller: _notes,
+                decoration:
+                    const InputDecoration(labelText: 'Notes', hintText: 'Optional'),
+                textCapitalization: TextCapitalization.sentences,
+                maxLines: 2,
+                minLines: 1,
               ),
-            if (_error != null)
-              Text(_error!,
-                  style: theme.textTheme.bodyMedium
-                      ?.copyWith(color: theme.colorScheme.error)),
-            const SizedBox(height: 12),
-            TextField(
-              controller: _dose,
-              decoration: const InputDecoration(labelText: 'Dose'),
-              textCapitalization: TextCapitalization.sentences,
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: _givenBy,
-              decoration: const InputDecoration(
-                  labelText: 'Given by', hintText: 'Optional'),
-              textCapitalization: TextCapitalization.words,
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: _notes,
-              decoration:
-                  const InputDecoration(labelText: 'Notes', hintText: 'Optional'),
-              textCapitalization: TextCapitalization.sentences,
-              maxLines: 2,
-              minLines: 1,
-            ),
-            const SizedBox(height: 20),
-            FilledButton(
-              onPressed: _save,
-              child: Text(correcting ? 'Save correction' : 'Log dose'),
-            ),
-          ],
+              const SizedBox(height: 20),
+              FilledButton(
+                onPressed: _save,
+                child: Text(correcting ? 'Save correction' : 'Log dose'),
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -1,6 +1,9 @@
+import 'dart:ui' show PlatformDispatcher;
+
 import 'package:flutter/material.dart';
 
 import 'package:nexpill/data/care_repository.dart';
+import 'package:nexpill/domain/wording.dart';
 import 'package:nexpill/services/notification_service.dart';
 import 'package:nexpill/services/preferences.dart';
 import 'package:nexpill/services/reminder_sync.dart';
@@ -17,6 +20,11 @@ Future<void> main() async {
     onTap: (response) => taps.value = ReminderTag.tryParse(response.payload),
   );
   taps.value = await notifications.launchTag();
+
+  // Saved for the reminder isolate, which can't ask the phone. NexpillApp
+  // keeps both in step with MediaQuery once it's on screen.
+  use24HourClock = PlatformDispatcher.instance.alwaysUse24HourFormat;
+  await Preferences.setUse24HourClock(use24HourClock);
 
   final store = CareStore(repository: CareRepository(), notifications: notifications);
   // Every start replans the week's reminders, so they never run out while

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import 'package:nexpill/domain/wording.dart';
 import 'package:nexpill/services/notification_service.dart';
 import 'package:nexpill/services/preferences.dart';
 import 'package:nexpill/ui/care_screen.dart';
@@ -50,6 +51,20 @@ class _NexpillAppState extends State<NexpillApp> with WidgetsBindingObserver {
     widget.reminderTaps.removeListener(_openTapped);
     _tick?.cancel();
     super.dispose();
+  }
+
+  /// Follows the phone's 24-hour setting. Flutter only rereads it at start
+  /// and on a configuration change (rotating, dark mode), so a change made
+  /// in system settings may wait until then. Reminders say the time too, so
+  /// they're replanned.
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final use24 = MediaQuery.alwaysUse24HourFormatOf(context);
+    if (use24 == use24HourClock) return;
+    use24HourClock = use24;
+    Preferences.setUse24HourClock(use24);
+    widget.store.refresh();
   }
 
   /// A dose may have been marked given from a reminder while away.

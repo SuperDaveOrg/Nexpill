@@ -28,6 +28,10 @@ turns that section into the release's own when it's cut.
   `nexpill-alex-summary-2026-06-10.txt` and `nexpill-alex-doses-2026-06-10.csv`.
 
 ### Fixed
+- Times follow the phone's 24-hour setting, on screen and in reminders.
+  They always read "7:15 PM" before.
+- The "Log dose" button no longer sits partly under a 3-button navigation
+  bar, where a tap on it landed on the bar instead.
 - Correcting a dose now saves exactly what you enter. Before, clearing
   "Given by" or the notes, or setting the dose back to the usual one, kept
   the original entry's value.

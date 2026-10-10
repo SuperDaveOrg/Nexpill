@@ -22,12 +22,20 @@ String durationText(int minutes) {
   return '${unit(h, 'hour')} ${unit(m, 'minute')}';
 }
 
-/// "2:30 PM".
-String clockText(DateTime at) => DateFormat.jm().format(at.toLocal());
+/// Whether times read "14:30" rather than "2:30 PM". Follows the phone's
+/// 24-hour setting: the app sets it from MediaQuery, and the reminder
+/// isolate from the copy kept in Preferences.
+bool use24HourClock = false;
 
-/// "Jun 10, 2026, 2:30 PM".
-String dateTimeText(DateTime at) =>
-    DateFormat.yMMMd().add_jm().format(at.toLocal());
+/// "2:30 PM", or "14:30" with [use24HourClock].
+String clockText(DateTime at) =>
+    (use24HourClock ? DateFormat.Hm() : DateFormat.jm()).format(at.toLocal());
+
+/// "Jun 10, 2026, 2:30 PM", or "Jun 10, 2026, 14:30" with [use24HourClock].
+String dateTimeText(DateTime at) {
+  final date = DateFormat.yMMMd();
+  return (use24HourClock ? date.add_Hm() : date.add_jm()).format(at.toLocal());
+}
 
 /// "Jun 10, 2026".
 String dateText(DateTime day) => DateFormat.yMMMd().format(day);

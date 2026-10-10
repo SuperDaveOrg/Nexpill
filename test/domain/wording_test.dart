@@ -122,4 +122,12 @@ void main() {
     expect(dayHeading(dateOnly(now), now), 'Today');
     expect(shortDurationText(192), '3 hr 12 min');
   });
+
+  test('follows the 24-hour setting', () {
+    addTearDown(() => use24HourClock = false);
+    use24HourClock = true;
+    expect(clockText(DateTime(2026, 6, 10, 19, 15)), '19:15');
+    expect(whenText(DateTime(2026, 6, 9, 21), now), 'yesterday at 21:00');
+    expect(dateTimeText(DateTime(2026, 6, 10, 7, 5)), 'Jun 10, 2026 07:05');
+  });
 }

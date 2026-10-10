@@ -3,7 +3,9 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import 'package:nexpill/data/care_repository.dart';
 import 'package:nexpill/domain/reminder_planner.dart';
+import 'package:nexpill/domain/wording.dart';
 import 'package:nexpill/services/notification_service.dart';
+import 'package:nexpill/services/preferences.dart';
 
 /// Replans every reminder from what's in the database now.
 ///
@@ -31,6 +33,7 @@ Future<void> onReminderAction(NotificationResponse response) async {
   final tag = ReminderTag.tryParse(response.payload);
   if (tag == null) return;
 
+  use24HourClock = await Preferences.use24HourClock() ?? false;
   final repository = CareRepository();
   final notifications = NotificationService();
   await notifications.init(onAction: onReminderAction);
