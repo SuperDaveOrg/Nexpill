@@ -9,7 +9,8 @@ import 'package:nexpill/models/patient.dart';
 ///
 /// Built relative to [now], so every status and kind of reminder shows up
 /// straight away: one dose due within minutes, one overdue, a fixed-time
-/// medication, a taper mid-way, an as-needed one, and a correction.
+/// medication, a taper mid-way, an as-needed one, a course with an end,
+/// and a correction.
 CareSnapshot sampleCare(DateTime now) {
   const alex = Patient(id: 'sample-alex', displayName: 'Alex Rivera');
   const jordan = Patient(id: 'sample-jordan', displayName: 'Jordan Lee');
@@ -25,6 +26,7 @@ CareSnapshot sampleCare(DateTime now) {
     String? instructions,
     ReminderSettings? reminders,
     double? stock,
+    CourseEnd? course,
   }) =>
       Medication(
         id: id,
@@ -40,6 +42,7 @@ CareSnapshot sampleCare(DateTime now) {
         doseAmount: stock == null ? null : 1,
         doseUnit: stock == null ? null : 'tablets',
         lowSupplyThreshold: stock == null ? null : 6,
+        course: course,
       );
 
   DoseEvent dose(String id, String medicationId, Duration ago,
@@ -63,7 +66,10 @@ CareSnapshot sampleCare(DateTime now) {
           stock: 30),
       med('sample-amox', alex.id, 'Amoxicillin', '1 capsule',
           const IntervalSchedule(8 * 60),
-          strength: '500 mg', instructions: 'With water, with or without food.'),
+          strength: '500 mg',
+          instructions: 'With water, with or without food.',
+          // A week's course, started two days ago.
+          course: EndsAfterDay(DateTime(today.year, today.month, today.day + 4))),
       med('sample-drops', alex.id, 'Eye drops', '1 drop each eye',
           const FixedTimesSchedule([ClockTime(8, 0), ClockTime(20, 0)])),
       med('sample-pred', alex.id, 'Prednisone', '10 mg',

@@ -3,10 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:nexpill/domain/dates.dart';
 import 'package:nexpill/domain/wording.dart';
 import 'package:nexpill/export/dose_history_csv.dart';
+import 'package:nexpill/export/file_names.dart';
 import 'package:nexpill/models/dose_event.dart';
 import 'package:nexpill/models/patient.dart';
-import 'package:nexpill/services/document_service.dart';
 import 'package:nexpill/ui/care_store.dart';
+import 'package:nexpill/ui/dialogs.dart';
 import 'package:nexpill/ui/give_dose_sheet.dart';
 import 'package:nexpill/ui/layout.dart';
 
@@ -34,25 +35,13 @@ class HistoryScreen extends StatefulWidget {
 class _HistoryScreenState extends State<HistoryScreen> {
   late String? _medicationId = widget.medicationId;
 
-  Future<void> _export() async {
-    final care = widget.store.care;
-    try {
-      final saved = await DocumentService().save(
-        'nexpill-${_slug(widget.patient.displayName)}-doses-${isoDate(DateTime.now())}.csv',
-        doseHistoryCsv(care, patientId: widget.patient.id),
+  Future<void> _export() => saveToFile(
+        context,
+        name: doseHistoryFileName(widget.patient, DateTime.now()),
+        text: doseHistoryCsv(widget.store.care, patientId: widget.patient.id),
         mimeType: 'text/csv',
+        done: 'Dose history saved',
       );
-      if (saved && mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(const SnackBar(content: Text('Dose history saved')));
-      }
-    } catch (_) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Couldn\'t save the file')));
-      }
-    }
-  }
 
   Future<void> _open(DoseEvent dose, {required bool replaced}) async {
     final medication = widget.store.care.medication(dose.medicationId);
@@ -92,25 +81,15 @@ class _HistoryScreenState extends State<HistoryScreen> {
               notes: entry.notes,
             ));
       case 'delete':
-        final ok = await showDialog<bool>(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: const Text('Delete this entry?'),
-            content: Text(
-                '${medication.name}, ${dateTimeText(dose.givenAt)}. Use this '
-                'only if the dose was never given; to fix its time, correct '
-                'it instead. Any corrections of it go too.'),
-            actions: [
-              TextButton(
-                  onPressed: () => Navigator.pop(context, false),
-                  child: const Text('Cancel')),
-              TextButton(
-                  onPressed: () => Navigator.pop(context, true),
-                  child: const Text('Delete')),
-            ],
-          ),
+        final ok = await confirmAction(
+          context,
+          title: 'Delete this entry?',
+          message: '${medication.name}, ${dateTimeText(dose.givenAt)}. Use this '
+              'only if the dose was never given; to fix its time, correct '
+              'it instead. Any corrections of it go too.',
+          action: 'Delete',
         );
-        if (ok == true) await widget.store.change((repo) => repo.deleteDose(dose.id));
+        if (ok) await widget.store.change((repo) => repo.deleteDose(dose.id));
     }
   }
 
@@ -123,8 +102,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
         final care = widget.store.care;
         final now = widget.store.now;
         final meds = {
-          for (final m in care.medications)
-            if (m.patientId == widget.patient.id) m.id: m,
+          for (final m in care.medicationsFor(widget.patient.id)) m.id: m,
         };
         final filter = _medicationId;
         final doses = [
@@ -222,6 +200,3 @@ class _HistoryScreenState extends State<HistoryScreen> {
     );
   }
 }
-
-String _slug(String s) =>
-    s.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]+'), '-').replaceAll(RegExp(r'^-|-$'), '');

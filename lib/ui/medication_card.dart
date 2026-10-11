@@ -20,6 +20,7 @@ class MedicationCard extends StatelessWidget {
     required this.onGive,
     required this.onAction,
     this.lastGivenBy,
+    this.course,
   });
 
   final Medication medication;
@@ -27,6 +28,9 @@ class MedicationCard extends StatelessWidget {
   final InventoryStatus inventory;
   final DateTime now;
   final String? lastGivenBy;
+
+  /// How much of a course is left, e.g. "3 doses left"; null if none.
+  final String? course;
   final VoidCallback onGive;
   final ValueChanged<CardAction> onAction;
 
@@ -35,7 +39,7 @@ class MedicationCard extends StatelessWidget {
     final theme = Theme.of(context);
     final colors = StatusColors.of(context);
     final m = medication;
-    final (headline, detail) = cardText(status, m.schedule, now);
+    final (headline, detail) = cardText(status, m, now);
     final accent = switch (status.label) {
       MedicationStatusLabel.missed ||
       MedicationStatusLabel.overdue => colors.late,
@@ -101,7 +105,8 @@ class MedicationCard extends StatelessWidget {
                 ],
               ),
               Text(
-                '${m.defaultDoseText} · ${scheduleShortText(m.schedule, now)}',
+                [m.defaultDoseText, scheduleShortText(m.schedule, now), ?course]
+                    .join(' · '),
                 style: theme.textTheme.bodySmall,
               ),
               if (m.instructions != null) ...[

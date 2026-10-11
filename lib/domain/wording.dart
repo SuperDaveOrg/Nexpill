@@ -1,7 +1,12 @@
+import 'dart:math' as math;
+
 import 'package:intl/intl.dart';
 
 import 'package:nexpill/domain/dates.dart';
+import 'package:nexpill/domain/dose_history.dart';
+import 'package:nexpill/domain/scheduling.dart';
 import 'package:nexpill/domain/status.dart';
+import 'package:nexpill/models/dose_event.dart';
 import 'package:nexpill/models/medication.dart';
 
 /// How timing is put into words, shared by the screens, the exports and the
@@ -17,12 +22,20 @@ String durationText(int minutes) {
   return '${unit(h, 'hour')} ${unit(m, 'minute')}';
 }
 
-/// "2:30 PM".
-String clockText(DateTime at) => DateFormat.jm().format(at.toLocal());
+/// Whether times read "14:30" rather than "2:30 PM". Follows the phone's
+/// 24-hour setting: the app sets it from MediaQuery, and the reminder
+/// isolate from the copy kept in Preferences.
+bool use24HourClock = false;
 
-/// "Jun 10, 2026, 2:30 PM".
-String dateTimeText(DateTime at) =>
-    DateFormat.yMMMd().add_jm().format(at.toLocal());
+/// "2:30 PM", or "14:30" with [use24HourClock].
+String clockText(DateTime at) =>
+    (use24HourClock ? DateFormat.Hm() : DateFormat.jm()).format(at.toLocal());
+
+/// "Jun 10, 2026, 2:30 PM", or "Jun 10, 2026, 14:30" with [use24HourClock].
+String dateTimeText(DateTime at) {
+  final date = DateFormat.yMMMd();
+  return (use24HourClock ? date.add_Hm() : date.add_jm()).format(at.toLocal());
+}
 
 /// "Jun 10, 2026".
 String dateText(DateTime day) => DateFormat.yMMMd().format(day);
@@ -53,28 +66,25 @@ String scheduleText(MedicationSchedule schedule) => switch (schedule) {
     };
 
 /// The schedule as it stands [now], short enough for a card: a taper shows
-/// the step in force and what comes next, not every step.
+/// the step the timing engine has in force and what comes next, not every
+/// step.
 String scheduleShortText(MedicationSchedule schedule, DateTime now) {
   if (schedule is! TaperSchedule || schedule.rules.isEmpty) {
     return scheduleText(schedule);
   }
-  final rules = [...schedule.rules]..sort((a, b) => a.startDate.compareTo(b.startDate));
-  final i = rules.indexWhere((r) =>
-      !now.isBefore(dateOnly(r.startDate)) &&
-      (r.endDate == null || now.isBefore(dateOnly(r.endDate!))));
-  if (i < 0) {
-    final upcoming = rules.where((r) => now.isBefore(dateOnly(r.startDate)));
-    if (upcoming.isEmpty) return 'Taper finished';
-    final first = upcoming.first;
-    return 'Taper: every ${durationText(first.intervalMinutes)} '
-        'from ${DateFormat.MMMd().format(first.startDate)}';
+  if (taperFinished(schedule.rules, now)) return 'Taper finished';
+  final r = activeTaperRule(schedule.rules, now)!;
+  final every = 'Taper: every ${durationText(r.intervalMinutes)}';
+  if (now.isBefore(dateOnly(r.startDate))) {
+    return '$every from ${DateFormat.MMMd().format(r.startDate)}';
   }
-  final r = rules[i];
+  final rules = orderedTaperRules(schedule.rules);
+  final i = rules.indexOf(r);
   final until = r.endDate == null ? '' : ' until ${DateFormat.MMMd().format(r.endDate!)}';
   final next = i + 1 < rules.length
       ? ', then every ${durationText(rules[i + 1].intervalMinutes)}'
       : '';
-  return 'Taper: every ${durationText(r.intervalMinutes)}$until$next';
+  return '$every$until$next';
 }
 
 /// One line saying where a medication stands, e.g. "Due at 2:30 PM" or
@@ -92,6 +102,7 @@ String statusText(MedicationStatus status) {
       'Overdue by ${durationText(s.overdueByMinutes ?? 0)}',
     MedicationStatusLabel.missed =>
       'Missed: was due ${durationText(s.overdueByMinutes ?? 0)} ago',
+    MedicationStatusLabel.finished => 'Finished',
   };
 }
 
@@ -148,10 +159,42 @@ String dayHeading(DateTime day, DateTime now) {
   };
 }
 
+/// Why a finished medication has nothing more due: "Taper finished",
+/// "Course finished: last day was Jun 14, 2026", "Course finished: all 5
+/// doses given".
+String finishedText(Medication m) => switch (m.course) {
+      EndsAfterDay(:final lastDay) =>
+        'Course finished: last day was ${dateText(lastDay)}',
+      EndsAfterDoses(:final doses) =>
+        'Course finished: ${doses == 1 ? 'its 1 dose' : 'all $doses doses'} given',
+      null => 'Taper finished',
+    };
+
+/// How long [m]'s course runs, for a summary: "Last day Jun 14, 2026" or
+/// "5 doses, 2 given so far". Null for a medication that carries on.
+String? courseText(Medication m, Iterable<DoseEvent> doses) => switch (m.course) {
+      EndsAfterDay(:final lastDay) => 'Last day ${dateText(lastDay)}',
+      EndsAfterDoses(doses: final total) =>
+        '${_doses(total)}, ${effectiveDoses(m.id, doses).length} given so far',
+      null => null,
+    };
+
+/// The same, short enough for a card: "last day Jun 14" or "3 doses left".
+String? courseShortText(Medication m, Iterable<DoseEvent> doses) =>
+    switch (m.course) {
+      EndsAfterDay(:final lastDay) => 'last day ${DateFormat.MMMd().format(lastDay)}',
+      EndsAfterDoses(doses: final total) =>
+        '${_doses(math.max(0, total - effectiveDoses(m.id, doses).length))} left',
+      null => null,
+    };
+
+String _doses(int n) => n == 1 ? '1 dose' : '$n doses';
+
 /// What a medication card says, in two lines: the one thing to know
 /// ("Due in 8 min", "Overdue 25 min"), and when that is.
 (String headline, String detail) cardText(
-    MedicationStatus status, MedicationSchedule schedule, DateTime now) {
+    MedicationStatus status, Medication medication, DateTime now) {
+  final schedule = medication.schedule;
   final s = status.schedule;
   final next = whenText(s.nextEligibleAt, now);
   final late = s.overdueByMinutes ?? 0;
@@ -176,5 +219,6 @@ String dayHeading(DateTime day, DateTime now) {
         'Missed',
         'was due $next, ${shortDurationText(late)} ago',
       ),
+    MedicationStatusLabel.finished => ('Finished', finishedText(medication)),
   };
 }

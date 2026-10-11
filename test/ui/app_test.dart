@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nexpill/data/sample_data.dart';
+import 'package:nexpill/models/care_snapshot.dart';
+import 'package:nexpill/models/dose_event.dart';
+import 'package:nexpill/models/medication.dart';
 import 'package:nexpill/services/notification_service.dart';
 import 'package:nexpill/ui/app.dart';
 import 'package:nexpill/ui/care_store.dart';
+import 'package:nexpill/ui/give_dose_sheet.dart';
+import 'package:nexpill/ui/settings_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../support/fakes.dart';
@@ -101,6 +106,34 @@ void main() {
     expect(names[1].$2, lessThan(names[2].$2));
   });
 
+  testWidgets('a finished course moves below, with the stopped ones', (tester) async {
+    final sample = sampleCare(DateTime.now());
+    await repo.replaceAll(CareSnapshot(
+      patients: sample.patients,
+      medications: [
+        for (final m in sample.medications)
+          if (m.id == 'sample-amox')
+            Medication(
+                id: m.id, patientId: m.patientId, name: m.name,
+                defaultDoseText: m.defaultDoseText, schedule: m.schedule,
+                reminders: m.reminders, course: const EndsAfterDoses(1))
+          else
+            m,
+      ],
+      doses: sample.doses,
+    ));
+    await start(tester, tall: true);
+
+    expect(find.text('Finished (1)'), findsOneWidget);
+    await tester.tap(find.text('Finished (1)'));
+    await tester.pumpAndSettle();
+    expect(find.text('Course finished: its 1 dose given'), findsOneWidget);
+    await store.refresh();
+    expect(notifications.lastPlan!.notifications
+        .expand((n) => n.medicationIds)
+        .contains('sample-amox'), isFalse);
+  });
+
   testWidgets('tapping a card edits it; the list ends with an add button', (tester) async {
     await repo.replaceAll(sampleCare(DateTime.now()));
     await start(tester, tall: true);
@@ -108,5 +141,49 @@ void main() {
     await tester.tap(find.textContaining('Amoxicillin', findRichText: true).first);
     await tester.pumpAndSettle();
     expect(find.text('Edit Amoxicillin'), findsOneWidget);
+  });
+
+  testWidgets('a correction keeps a blank "Given by"', (tester) async {
+    SharedPreferences.setMockInitialValues({'last_given_by': 'Pat'});
+    final m = sampleCare(DateTime.now()).medications.first;
+    DoseEvent? correcting;
+    await tester.pumpWidget(MaterialApp(
+      home: Builder(
+        builder: (context) => TextButton(
+          onPressed: () =>
+              showGiveDoseSheet(context, medication: m, correcting: correcting),
+          child: const Text('open'),
+        ),
+      ),
+    ));
+    String givenBy() => tester
+        .widget<TextField>(find.widgetWithText(TextField, 'Given by'))
+        .controller!
+        .text;
+
+    // A new dose offers the last name used...
+    await tester.tap(find.text('open'));
+    await tester.pumpAndSettle();
+    expect(givenBy(), 'Pat');
+    Navigator.pop(tester.element(find.text('Given by')));
+    await tester.pumpAndSettle();
+
+    // ...but correcting one logged without a name keeps it blank.
+    correcting = DoseEvent(id: 'd', medicationId: m.id, givenAt: DateTime.now());
+    await tester.tap(find.text('open'));
+    await tester.pumpAndSettle();
+    expect(givenBy(), '');
+  });
+
+  testWidgets('Settings shows restored people without reopening', (tester) async {
+    await store.load();
+    await tester.pumpWidget(MaterialApp(home: SettingsScreen(store: store)));
+    await tester.pumpAndSettle();
+    expect(find.text('0 on this phone'), findsOneWidget);
+
+    final backup = sampleCare(DateTime.now());
+    await store.change((repo) => repo.replaceAll(backup));
+    await tester.pumpAndSettle();
+    expect(find.text('${backup.patients.length} on this phone'), findsOneWidget);
   });
 }

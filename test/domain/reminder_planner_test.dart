@@ -14,6 +14,7 @@ Medication med(
   String patientId = 'sam',
   ReminderSettings? reminders,
   bool active = true,
+  CourseEnd? course,
 }) =>
     Medication(
       id: id,
@@ -23,6 +24,7 @@ Medication med(
       schedule: schedule,
       reminders: reminders ?? const ReminderSettings(enabled: true),
       active: active,
+      course: course,
     );
 
 DoseEvent given(String medicationId, DateTime at, {String id = 'd'}) =>
@@ -221,6 +223,56 @@ void main() {
       final plan = const ReminderPlanner(horizon: Duration(hours: 16))
           .plan(care([m], []), from: from);
       expect(summary(plan), ['10/16:00 dueNow:pred', '11/00:00 dueNow:pred']);
+    });
+
+    test('stops when its last step ends', () {
+      final ending = TaperSchedule([
+        TaperRule(startDate: DateTime(2026, 6, 1), endDate: DateTime(2026, 6, 11), intervalMinutes: 480),
+      ]);
+      final m = med('pred', ending,
+          reminders: const ReminderSettings(enabled: true, overdueRepeatMinutes: 120));
+      final doses = [given('pred', DateTime(2026, 6, 10, 6))];
+      final plan = const ReminderPlanner(horizon: Duration(hours: 48))
+          .plan(care([m], doses), from: from);
+      // Due 14:00 and repeating while overdue, but not past midnight, when
+      // the taper ends.
+      expect(summary(plan), [
+        '10/14:00 dueNow:pred',
+        '10/16:00 overdue:pred',
+        '10/18:00 overdue:pred',
+        '10/20:00 overdue:pred',
+        '10/22:00 overdue:pred',
+      ]);
+      expect(plan.refreshNoticeAt, isNull);
+
+      final snoozed = snoozedNotification(care([m], doses), ['pred'],
+          now: DateTime(2026, 6, 11, 0, 5), at: DateTime(2026, 6, 11, 0, 10));
+      expect(snoozed, isNull, reason: 'a snooze past the end shows nothing');
+    });
+  });
+
+  group('a course with an end', () {
+    test('stops reminding at midnight after its last day', () {
+      final m = med('amox', const IntervalSchedule(8 * 60),
+          reminders: const ReminderSettings(enabled: true, overdueRepeatMinutes: 60),
+          course: EndsAfterDay(DateTime(2026, 6, 10)));
+      final plan = const ReminderPlanner(horizon: Duration(hours: 48))
+          .plan(care([m], [given('amox', DateTime(2026, 6, 10, 13))]), from: from);
+      // Due 21:00, overdue on the hour until the course ends at midnight.
+      expect(summary(plan), [
+        '10/21:00 dueNow:amox',
+        '10/22:00 overdue:amox',
+        '10/23:00 overdue:amox',
+      ]);
+    });
+
+    test('of doses stops once the last is given', () {
+      final m = med('amox', const IntervalSchedule(8 * 60),
+          course: const EndsAfterDoses(2));
+      final one = [given('amox', DateTime(2026, 6, 10, 6))];
+      expect(planner.plan(care([m], one), from: from).notifications, isNotEmpty);
+      final two = [...one, given('amox', DateTime(2026, 6, 10, 8), id: 'e')];
+      expect(planner.plan(care([m], two), from: from).notifications, isEmpty);
     });
   });
 

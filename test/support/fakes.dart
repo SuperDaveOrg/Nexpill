@@ -86,14 +86,14 @@ class InMemoryCareRepository implements CareRepository {
 
   @override
   Future<DoseEvent> correctDose(DoseEvent original,
-      {DateTime? givenAt, String? doseText, String? givenBy, String? notes}) async {
+      {required DateTime givenAt, String? doseText, String? givenBy, String? notes}) async {
     final d = DoseEvent(
       id: newId(),
       medicationId: original.medicationId,
-      givenAt: (givenAt ?? original.givenAt).toUtc(),
-      doseText: doseText ?? original.doseText,
-      givenBy: givenBy ?? original.givenBy,
-      notes: notes ?? original.notes,
+      givenAt: givenAt.toUtc(),
+      doseText: doseText,
+      givenBy: givenBy,
+      notes: notes,
       supersedesId: original.id,
     );
     return _doses[d.id] = d;

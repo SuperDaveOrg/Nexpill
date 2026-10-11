@@ -20,4 +20,8 @@ class CareSnapshot {
 
   Medication? medication(String id) =>
       medications.where((m) => m.id == id).firstOrNull;
+
+  /// [patientId]'s medications, stopped ones included.
+  List<Medication> medicationsFor(String patientId) =>
+      [for (final m in medications) if (m.patientId == patientId) m];
 }

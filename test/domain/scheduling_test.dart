@@ -11,6 +11,7 @@ Medication med(
   MedicationSchedule schedule, {
   String id = 'med-1',
   ReminderSettings? reminders,
+  CourseEnd? course,
 }) =>
     Medication(
       id: id,
@@ -19,6 +20,7 @@ Medication med(
       defaultDoseText: '1 tablet',
       schedule: schedule,
       reminders: reminders ?? ReminderSettings.defaultsFor(schedule),
+      course: course,
     );
 
 DoseEvent dose(String at,
@@ -227,6 +229,79 @@ void main() {
       final r = calculateSchedule(
           med(taper), [dose('2026-03-24T22:00:00')], DateTime(2026, 3, 26));
       expect(r.nextEligibleAt, DateTime(2026, 3, 25, 12));
+    });
+
+    test('finishes at local midnight on the last step\'s end date', () {
+      final ending = TaperSchedule([
+        TaperRule(
+            startDate: DateTime(2026, 3, 20),
+            endDate: DateTime(2026, 3, 25),
+            intervalMinutes: 8 * 60),
+      ]);
+      final end = DateTime(2026, 3, 25);
+      final doses = [dose('2026-03-24T12:00:00')];
+
+      final before = calculateSchedule(
+          med(ending), doses, end.subtract(const Duration(minutes: 1)));
+      expect(before.finished, isFalse);
+      expect(before.overdueByMinutes, isNotNull);
+
+      final after = calculateSchedule(
+          med(ending), doses, end.add(const Duration(days: 3)));
+      expect(after.finished, isTrue);
+      expect(after.nextEligibleAt, end);
+      expect(after.lastGivenAt, DateTime(2026, 3, 24, 12));
+      expect(after.overdueByMinutes, isNull);
+      expect(after.reminderAt, isNull);
+    });
+
+    test('with an open-ended last step never finishes', () {
+      final r = calculateSchedule(med(taper), [], DateTime(2027, 1, 1));
+      expect(r.finished, isFalse);
+    });
+  });
+
+  group('a course with an end', () {
+    test('runs through its last day, then is finished', () {
+      final m = med(const IntervalSchedule(8 * 60),
+          course: EndsAfterDay(DateTime(2026, 3, 28)));
+      final doses = [dose('2026-03-28T20:00:00')];
+      final lastMinute = calculateSchedule(m, doses, DateTime(2026, 3, 28, 23, 59));
+      expect(lastMinute.finished, isFalse);
+      expect(lastMinute.nextEligibleAt, DateTime(2026, 3, 29, 4));
+
+      final after = calculateSchedule(m, doses, DateTime(2026, 3, 29));
+      expect(after.finished, isTrue);
+      expect(after.nextEligibleAt, DateTime(2026, 3, 29));
+      expect(after.overdueByMinutes, isNull);
+      expect(after.reminderAt, isNull);
+    });
+
+    test('of doses is finished by the last one, and a correction isn\'t another', () {
+      final m = med(const IntervalSchedule(8 * 60), course: const EndsAfterDoses(2));
+      final first = dose('2026-03-27T22:00:00Z', id: 'a');
+      final fixed = dose('2026-03-27T21:30:00Z', id: 'b', corrects: 'a');
+      expect(calculateSchedule(m, [first, fixed], now).finished, isFalse);
+
+      final second = dose('2026-03-28T06:00:00Z', id: 'c');
+      final r = calculateSchedule(m, [first, fixed, second], now);
+      expect(r.finished, isTrue);
+      expect(r.nextEligibleAt, utc('2026-03-28T06:00:00Z'));
+      expect(r.lastGivenAt, utc('2026-03-28T06:00:00Z'));
+
+      expect(
+          calculateSchedule(m, [first, fixed, second], utc('2026-03-28T05:59:00Z'))
+              .finished,
+          isFalse,
+          reason: 'as of before the last dose');
+    });
+
+    test('ends a taper early if it comes first', () {
+      final m = med(
+          TaperSchedule([TaperRule(startDate: DateTime(2026, 3, 1), intervalMinutes: 480)]),
+          course: EndsAfterDay(DateTime(2026, 3, 27)));
+      expect(finishesAt(m, []), DateTime(2026, 3, 28));
+      expect(calculateSchedule(m, [], now).finished, isTrue);
     });
   });
 

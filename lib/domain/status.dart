@@ -27,7 +27,10 @@ enum MedicationStatusLabel {
   missed,
 
   /// An as-needed medication that may be given now.
-  availablePrn;
+  availablePrn,
+
+  /// A taper whose last step has ended: nothing more is due.
+  finished;
 
   /// Where a medication in this state goes in a list: what needs doing
   /// first at the top.
@@ -39,6 +42,7 @@ enum MedicationStatusLabel {
         neverTaken => 4,
         tooEarly => 5,
         availablePrn => 6,
+        finished => 7,
       };
 
   /// Whether the dose is late.
@@ -87,6 +91,7 @@ MedicationStatus computeMedicationStatus(
   };
 
   final label = switch (schedule) {
+    _ when result.finished => MedicationStatusLabel.finished,
     _ when result.lastGivenAt == null => MedicationStatusLabel.neverTaken,
     PrnSchedule() when result.eligibleNow => MedicationStatusLabel.availablePrn,
     _ when !result.eligibleNow => minutesUntilEligible <= dueSoonWindowMinutes

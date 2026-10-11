@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:nexpill/data/sample_data.dart';
 import 'package:nexpill/domain/wording.dart';
 import 'package:nexpill/export/dose_history_csv.dart';
+import 'package:nexpill/export/file_names.dart';
 import 'package:nexpill/export/patient_summary.dart';
 import 'package:nexpill/models/care_snapshot.dart';
 import 'package:nexpill/models/dose_event.dart';
@@ -88,5 +89,15 @@ void main() {
       expect(listText(['a']), 'a');
       expect(listText(['a', 'b', 'c']), 'a, b and c');
     });
+  });
+
+  test('file names', () {
+    const alex = Patient(id: 'a', displayName: ' Dr. Alex  Rivera ');
+    expect(patientSummaryFileName(alex, now), 'nexpill-dr-alex-rivera-summary-2026-06-10.txt');
+    expect(doseHistoryFileName(alex, now), 'nexpill-dr-alex-rivera-doses-2026-06-10.csv');
+    expect(doseHistoryFileName(const Patient(id: 'j', displayName: 'José'), now),
+        'nexpill-jos-doses-2026-06-10.csv');
+    expect(patientSummaryFileName(const Patient(id: 'z', displayName: '李'), now),
+        'nexpill-summary-2026-06-10.txt', reason: 'no stray hyphens');
   });
 }

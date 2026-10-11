@@ -24,35 +24,52 @@ class NotificationService {
 
   static const snoozeMinutes = 5;
 
-  static const _reminders = AndroidNotificationDetails(
-    'reminders',
-    'Medication reminders',
-    channelDescription: 'Heads-ups, doses due, and overdue doses.',
-    importance: Importance.high,
-    priority: Priority.high,
-    category: AndroidNotificationCategory.reminder,
-    icon: _icon,
-    actions: _actions,
-  );
-
-  /// Alarm mode: the alarm sound, repeating until acknowledged.
-  static final _alarms = AndroidNotificationDetails(
-    'alarms',
-    'Medication alarms',
-    channelDescription:
-        'For medications set to ring like an alarm when a dose is due.',
-    importance: Importance.max,
-    priority: Priority.max,
-    category: AndroidNotificationCategory.alarm,
-    icon: _icon,
-    actions: _actions,
-    sound: const UriAndroidNotificationSound(
-        'content://settings/system/alarm_alert'),
-    audioAttributesUsage: AudioAttributesUsage.alarm,
-    // FLAG_INSISTENT: the sound repeats until the notification is dealt
-    // with.
-    additionalFlags: Int32List.fromList([4]),
-  );
+  /// How a reminder is shown. [rings] is alarm mode: the alarm sound,
+  /// repeating until acknowledged. [tag] is how it's found again in the
+  /// shade. Every reminder, the test one included, is built here, so
+  /// each Android channel always gets the same settings.
+  static AndroidNotificationDetails _details({
+    required bool rings,
+    String? tag,
+    bool multiline = false,
+    bool withActions = true,
+  }) {
+    final style = multiline ? const BigTextStyleInformation('') : null;
+    final actions = withActions ? _actions : null;
+    if (rings) {
+      return AndroidNotificationDetails(
+        'alarms',
+        'Medication alarms',
+        channelDescription:
+            'For medications set to ring like an alarm when a dose is due.',
+        importance: Importance.max,
+        priority: Priority.max,
+        category: AndroidNotificationCategory.alarm,
+        icon: _icon,
+        actions: actions,
+        sound: const UriAndroidNotificationSound(
+            'content://settings/system/alarm_alert'),
+        audioAttributesUsage: AudioAttributesUsage.alarm,
+        // FLAG_INSISTENT: the sound repeats until the notification is dealt
+        // with.
+        additionalFlags: Int32List.fromList([4]),
+        styleInformation: style,
+        tag: tag,
+      );
+    }
+    return AndroidNotificationDetails(
+      'reminders',
+      'Medication reminders',
+      channelDescription: 'Heads-ups, doses due, and overdue doses.',
+      importance: Importance.high,
+      priority: Priority.high,
+      category: AndroidNotificationCategory.reminder,
+      icon: _icon,
+      actions: actions,
+      styleInformation: style,
+      tag: tag,
+    );
+  }
 
   static const _upkeep = AndroidNotificationDetails(
     'upkeep',
@@ -153,7 +170,6 @@ class NotificationService {
   }
 
   Future<void> _schedule(int id, PlannedNotification n, ReminderTag tag) async {
-    final base = n.rings ? _alarms : _reminders;
     await _plugin.zonedSchedule(
       id: id,
       title: n.title,
@@ -161,7 +177,8 @@ class NotificationService {
       payload: tag.encode(),
       scheduledDate: tz.TZDateTime.from(n.at, tz.UTC),
       notificationDetails: NotificationDetails(
-        android: _withTag(base, tag.encode(), multiline: n.items.length > 1),
+        android: _details(
+            rings: n.rings, tag: tag.encode(), multiline: n.items.length > 1),
       ),
       androidScheduleMode: n.rings
           ? AndroidScheduleMode.alarmClock
@@ -189,16 +206,9 @@ class NotificationService {
       body: 'Reminders are working. This is how they\'ll look.',
       scheduledDate:
           tz.TZDateTime.from(DateTime.now().add(const Duration(seconds: 5)), tz.UTC),
-      notificationDetails: const NotificationDetails(
-        android: AndroidNotificationDetails(
-          'reminders',
-          'Medication reminders',
-          channelDescription: 'Heads-ups, doses due, and overdue doses.',
-          importance: Importance.high,
-          priority: Priority.high,
-          icon: _icon,
-        ),
-      ),
+      // No actions: there's no dose to mark given or snooze.
+      notificationDetails: NotificationDetails(
+          android: _details(rings: false, withActions: false)),
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
     );
   }
@@ -254,27 +264,6 @@ class ReminderTag {
         return latest == null || latest.givenAt.isBefore(at);
       });
 }
-
-AndroidNotificationDetails _withTag(
-  AndroidNotificationDetails d,
-  String tag, {
-  required bool multiline,
-}) =>
-    AndroidNotificationDetails(
-      d.channelId,
-      d.channelName,
-      channelDescription: d.channelDescription,
-      importance: d.importance,
-      priority: d.priority,
-      category: d.category,
-      icon: d.icon,
-      actions: d.actions,
-      sound: d.sound,
-      audioAttributesUsage: d.audioAttributesUsage,
-      additionalFlags: d.additionalFlags,
-      styleInformation: multiline ? const BigTextStyleInformation('') : null,
-      tag: tag,
-    );
 
 /// FNV-1a: a hash that stays the same between runs, unlike String.hashCode.
 int _hash(String s) {

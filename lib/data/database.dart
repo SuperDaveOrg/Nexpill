@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show visibleForTesting;
 import 'package:path/path.dart' as p;
 import 'package:sqflite/sqflite.dart';
 
@@ -14,7 +15,7 @@ class NexpillDatabase {
   static final NexpillDatabase instance = NexpillDatabase();
 
   static const _fileName = 'nexpill.db';
-  static const version = 1;
+  static const version = 2;
 
   final String? _path;
   final DatabaseFactory? _factory;
@@ -37,9 +38,16 @@ class NexpillDatabase {
   }
 
   /// A fresh install builds the version-1 schema and then replays every
-  /// migration, so new and upgraded phones cannot drift apart. Never edit
-  /// this once shipped; add a version to [_upgrade].
+  /// migration, so new and upgraded phones cannot drift apart.
   Future<void> _create(Database db, int version) async {
+    await createVersion1(db);
+    await _upgrade(db, 1, version);
+  }
+
+  /// The schema as version 1 shipped it. Never edit this; add a version to
+  /// [_upgrade]. Public only so tests can build an old database to upgrade.
+  @visibleForTesting
+  static Future<void> createVersion1(Database db) async {
     await db.execute('''
       CREATE TABLE patients (
         id                    TEXT PRIMARY KEY,
@@ -109,12 +117,18 @@ class NexpillDatabase {
         'CREATE INDEX idx_doses_medication ON dose_events(medication_id, given_at)');
     await db.execute(
         'CREATE INDEX idx_doses_supersedes ON dose_events(supersedes_id)');
-    await _upgrade(db, 1, version);
   }
 
   /// Each step brings a database from the previous version to the next, so a
   /// phone that skipped several releases replays them in order.
-  Future<void> _upgrade(Database db, int oldVersion, int newVersion) async {}
+  Future<void> _upgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      // A course with an end: at most one of these is set. The last day is
+      // a YYYY-MM-DD calendar day; the doses are a total that counts.
+      await db.execute('ALTER TABLE medications ADD COLUMN course_last_day TEXT');
+      await db.execute('ALTER TABLE medications ADD COLUMN course_doses INTEGER');
+    }
+  }
 
   /// Empties every table. Used by "delete everything" and by restore, which
   /// rebuilds from a backup inside the same transaction.

@@ -172,12 +172,23 @@ class _CareScreenState extends State<CareScreen> with WidgetsBindingObserver {
     final theme = Theme.of(context);
     final care = _store.care;
     final now = _store.now;
-    final meds = [for (final m in care.medications) if (m.patientId == patient.id) m];
-    final active = [
+    final meds = care.medicationsFor(patient.id);
+    final taking = [
       for (final m in meds)
         if (m.active) (m, computeMedicationStatus(m, care.doses, now)),
+    ];
+    // A finished course or taper has nothing more to give, so it goes below
+    // with the stopped ones.
+    final active = [
+      for (final e in taking)
+        if (e.$2.label != MedicationStatusLabel.finished) e,
     ]..sort((a, b) => compareByUrgency(a.$2, b.$2));
+    final finished = [
+      for (final (m, status) in taking)
+        if (status.label == MedicationStatusLabel.finished) m,
+    ];
     final stopped = [for (final m in meds) if (!m.active) m];
+    final ended = finished.length + stopped.length;
     final wantsReminders = patient.notificationsEnabled &&
         active.any((e) => e.$1.reminders.enabled);
 
@@ -251,11 +262,15 @@ class _CareScreenState extends State<CareScreen> with WidgetsBindingObserver {
                   Icon(Icons.medication_outlined,
                       size: 48, color: theme.colorScheme.onSurfaceVariant),
                   const SizedBox(height: 12),
-                  Text('No medications yet', style: theme.textTheme.titleLarge),
+                  Text(meds.isEmpty ? 'No medications yet' : 'Nothing to give now',
+                      style: theme.textTheme.titleLarge),
                   const SizedBox(height: 6),
                   Text(
-                    'Add ${patient.displayName}\'s first one, and Nexpill will '
-                    'keep track of when each dose can be given.',
+                    meds.isEmpty
+                        ? 'Add ${patient.displayName}\'s first one, and Nexpill '
+                            'will keep track of when each dose can be given.'
+                        : 'Everything for ${patient.displayName} has finished or '
+                            'been stopped. It\'s all below, with its history.',
                     textAlign: TextAlign.center,
                     style: theme.textTheme.bodyMedium,
                   ),
@@ -273,6 +288,7 @@ class _CareScreenState extends State<CareScreen> with WidgetsBindingObserver {
                 medication: m,
                 status: status,
                 inventory: computeInventoryStatus(m, care.doses),
+                course: courseShortText(m, care.doses),
                 now: now,
                 lastGivenBy: latestDose(m.id, care.doses)?.givenBy,
                 onGive: () => _give(m, status),
@@ -290,13 +306,23 @@ class _CareScreenState extends State<CareScreen> with WidgetsBindingObserver {
                       _push(MedicationEditor(store: _store, patient: patient)),
                 ),
               ),
-            if (stopped.isNotEmpty)
+            if (ended > 0)
               Theme(
                 data: theme.copyWith(dividerColor: Colors.transparent),
                 child: ExpansionTile(
-                  title: Text('Stopped (${stopped.length})',
+                  title: Text(
+                      '${finished.isEmpty ? 'Stopped' : stopped.isEmpty ? 'Finished' : 'Finished and stopped'} '
+                      '($ended)',
                       style: theme.textTheme.titleSmall),
                   children: [
+                    // Tapping one opens it, to set a longer course.
+                    for (final m in finished)
+                      ListTile(
+                        title: Text(m.name),
+                        subtitle: Text(finishedText(m)),
+                        onTap: () => _push(MedicationEditor(
+                            store: _store, patient: patient, existing: m)),
+                      ),
                     for (final m in stopped)
                       ListTile(
                         title: Text(m.name),

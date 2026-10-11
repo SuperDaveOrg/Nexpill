@@ -9,6 +9,37 @@ turns that section into the release's own when it's cut.
 
 ## [Unreleased]
 
+### Added
+- A course with an end. Under "How long" when adding or editing a
+  medication, choose a last day ("until the 14th") or a number of doses
+  ("10 doses"). Its card shows what's left, and when the course is over its
+  reminders stop by themselves and it moves to the bottom of the list,
+  history kept. Open it there to make the course longer.
+- Backups are now format version 2, to carry courses. Older backups still
+  restore; an older Nexpill refuses a new backup and asks to be updated,
+  rather than restoring it without its courses.
+
+### Changed
+- A taper now finishes when its last step ends: from midnight on the end
+  date it stops reminding and moves to the bottom of the list as "Taper
+  finished", instead of showing the dose as overdue. A taper whose last
+  step has no end date carries on as before.
+- Saved summaries and dose histories are named the same way, e.g.
+  `nexpill-alex-summary-2026-06-10.txt` and `nexpill-alex-doses-2026-06-10.csv`.
+
+### Fixed
+- Times follow the phone's 24-hour setting, on screen and in reminders.
+  They always read "7:15 PM" before.
+- The "Log dose" button no longer sits partly under a 3-button navigation
+  bar, where a tap on it landed on the bar instead.
+- Correcting a dose whose "Given by" was left blank no longer fills in
+  the last name used.
+- After a restore, Settings shows the restored people straight away. It
+  showed none, and no summary, until it was reopened.
+- Correcting a dose now saves exactly what you enter. Before, clearing
+  "Given by" or the notes, or setting the dose back to the usual one, kept
+  the original entry's value.
+
 ## [0.2.2] - 2026-10-02
 
 ### Fixed

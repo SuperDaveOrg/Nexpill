@@ -23,7 +23,7 @@ void main() {
 
   (String, String) card(MedicationSchedule s, List<DoseEvent> doses) {
     final m = med(s);
-    final (a, b) = cardText(computeMedicationStatus(m, doses, now), s, now);
+    final (a, b) = cardText(computeMedicationStatus(m, doses, now), m, now);
     return (plain(a), plain(b));
   }
 
@@ -83,11 +83,51 @@ void main() {
     });
   });
 
+  group('a course', () {
+    Medication course(CourseEnd c) => Medication(
+        id: 'm',
+        patientId: 'p',
+        name: 'M',
+        defaultDoseText: '1',
+        schedule: const IntervalSchedule(480),
+        reminders: const ReminderSettings(enabled: true),
+        course: c);
+    final doses = [at(DateTime(2026, 6, 10, 6))];
+
+    test('says how long is left', () {
+      expect(courseShortText(course(EndsAfterDay(DateTime(2026, 6, 14))), doses),
+          'last day Jun 14');
+      expect(courseShortText(course(const EndsAfterDoses(4)), doses), '3 doses left');
+      expect(courseShortText(course(const EndsAfterDoses(2)), doses), '1 dose left');
+      expect(courseText(course(const EndsAfterDoses(4)), doses),
+          '4 doses, 1 given so far');
+      expect(courseShortText(med(const IntervalSchedule(480)), doses), isNull);
+    });
+
+    test('and why it finished', () {
+      expect(finishedText(course(EndsAfterDay(DateTime(2026, 6, 14)))),
+          'Course finished: last day was Jun 14, 2026');
+      expect(finishedText(course(const EndsAfterDoses(5))),
+          'Course finished: all 5 doses given');
+      final m = course(const EndsAfterDoses(1));
+      expect(cardText(computeMedicationStatus(m, doses, now), m, now),
+          ('Finished', 'Course finished: its 1 dose given'));
+    });
+  });
+
   test('relative days', () {
     expect(plain(whenText(DateTime(2026, 6, 10, 9), now)), '9:00 AM');
     expect(plain(whenText(DateTime(2026, 6, 9, 21), now)), 'yesterday at 9:00 PM');
     expect(plain(whenText(DateTime(2026, 6, 13, 8), now)), 'Jun 13 at 8:00 AM');
     expect(dayHeading(dateOnly(now), now), 'Today');
     expect(shortDurationText(192), '3 hr 12 min');
+  });
+
+  test('follows the 24-hour setting', () {
+    addTearDown(() => use24HourClock = false);
+    use24HourClock = true;
+    expect(clockText(DateTime(2026, 6, 10, 19, 15)), '19:15');
+    expect(whenText(DateTime(2026, 6, 9, 21), now), 'yesterday at 21:00');
+    expect(dateTimeText(DateTime(2026, 6, 10, 7, 5)), 'Jun 10, 2026 07:05');
   });
 }

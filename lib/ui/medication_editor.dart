@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 
 import 'package:nexpill/data/ids.dart';
 import 'package:nexpill/domain/dates.dart';
+import 'package:nexpill/domain/dose_history.dart';
 import 'package:nexpill/domain/wording.dart';
 import 'package:nexpill/models/medication.dart';
 import 'package:nexpill/models/patient.dart';
 import 'package:nexpill/ui/care_store.dart';
+import 'package:nexpill/ui/dialogs.dart';
 import 'package:nexpill/ui/duration_field.dart';
 import 'package:nexpill/ui/layout.dart';
 import 'package:nexpill/ui/medication_draft.dart';
@@ -31,7 +33,9 @@ class MedicationEditor extends StatefulWidget {
 class _MedicationEditorState extends State<MedicationEditor> {
   late final MedicationDraft _d = widget.existing == null
       ? MedicationDraft.blank(widget.patient.id, DateTime.now())
-      : MedicationDraft.of(widget.existing!);
+      : MedicationDraft.of(widget.existing!,
+          givenSoFar:
+              effectiveDoses(widget.existing!.id, widget.store.care.doses).length);
   Map<String, String> _errors = {};
   bool _saving = false;
 
@@ -58,24 +62,14 @@ class _MedicationEditorState extends State<MedicationEditor> {
 
   Future<void> _delete() async {
     final m = widget.existing!;
-    final ok = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Delete ${m.name}?'),
-        content: const Text(
-            'Its dose history goes with it. To stop it but keep the history, '
-            'turn off "Taking this now" instead.'),
-        actions: [
-          TextButton(
-              onPressed: () => Navigator.pop(context, false),
-              child: const Text('Cancel')),
-          TextButton(
-              onPressed: () => Navigator.pop(context, true),
-              child: const Text('Delete')),
-        ],
-      ),
+    final ok = await confirmAction(
+      context,
+      title: 'Delete ${m.name}?',
+      message: 'Its dose history goes with it. To stop it but keep the history, '
+          'turn off "Taking this now" instead.',
+      action: 'Delete',
     );
-    if (ok != true) return;
+    if (!ok) return;
     await widget.store.change((repo) => repo.deleteMedication(m.id));
     if (mounted) Navigator.pop(context, true);
   }
@@ -110,6 +104,8 @@ class _MedicationEditorState extends State<MedicationEditor> {
                 hint: 'Optional, e.g. with food', maxLines: 3),
           ]),
           Section(title: 'When', children: [_schedule(theme)]),
+          if (_d.courseAvailable)
+            Section(title: 'How long', children: [_course(theme)]),
           Section(title: 'Reminders', children: _reminders()),
           Section(title: 'Supply', children: _supply()),
           if (!_d.isNew)
@@ -264,6 +260,78 @@ class _MedicationEditorState extends State<MedicationEditor> {
       final t = ClockTime(picked.hour, picked.minute);
       if (!_d.times.contains(t)) _d.times.add(t);
     });
+  }
+
+  Widget _course(ThemeData theme) {
+    final given = _d.givenSoFar;
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              for (final (kind, label) in const [
+                (CourseKind.ongoing, 'Until stopped'),
+                (CourseKind.lastDay, 'Until a date'),
+                (CourseKind.doses, 'A number of doses'),
+              ])
+                ChoiceChip(
+                  label: Text(label),
+                  selected: _d.courseKind == kind,
+                  onSelected: (_) => _update(() => _d.courseKind = kind),
+                ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          ...switch (_d.courseKind) {
+            CourseKind.ongoing => [
+                _hint(theme, 'Reminders carry on until you turn off "Taking '
+                    'this now".'),
+              ],
+            CourseKind.lastDay => [
+                ActionChip(
+                  avatar: const Icon(Icons.event_outlined),
+                  label: Text('Last day: ${dateText(_d.courseLastDay)}'),
+                  onPressed: _pickLastDay,
+                ),
+                _hint(theme, 'Doses carry on through that day; reminders stop '
+                    'at midnight at the end of it.'),
+              ],
+            CourseKind.doses => [
+                _text(given > 0 ? 'Doses still to give' : 'Number of doses',
+                    _d.dosesLeft, (v) => _d.dosesLeft = v,
+                    error: _errors['course'],
+                    hint: 'e.g. 10',
+                    keyboard: TextInputType.number),
+                _hint(
+                    theme,
+                    '${given > 0 ? '${given == 1 ? '1 dose' : '$given doses'} '
+                        'given so far. ' : ''}Reminders stop once the last '
+                        'one is given.'),
+              ],
+          },
+        ],
+      ),
+    );
+  }
+
+  Future<void> _pickLastDay() async {
+    final today = dateOnly(DateTime.now());
+    final initial = _d.courseLastDay;
+    final first = _d.isNew || !initial.isBefore(today)
+        ? today
+        : DateTime(initial.year, initial.month, initial.day);
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: initial.isBefore(first) ? first : initial,
+      firstDate: first,
+      lastDate: DateTime(today.year + 2, today.month, today.day),
+      helpText: 'Last day of the course',
+    );
+    if (picked != null) _update(() => _d.courseLastDay = picked);
   }
 
   List<Widget> _taper(ThemeData theme) {
