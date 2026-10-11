@@ -1,0 +1,4 @@
+• New: courses with an end. Set a last day or a number of doses; when the course is over its reminders stop and it moves to the bottom of the list, history kept.
+• Tapers now finish when their last step ends, instead of showing a dose as overdue.
+• Times follow your phone's 24-hour setting.
+• Fixed: "Log dose" no longer hides under the navigation bar, and correcting a dose saves exactly what you enter.
