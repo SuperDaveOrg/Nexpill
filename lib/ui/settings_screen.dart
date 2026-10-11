@@ -43,6 +43,9 @@ class _SettingsScreenState extends State<SettingsScreen>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    // The people count and summary come from the store; a restore or the
+    // sample data replaces it while this screen is open.
+    _store.addListener(_changed);
     _checkPermissions();
     installedVersion().then((v) {
       if (mounted) setState(() => _version = v);
@@ -52,8 +55,11 @@ class _SettingsScreenState extends State<SettingsScreen>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    _store.removeListener(_changed);
     super.dispose();
   }
+
+  void _changed() => setState(() {});
 
   /// Permissions may have been changed in system settings meanwhile.
   @override

@@ -51,7 +51,11 @@ Future<DoseEntry?> showGiveDoseSheet(
   required Medication medication,
   DoseEvent? correcting,
 }) async {
-  final givenBy = correcting?.givenBy ?? await Preferences.lastGivenBy();
+  // A correction starts from what was logged, even a blank "Given by";
+  // only a new dose offers the last name used.
+  final givenBy = correcting != null
+      ? correcting.givenBy
+      : await Preferences.lastGivenBy();
   if (!context.mounted) return null;
   return showModalBottomSheet<DoseEntry>(
     context: context,

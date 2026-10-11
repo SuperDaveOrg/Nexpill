@@ -32,6 +32,10 @@ turns that section into the release's own when it's cut.
   They always read "7:15 PM" before.
 - The "Log dose" button no longer sits partly under a 3-button navigation
   bar, where a tap on it landed on the bar instead.
+- Correcting a dose whose "Given by" was left blank no longer fills in
+  the last name used.
+- After a restore, Settings shows the restored people straight away. It
+  showed none, and no summary, until it was reopened.
 - Correcting a dose now saves exactly what you enter. Before, clearing
   "Given by" or the notes, or setting the dose back to the usual one, kept
   the original entry's value.
