@@ -9,6 +9,8 @@ turns that section into the release's own when it's cut.
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-10-11
+
 ### Added
 - A course with an end. Under "How long" when adding or editing a
   medication, choose a last day ("until the 14th") or a number of doses
