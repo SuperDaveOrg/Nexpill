@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:nexpill/domain/dates.dart';
+import 'package:nexpill/domain/dose_history.dart';
 import 'package:nexpill/domain/scheduling.dart';
 import 'package:nexpill/models/dose_event.dart';
 import 'package:nexpill/models/medication.dart';
@@ -92,8 +93,8 @@ MedicationStatus computeMedicationStatus(
 
   final label = switch (schedule) {
     _ when result.finished => MedicationStatusLabel.finished,
-    // Never given, unless a skip has moved it on to a later time.
-    _ when result.lastGivenAt == null && result.eligibleNow =>
+    // Nothing logged at all: a skip, though not a dose given, moves it on.
+    _ when latestEntry(medication.id, doseEvents) == null =>
       MedicationStatusLabel.neverTaken,
     PrnSchedule() when result.eligibleNow => MedicationStatusLabel.availablePrn,
     _ when !result.eligibleNow => minutesUntilEligible <= dueSoonWindowMinutes
