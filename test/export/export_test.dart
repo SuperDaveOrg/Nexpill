@@ -27,9 +27,15 @@ void main() {
       expect(csv, contains(',Correction,sample-d2,sample-d3'));
     });
 
+    test('marks skipped doses, with no dose given', () {
+      final csv = doseHistoryCsv(sample);
+      expect(csv, contains(',Vitamin D,,,,Skipped,,sample-d6'));
+    });
+
     test('one patient only', () {
-      final csv = doseHistoryCsv(sample, patientId: 'sample-jordan');
-      expect(csv.split('\r\n').where((l) => l.isNotEmpty), hasLength(1));
+      final csv = doseHistoryCsv(sample, patientId: 'sample-alex');
+      expect(csv, isNot(contains('Vitamin D')));
+      expect(csv, contains('Ibuprofen'));
     });
 
     test('quotes fields with commas, quotes or line breaks', () {

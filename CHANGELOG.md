@@ -9,6 +9,20 @@ turns that section into the release's own when it's cut.
 
 ## [Unreleased]
 
+### Added
+- Skip a dose. When a dose is due, Skip sits next to Give on its card and
+  on its reminder; before then, "Skip the 8:00 PM dose" is in the card's ⋮
+  menu. The medication carries on as if the dose had been given on time: at
+  set times, the next time; every few hours, one interval after the skipped
+  dose. Its reminders stop. If it's given after all, Give works as usual and
+  the next dose counts from then. The skip is kept in dose history and the
+  spreadsheet export; it uses no supply and doesn't count towards a course.
+  As-needed medications have nothing to skip. After three skips in a row,
+  Skip offers to turn that medication's reminders off; it stays on the list
+  to give whenever it's wanted.
+- Backups are now format version 3, to carry skipped doses. Older backups
+  still restore.
+
 ## [0.4.0] - 2026-10-16
 
 ### Added

@@ -92,7 +92,9 @@ MedicationStatus computeMedicationStatus(
 
   final label = switch (schedule) {
     _ when result.finished => MedicationStatusLabel.finished,
-    _ when result.lastGivenAt == null => MedicationStatusLabel.neverTaken,
+    // Never given, unless a skip has moved it on to a later time.
+    _ when result.lastGivenAt == null && result.eligibleNow =>
+      MedicationStatusLabel.neverTaken,
     PrnSchedule() when result.eligibleNow => MedicationStatusLabel.availablePrn,
     _ when !result.eligibleNow => minutesUntilEligible <= dueSoonWindowMinutes
         ? MedicationStatusLabel.dueSoon

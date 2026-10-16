@@ -68,7 +68,7 @@ ScheduleResult calculateSchedule(
       finished: true,
     );
   }
-  final due = _nextEligibleAt(medication.schedule, latest, now);
+  final due = _dueAfterSkips(medication, doseEvents, latest, now);
   final sinceDue = now.difference(due);
   final eligibleNow = !sinceDue.isNegative;
 
@@ -111,6 +111,22 @@ DateTime? _courseEndsAt(
         });
       return doses >= 1 && given.length >= doses ? given[doses - 1].givenAt : null;
   }
+}
+
+/// When [medication] is next due, counting a skipped dose as if it had been
+/// given on time — but only a skip of a dose the last one given hasn't
+/// already covered. So a dose given after all, even before the time of a
+/// skip logged ahead, is what the next one counts from. As-needed doses are
+/// never due, so there's nothing to skip.
+DateTime _dueAfterSkips(Medication medication, Iterable<DoseEvent> doseEvents,
+    DoseEvent? latest, DateTime now) {
+  final schedule = medication.schedule;
+  final fromGiven = _nextEligibleAt(schedule, latest, now);
+  if (schedule is PrnSchedule) return fromGiven;
+  final skip = latestSkip(medication.id, doseEvents);
+  if (skip == null) return fromGiven;
+  if (latest != null && skip.givenAt.isBefore(fromGiven)) return fromGiven;
+  return _nextEligibleAt(schedule, skip, now);
 }
 
 DateTime _nextEligibleAt(

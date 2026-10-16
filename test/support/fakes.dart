@@ -85,6 +85,13 @@ class InMemoryCareRepository implements CareRepository {
   }
 
   @override
+  Future<DoseEvent> skipDose(String medicationId, DateTime dueAt) async {
+    final d = DoseEvent(
+        id: newId(), medicationId: medicationId, givenAt: dueAt.toUtc(), skipped: true);
+    return _doses[d.id] = d;
+  }
+
+  @override
   Future<DoseEvent> correctDose(DoseEvent original,
       {required DateTime givenAt, String? doseText, String? givenBy, String? notes}) async {
     final d = DoseEvent(

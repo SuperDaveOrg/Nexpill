@@ -7,6 +7,8 @@ import 'package:timezone/timezone.dart' as tz;
 import 'package:nexpill/models/care_snapshot.dart';
 import 'package:nexpill/domain/dose_history.dart';
 import 'package:nexpill/domain/reminder_planner.dart';
+import 'package:nexpill/domain/scheduling.dart';
+import 'package:nexpill/models/medication.dart';
 
 /// Hands the reminder plan to Android as exact alarms, and keeps the
 /// notification shade truthful.
@@ -33,9 +35,12 @@ class NotificationService {
     String? tag,
     bool multiline = false,
     bool withActions = true,
+    bool canSkip = false,
   }) {
     final style = multiline ? const BigTextStyleInformation('') : null;
-    final actions = withActions ? _actions : null;
+    final actions = withActions
+        ? [_given, if (canSkip) _skip, _snooze]
+        : null;
     if (rings) {
       return AndroidNotificationDetails(
         'alarms',
@@ -81,15 +86,16 @@ class NotificationService {
 
   static const _icon = 'ic_stat_nexpill';
 
-  static const _actions = [
-    AndroidNotificationAction(actionGiven, 'Mark given'),
-    AndroidNotificationAction(actionSnooze, 'Snooze $snoozeMinutes min'),
-  ];
+  static const _given = AndroidNotificationAction(actionGiven, 'Mark given');
+  static const _skip = AndroidNotificationAction(actionSkip, 'Skip');
+  static const _snooze =
+      AndroidNotificationAction(actionSnooze, 'Snooze $snoozeMinutes min');
 
   static const actionGiven = 'given';
+  static const actionSkip = 'skip';
   static const actionSnooze = 'snooze';
 
-  /// [onAction] handles "Mark given" and "Snooze". It runs in a background
+  /// [onAction] handles "Mark given", "Skip" and "Snooze". It runs in a background
   /// isolate when the app isn't open, so it must be a top-level function
   /// marked `@pragma('vm:entry-point')`.
   Future<void> init({
@@ -178,7 +184,10 @@ class NotificationService {
       scheduledDate: tz.TZDateTime.from(n.at, tz.UTC),
       notificationDetails: NotificationDetails(
         android: _details(
-            rings: n.rings, tag: tag.encode(), multiline: n.items.length > 1),
+            rings: n.rings,
+            tag: tag.encode(),
+            multiline: n.items.length > 1,
+            canSkip: n.canSkip),
       ),
       androidScheduleMode: n.rings
           ? AndroidScheduleMode.alarmClock
@@ -257,12 +266,31 @@ class ReminderTag {
   }
 
   /// False once every medication here has had a dose logged at or after
-  /// the notification's time — or has gone.
+  /// the notification's time, or the dose it was about skipped — or has gone.
   bool stillDue(CareSnapshot care) => medicationIds.any((id) {
-        if (care.medication(id) == null) return false;
-        final latest = latestDose(id, care.doses);
-        return latest == null || latest.givenAt.isBefore(at);
+        final m = care.medication(id);
+        if (m == null) return false;
+        final latest = latestEntry(id, care.doses);
+        if (latest == null) return true;
+        // A skip is logged at the time it was due, so ask the engine instead.
+        if (latest.skipped) return calculateSchedule(m, care.doses, at).eligibleNow;
+        return latest.givenAt.isBefore(at);
       });
+
+  /// What Skip on this reminder skips, as of [now]: for each medication on
+  /// it still due, the dose it's due next, by medication id. As-needed ones
+  /// and any given or skipped since are left alone.
+  Map<String, DateTime> dosesToSkip(CareSnapshot care, DateTime now) {
+    final skips = <String, DateTime>{};
+    for (final id in medicationIds) {
+      final m = care.medication(id);
+      if (m == null || m.schedule is PrnSchedule) continue;
+      if (!ReminderTag(at, [id]).stillDue(care)) continue;
+      final s = calculateSchedule(m, care.doses, now);
+      if (!s.finished) skips[id] = s.nextEligibleAt;
+    }
+    return skips;
+  }
 }
 
 /// FNV-1a: a hash that stays the same between runs, unlike String.hashCode.

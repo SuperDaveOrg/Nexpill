@@ -31,6 +31,9 @@ bool use24HourClock = false;
 String clockText(DateTime at) =>
     (use24HourClock ? DateFormat.Hm() : DateFormat.jm()).format(at.toLocal());
 
+/// "Skipped the 8:00 AM dose", for a skip logged at the time it was due.
+String skippedText(DateTime dueAt) => 'Skipped the ${clockText(dueAt)} dose';
+
 /// "Jun 10, 2026, 2:30 PM", or "Jun 10, 2026, 14:30" with [use24HourClock].
 String dateTimeText(DateTime at) {
   final date = DateFormat.yMMMd();

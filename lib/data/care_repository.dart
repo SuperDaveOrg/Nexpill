@@ -163,6 +163,20 @@ class CareRepository {
     return dose;
   }
 
+  /// Logs that the dose of [medicationId] due at [dueAt] was skipped, and
+  /// returns the entry.
+  Future<DoseEvent> skipDose(String medicationId, DateTime dueAt) async {
+    final skip = DoseEvent(
+      id: newId(),
+      medicationId: medicationId,
+      givenAt: dueAt.toUtc(),
+      skipped: true,
+    );
+    final db = await _db.database;
+    await db.insert('dose_events', skip.toRow());
+    return skip;
+  }
+
   /// Replaces [original] with a corrected entry, leaving the original in
   /// history. The correction says exactly what it's given: a detail left
   /// out is cleared, not carried over, so a caregiver can remove one.

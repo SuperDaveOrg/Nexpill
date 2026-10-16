@@ -1,6 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nexpill/domain/dates.dart';
+import 'package:nexpill/domain/dose_history.dart';
+import 'package:nexpill/domain/inventory.dart';
 import 'package:nexpill/domain/scheduling.dart';
+import 'package:nexpill/domain/status.dart';
 import 'package:nexpill/models/dose_event.dart';
 import 'package:nexpill/models/medication.dart';
 
@@ -186,6 +189,106 @@ void main() {
       expect(evening.nextEligibleAt, DateTime(2026, 3, 27, 20));
       expect(evening.overdueByMinutes, 11 * 60);
       expect(due(noon, DateTime(2026, 3, 28, 9)), DateTime(2026, 3, 28, 8));
+    });
+
+    group('skipping', () {
+      DoseEvent skipped(DateTime local) => DoseEvent(
+          id: 'skip-1', medicationId: 'med-1', givenAt: local.toUtc(), skipped: true);
+      final lastNight = givenAt(DateTime(2026, 3, 27, 20));
+      final morning = skipped(DateTime(2026, 3, 28, 8));
+
+      test('moves on to the next slot, without counting as given', () {
+        final r = calculateSchedule(
+            med(times), [lastNight, morning], DateTime(2026, 3, 28, 9, 30));
+        expect(r.nextEligibleAt, DateTime(2026, 3, 28, 12));
+        expect(r.eligibleNow, isFalse);
+        expect(r.lastGivenAt, lastNight.givenAt);
+      });
+
+      test('the next dose is due as usual', () {
+        final r = calculateSchedule(
+            med(times), [lastNight, morning], DateTime(2026, 3, 28, 12, 30));
+        expect(r.nextEligibleAt, DateTime(2026, 3, 28, 12));
+        expect(r.overdueByMinutes, 30);
+      });
+
+      test('with nothing given yet, it isn\'t shown as never taken', () {
+        final s = computeMedicationStatus(med(times), [morning], DateTime(2026, 3, 28, 9));
+        expect(s.label, MedicationStatusLabel.tooEarly);
+        expect(s.schedule.lastGivenAt, isNull);
+      });
+
+      test('uses no supply and doesn\'t count towards a course', () {
+        final m = Medication(
+            id: 'med-1', patientId: 'patient-1', name: 'Test med',
+            defaultDoseText: '1 tablet', schedule: times,
+            reminders: const ReminderSettings(enabled: true),
+            inventoryEnabled: true, initialQuantity: 10, doseAmount: 1,
+            course: const EndsAfterDoses(1));
+        expect(computeInventoryStatus(m, [morning]).remaining, 10);
+        expect(calculateSchedule(m, [morning], DateTime(2026, 3, 28, 13)).finished, isFalse);
+      });
+
+      test('an interval keeps its rhythm, as if given on time', () {
+        // Every 4 hours: given 20:00, so 00:00 is skipped and 04:00 is next.
+        final midnight = skipped(DateTime(2026, 3, 28, 0));
+        final r = calculateSchedule(med(const IntervalSchedule(240)),
+            [lastNight, midnight], DateTime(2026, 3, 28, 1));
+        expect(r.nextEligibleAt.isAtSameMomentAs(DateTime(2026, 3, 28, 4)), isTrue);
+        expect(r.lastGivenAt, lastNight.givenAt);
+      });
+
+      test('the next dose can be skipped before it\'s due', () {
+        final evening = skipped(DateTime(2026, 3, 28, 20));
+        final r = calculateSchedule(med(times),
+            [givenAt(DateTime(2026, 3, 28, 12)), evening], DateTime(2026, 3, 28, 13));
+        expect(r.nextEligibleAt, DateTime(2026, 3, 29, 8));
+      });
+
+      test('a dose given after all, even before a skip logged ahead, counts', () {
+        // Given 04:43, 12:43 skipped, 20:43 skipped ahead, then given at 20:30.
+        DateTime t(int h, int m) => DateTime(2026, 3, 28, h, m);
+        final every8 = med(const IntervalSchedule(480));
+        final entries = [
+          givenAt(t(4, 43)),
+          DoseEvent(id: 's1', medicationId: 'med-1', givenAt: t(12, 43).toUtc(), skipped: true),
+          DoseEvent(id: 's2', medicationId: 'med-1', givenAt: t(20, 43).toUtc(), skipped: true),
+        ];
+        expect(calculateSchedule(every8, entries, t(13, 0)).nextEligibleAt
+            .isAtSameMomentAs(DateTime(2026, 3, 29, 4, 43)), isTrue);
+        final gave = DoseEvent(id: 'g', medicationId: 'med-1', givenAt: t(20, 30).toUtc());
+        final r = calculateSchedule(every8, [...entries, gave], t(20, 31));
+        expect(r.nextEligibleAt.isAtSameMomentAs(DateTime(2026, 3, 29, 4, 30)), isTrue);
+        expect(r.lastGivenAt, gave.givenAt);
+      });
+
+      test('at set times, a dose given for a skipped time counts for it', () {
+        final r = calculateSchedule(med(times),
+            [lastNight, morning, givenAt(DateTime(2026, 3, 28, 8, 20))],
+            DateTime(2026, 3, 28, 9));
+        expect(r.nextEligibleAt, DateTime(2026, 3, 28, 12));
+        expect(r.lastGivenAt, DateTime(2026, 3, 28, 8, 20).toUtc());
+      });
+
+      test('counts skips in a row, back to the last dose given', () {
+        DoseEvent entry(String id, int day, {bool skip = true}) => DoseEvent(
+            id: id, medicationId: 'med-1',
+            givenAt: DateTime(2026, 3, day, 8).toUtc(), skipped: skip);
+        expect(skipsInARow('med-1', []), 0);
+        final history = [
+          entry('a', 20, skip: false), entry('b', 21), entry('c', 22, skip: false),
+          entry('d', 23), entry('e', 24), entry('f', 25),
+        ];
+        expect(skipsInARow('med-1', history), 3);
+        expect(skipsInARow('med-1', [...history, entry('g', 26, skip: false)]), 0);
+        expect(skipsInARow('other', history), 0);
+      });
+
+      test('is ignored as needed, where nothing is due', () {
+        final r = calculateSchedule(med(const PrnSchedule(240)),
+            [lastNight, morning], DateTime(2026, 3, 28, 9));
+        expect(r.nextEligibleAt.isAtSameMomentAs(DateTime(2026, 3, 28, 0)), isTrue);
+      });
     });
 
     test('with one slot a day, the window is twelve hours either side', () {
