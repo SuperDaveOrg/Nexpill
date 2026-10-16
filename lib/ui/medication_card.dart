@@ -104,6 +104,11 @@ class MedicationCard extends StatelessWidget {
                   ),
                 ],
               ),
+              if (m.purpose != null)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 2),
+                  child: Text(m.purpose!, style: theme.textTheme.bodyMedium),
+                ),
               Text(
                 [m.defaultDoseText, scheduleShortText(m.schedule, now), ?course]
                     .join(' · '),

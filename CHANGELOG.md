@@ -9,6 +9,12 @@ turns that section into the release's own when it's cut.
 
 ## [Unreleased]
 
+### Added
+- What each medication is for. Fill in "What it's for" when adding or
+  editing one ("blood pressure", "pain after surgery") and it shows on the
+  medication's card under its name, in its reminders, and in the printable
+  summary. It's optional, and it's kept in backups.
+
 ## [0.3.0] - 2026-10-11
 
 ### Added

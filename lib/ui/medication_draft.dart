@@ -34,6 +34,7 @@ class MedicationDraft {
         patientId = m.patientId,
         name = m.name,
         strength = m.strengthText ?? '',
+        purpose = m.purpose ?? '',
         dose = m.defaultDoseText,
         instructions = m.instructions ?? '',
         active = m.active,
@@ -85,6 +86,7 @@ class MedicationDraft {
 
   String name = '';
   String strength = '';
+  String purpose = '';
   String dose = '1 tablet';
   String instructions = '';
   bool active = true;
@@ -200,6 +202,7 @@ class MedicationDraft {
       patientId: patientId,
       name: name.trim(),
       strengthText: opt(strength),
+      purpose: opt(purpose),
       instructions: opt(instructions),
       active: active,
       defaultDoseText: dose.trim(),

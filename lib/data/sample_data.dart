@@ -23,6 +23,7 @@ CareSnapshot sampleCare(DateTime now) {
     String dose,
     MedicationSchedule schedule, {
     String? strength,
+    String? purpose,
     String? instructions,
     ReminderSettings? reminders,
     double? stock,
@@ -33,6 +34,7 @@ CareSnapshot sampleCare(DateTime now) {
         patientId: patientId,
         name: name,
         strengthText: strength,
+        purpose: purpose,
         instructions: instructions,
         defaultDoseText: dose,
         schedule: schedule,
@@ -61,12 +63,14 @@ CareSnapshot sampleCare(DateTime now) {
       med('sample-acet', alex.id, 'Acetaminophen', '1 tablet',
           const IntervalSchedule(4 * 60),
           strength: '500 mg',
+          purpose: 'Pain after surgery',
           instructions: 'Keep ahead of the pain: every 4 hours, day and night.',
           reminders: const ReminderSettings(enabled: true, earlyMinutes: 10, alarm: true),
           stock: 30),
       med('sample-amox', alex.id, 'Amoxicillin', '1 capsule',
           const IntervalSchedule(8 * 60),
           strength: '500 mg',
+          purpose: 'Chest infection',
           instructions: 'With water, with or without food.',
           // A week's course, started two days ago.
           course: EndsAfterDay(DateTime(today.year, today.month, today.day + 4))),
@@ -87,7 +91,8 @@ CareSnapshot sampleCare(DateTime now) {
           const PrnSchedule(6 * 60),
           instructions: 'As needed for pain, at least 6 hours apart.'),
       med('sample-vitd', jordan.id, 'Vitamin D', '1 capsule',
-          const FixedTimesSchedule([ClockTime(9, 0)])),
+          const FixedTimesSchedule([ClockTime(9, 0)]),
+          purpose: 'Bone health'),
     ],
     doses: [
       // Due in about eight minutes.

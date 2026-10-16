@@ -272,7 +272,11 @@ class PlannedNotification {
       : '${items.length} medications for ${patient.displayName}';
 
   String get body => items.length == 1
-      ? 'For ${patient.displayName} · ${items.single.medication.defaultDoseText}'
+      ? [
+          'For ${patient.displayName}',
+          items.single.medication.defaultDoseText,
+          ?items.single.medication.purpose,
+        ].join(' · ')
       : [for (final i in items) '${i.medication.name} ${i.phrase}'].join('\n');
 }
 

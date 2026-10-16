@@ -15,7 +15,7 @@ class NexpillDatabase {
   static final NexpillDatabase instance = NexpillDatabase();
 
   static const _fileName = 'nexpill.db';
-  static const version = 2;
+  static const version = 3;
 
   final String? _path;
   final DatabaseFactory? _factory;
@@ -127,6 +127,10 @@ class NexpillDatabase {
       // a YYYY-MM-DD calendar day; the doses are a total that counts.
       await db.execute('ALTER TABLE medications ADD COLUMN course_last_day TEXT');
       await db.execute('ALTER TABLE medications ADD COLUMN course_doses INTEGER');
+    }
+    if (oldVersion < 3) {
+      // What the medication is for, as free text.
+      await db.execute('ALTER TABLE medications ADD COLUMN purpose TEXT');
     }
   }
 

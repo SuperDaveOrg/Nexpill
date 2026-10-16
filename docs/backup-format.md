@@ -43,6 +43,7 @@ older app refuses the file instead of half-restoring it.
           "id": "a41c…",
           "name": "Amoxicillin",
           "strength": "500 mg capsules",
+          "purpose": "Chest infection",
           "active": true,
           "defaultDose": "1 capsule",
           "schedule": { "type": "interval", "everyMinutes": 480 },
@@ -94,6 +95,7 @@ the whole file; Nexpill writes random UUIDs.
 | `id` | string | |
 | `name` | string | Not empty. |
 | `strength` | string, optional | Free text, e.g. "500 mg capsules". |
+| `purpose` | string, optional | What it's for, in the user's words, e.g. "blood pressure". Added without a version change: an app that ignores it still does the same thing. |
 | `instructions` | string, optional | |
 | `active` | boolean, optional | `false` for a medication that's stopped but kept in history. Default `true`. |
 | `defaultDose` | string | Not empty; what one dose usually is, e.g. "1 capsule". |

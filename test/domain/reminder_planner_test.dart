@@ -295,6 +295,16 @@ void main() {
       expect(first.firstWhere((n) => n.patient.id == 'alex').title, 'zinc due now');
     });
 
+    test('one medication: its body says who, the dose, and what it\'s for', () {
+      final at = DateTime(2026, 6, 10, 6);
+      Iterable<PlannedNotification> plan(Medication m) =>
+          planner.plan(care([m], [given(m.id, at)]), from: from).notifications;
+      final plain = med('amox', const IntervalSchedule(480));
+      expect(plan(plain).first.body, 'For Sam · 1 tablet');
+      expect(plan(plain.copyWith(purpose: 'Chest infection')).first.body,
+          'For Sam · 1 tablet · Chest infection');
+    });
+
     test('alarm mode rings when due or overdue, not for the heads-up', () {
       final m = med('amox', const IntervalSchedule(480),
           reminders: const ReminderSettings(enabled: true, earlyMinutes: 10, alarm: true));

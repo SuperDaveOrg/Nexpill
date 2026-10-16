@@ -121,7 +121,8 @@ void main() {
     await old.insert('patients', sam.toRow());
     final row = med('a', const IntervalSchedule(480)).toRow()
       ..remove('course_last_day')
-      ..remove('course_doses');
+      ..remove('course_doses')
+      ..remove('purpose');
     await old.insert('medications', row);
     await old.close();
 
@@ -134,6 +135,29 @@ void main() {
         reminders: const ReminderSettings(enabled: true),
         course: const EndsAfterDoses(3)));
     expect((await upgradedRepo.medication('b'))!.course, isA<EndsAfterDoses>());
+    await upgraded.close();
+  });
+
+  test('a version 2 database upgrades, and then stores what a medication is for',
+      () async {
+    final path = '${dir.path}/v2.db';
+    final old = await databaseFactoryFfi.openDatabase(path,
+        options: OpenDatabaseOptions(
+            version: 1, onCreate: (d, _) => NexpillDatabase.createVersion1(d)));
+    await old.execute('ALTER TABLE medications ADD COLUMN course_last_day TEXT');
+    await old.execute('ALTER TABLE medications ADD COLUMN course_doses INTEGER');
+    await old.setVersion(2);
+    await old.insert('patients', sam.toRow());
+    await old.insert('medications',
+        med('a', const IntervalSchedule(480)).toRow()..remove('purpose'));
+    await old.close();
+
+    final upgraded = NexpillDatabase(path: path, factory: databaseFactoryFfi);
+    final upgradedRepo = CareRepository(db: upgraded);
+    expect((await upgradedRepo.medication('a'))!.purpose, isNull);
+    await upgradedRepo.saveMedication(
+        med('a', const IntervalSchedule(480)).copyWith(purpose: 'Blood pressure'));
+    expect((await upgradedRepo.medication('a'))!.purpose, 'Blood pressure');
     await upgraded.close();
   });
 
