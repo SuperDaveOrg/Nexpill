@@ -31,6 +31,7 @@ below is what the PWA did and the Flutter app must do before a first release.
 |---|---|
 | A course with an end, by last day or number of doses: reminders stop on their own, history kept | Done |
 | Tapers finish when their last step ends | Done |
+| What each medication is for ("blood pressure"), on the card, in its reminders and in the summary | Done |
 
 ---
 
@@ -38,9 +39,6 @@ below is what the PWA did and the Flutter app must do before a first release.
 
 From the PWA roadmap, still wanted:
 
-- **What each medication is for.** A plain-language line ("for pain",
-  "for nausea", "protects the stomach") shown on the card, in reminders and
-  in the summary, for the patient who asks every time what a pill is for.
 - **Declined doses.** Log that a dose was offered and refused, so history
   shows it and the caregiver can see what was and wasn't taken. 🟡 Whether a
   refusal should restart the interval, or leave the dose due, needs input.

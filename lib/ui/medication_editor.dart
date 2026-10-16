@@ -98,6 +98,8 @@ class _MedicationEditorState extends State<MedicationEditor> {
                 error: _errors['name'], autofocus: _d.isNew, hint: 'e.g. Amoxicillin'),
             _text('Strength', _d.strength, (v) => _d.strength = v,
                 hint: 'Optional, e.g. 500 mg'),
+            _text('What it\'s for', _d.purpose, (v) => _d.purpose = v,
+                hint: 'Optional, e.g. blood pressure'),
             _text('Usual dose', _d.dose, (v) => _d.dose = v,
                 error: _errors['dose'], hint: 'e.g. 1 tablet, 5 ml'),
             _text('Instructions', _d.instructions, (v) => _d.instructions = v,

@@ -28,6 +28,7 @@ String patientSummary(CareSnapshot care, Patient patient, {required DateTime now
     final inventory = computeInventoryStatus(m, care.doses);
     lines.addAll([
       '${i + 1}. ${m.name}${m.strengthText == null ? '' : ' (${m.strengthText})'}',
+      if (m.purpose != null) '   For: ${m.purpose}',
       '   Dose: ${m.defaultDoseText}',
       '   Schedule: ${scheduleText(m.schedule)}',
       if (courseText(m, care.doses) case final course?) '   Course: $course',

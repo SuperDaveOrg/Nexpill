@@ -34,6 +34,7 @@ void main() {
     for (final m in sample.medications) {
       final b = back.medication(m.id)!;
       expect(b.name, m.name);
+      expect(b.purpose, m.purpose);
       expect(b.patientId, m.patientId);
       expect(b.schedule.typeName, m.schedule.typeName);
       expect(b.reminders.enabled, m.reminders.enabled);

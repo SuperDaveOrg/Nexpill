@@ -152,11 +152,15 @@ void main() {
       ..setKind(ScheduleKind.fixedTimes)
       ..times = [const ClockTime(9, 30)]
       ..trackSupply = true
-      ..startingQuantity = '2.5';
+      ..startingQuantity = '2.5'
+      ..purpose = ' Blood pressure ';
     final m = original.build(() => 'id');
+    expect(m.purpose, 'Blood pressure');
     final again = MedicationDraft.of(m).build(() => 'other');
     expect(again.id, 'id');
     expect((again.schedule as FixedTimesSchedule).times, [const ClockTime(9, 30)]);
     expect(again.initialQuantity, 2.5);
+    expect(again.purpose, 'Blood pressure');
+    expect((MedicationDraft.of(m)..purpose = '  ').build(() => 'id').purpose, isNull);
   });
 }

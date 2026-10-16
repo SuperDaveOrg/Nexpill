@@ -61,7 +61,7 @@ void main() {
     test('lists active medications with schedule and status', () {
       expect(text, startsWith('Medication summary for Alex Rivera\n'));
       expect(text, contains('Not medical advice'));
-      expect(text, contains('1. Acetaminophen (500 mg)'));
+      expect(text, contains('1. Acetaminophen (500 mg)\n   For: Pain after surgery\n'));
       expect(text, contains('   Schedule: Every 4 hours'));
       expect(text, contains('   Schedule: At 08:00 and 20:00'));
       expect(text, contains('   Schedule: As needed, at least 6 hours apart'));
@@ -74,6 +74,7 @@ void main() {
       final drops = text.substring(text.indexOf('Eye drops'));
       expect(drops.split('\n\n').first, contains('Last given: Not yet'));
       expect(drops.split('\n\n').first, isNot(contains('Status:')));
+      expect(drops.split('\n\n').first, isNot(contains('For:')));
     });
   });
 

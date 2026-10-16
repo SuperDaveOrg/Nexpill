@@ -10,6 +10,7 @@ class Medication {
     required this.schedule,
     required this.reminders,
     this.strengthText,
+    this.purpose,
     this.instructions,
     this.active = true,
     this.inventoryEnabled = false,
@@ -24,6 +25,9 @@ class Medication {
   final String patientId;
   final String name;
   final String? strengthText;
+
+  /// What it's for, in the caregiver's words, e.g. "blood pressure".
+  final String? purpose;
   final String? instructions;
 
   /// Inactive medications stay in history but never remind.
@@ -51,6 +55,7 @@ class Medication {
   Medication copyWith({
     String? name,
     String? strengthText,
+    String? purpose,
     String? instructions,
     bool? active,
     String? defaultDoseText,
@@ -67,6 +72,7 @@ class Medication {
         patientId: patientId,
         name: name ?? this.name,
         strengthText: strengthText ?? this.strengthText,
+        purpose: purpose ?? this.purpose,
         instructions: instructions ?? this.instructions,
         active: active ?? this.active,
         defaultDoseText: defaultDoseText ?? this.defaultDoseText,
@@ -87,6 +93,7 @@ class Medication {
         'patient_id': patientId,
         'name': name,
         'strength_text': strengthText,
+        'purpose': purpose,
         'instructions': instructions,
         'active': active ? 1 : 0,
         'default_dose_text': defaultDoseText,
@@ -130,6 +137,7 @@ class Medication {
       patientId: row['patient_id'] as String,
       name: row['name'] as String,
       strengthText: row['strength_text'] as String?,
+      purpose: row['purpose'] as String?,
       instructions: row['instructions'] as String?,
       active: row['active'] == 1,
       defaultDoseText: row['default_dose_text'] as String,
