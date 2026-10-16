@@ -9,6 +9,8 @@ turns that section into the release's own when it's cut.
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-10-16
+
 ### Added
 - What each medication is for. Fill in "What it's for" when adding or
   editing one ("blood pressure", "pain after surgery") and it shows on the
