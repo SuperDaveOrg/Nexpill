@@ -65,7 +65,11 @@ class _CareScreenState extends State<CareScreen> with WidgetsBindingObserver {
   void _push(Widget screen) =>
       Navigator.push(context, MaterialPageRoute(builder: (_) => screen));
 
-  Future<void> _give(Medication m, MedicationStatus status) async {
+  Future<void> _give(Medication m) async {
+    // Whether it's early is judged from the doses actually given: a skip
+    // moves the schedule on, but giving the dose after all isn't early.
+    final given = [for (final d in _store.care.doses) if (!d.skipped) d];
+    final status = computeMedicationStatus(m, given, _store.now);
     if (!await confirmEarlyDose(context, m, status, _store.now)) return;
     if (!mounted) return;
     final entry = await showGiveDoseSheet(context, medication: m);
@@ -85,6 +89,48 @@ class _CareScreenState extends State<CareScreen> with WidgetsBindingObserver {
       action: SnackBarAction(
         label: 'Undo',
         onPressed: () => _store.change((repo) => repo.deleteDose(dose.id)),
+      ),
+    ));
+  }
+
+  /// Skips in a row after which Skip offers to turn the reminders off.
+  static const _skipsBeforeOfferingQuiet = 3;
+
+  /// Logs the dose due at [dueAt] as skipped, so the medication moves on as
+  /// if it had been given on time. After several in a row, offers to turn
+  /// its reminders off rather than undo; it stays on the list either way.
+  Future<void> _skip(Medication m, DateTime dueAt) async {
+    final skip = await _store.change((repo) => repo.skipDose(m.id, dueAt));
+    if (!mounted) return;
+    final inARow = skipsInARow(m.id, _store.care.doses);
+    final offerQuiet = m.reminders.enabled && inARow >= _skipsBeforeOfferingQuiet;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(offerQuiet
+          ? '${m.name}: skipped $inARow times in a row'
+          : '${m.name}: ${skippedText(dueAt)}'),
+      // Long enough to read and decide, for the offer.
+      duration: offerQuiet ? const Duration(seconds: 10) : const Duration(seconds: 4),
+      persist: false,
+      action: offerQuiet
+          ? SnackBarAction(label: 'Reminders off', onPressed: () => _quiet(m))
+          : SnackBarAction(
+              label: 'Undo',
+              onPressed: () => _store.change((repo) => repo.deleteDose(skip.id)),
+            ),
+    ));
+  }
+
+  /// Turns [m]'s reminders off, keeping it on the list to give when wanted.
+  Future<void> _quiet(Medication m) async {
+    await _store.change((repo) => repo.saveMedication(
+        m.copyWith(reminders: m.reminders.copyWith(enabled: false))));
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text('Reminders off for ${m.name}. Turn them on again in Edit.'),
+      persist: false,
+      action: SnackBarAction(
+        label: 'Undo',
+        onPressed: () => _store.change((repo) => repo.saveMedication(m)),
       ),
     ));
   }
@@ -291,7 +337,11 @@ class _CareScreenState extends State<CareScreen> with WidgetsBindingObserver {
                 course: courseShortText(m, care.doses),
                 now: now,
                 lastGivenBy: latestDose(m.id, care.doses)?.givenBy,
-                onGive: () => _give(m, status),
+                onGive: () => _give(m),
+                // The dose due now, or the next one before it's due.
+                onSkip: m.schedule is PrnSchedule
+                    ? null
+                    : () => _skip(m, status.schedule.nextEligibleAt),
                 onAction: (a) => _action(patient, m, a),
               ),
               const SizedBox(height: 12),

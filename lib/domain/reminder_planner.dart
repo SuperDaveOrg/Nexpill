@@ -1,5 +1,6 @@
 import 'package:nexpill/models/care_snapshot.dart';
 import 'package:nexpill/domain/dates.dart';
+import 'package:nexpill/domain/dose_history.dart';
 import 'package:nexpill/domain/scheduling.dart';
 import 'package:nexpill/domain/wording.dart';
 import 'package:nexpill/models/dose_event.dart';
@@ -113,7 +114,8 @@ class ReminderPlanner {
       final last = i == points.length - 2;
       final s = calculateSchedule(m, doses, start);
       if (s.finished ||
-          (s.lastGivenAt == null && (m.schedule is IntervalSchedule || prn))) {
+          (latestEntry(m.id, doses) == null &&
+              (m.schedule is IntervalSchedule || prn))) {
         continue;
       }
       final due = s.nextEligibleAt;
@@ -264,6 +266,9 @@ class PlannedNotification {
   final List<ReminderItem> items;
 
   bool get rings => items.any((i) => i.rings);
+
+  /// Whether it offers Skip: as-needed doses are never due, so can't be.
+  bool get canSkip => items.any((i) => i.medication.schedule is! PrnSchedule);
 
   List<String> get medicationIds => [for (final i in items) i.medication.id];
 

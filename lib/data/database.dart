@@ -15,7 +15,7 @@ class NexpillDatabase {
   static final NexpillDatabase instance = NexpillDatabase();
 
   static const _fileName = 'nexpill.db';
-  static const version = 3;
+  static const version = 4;
 
   final String? _path;
   final DatabaseFactory? _factory;
@@ -131,6 +131,11 @@ class NexpillDatabase {
     if (oldVersion < 3) {
       // What the medication is for, as free text.
       await db.execute('ALTER TABLE medications ADD COLUMN purpose TEXT');
+    }
+    if (oldVersion < 4) {
+      // A dose skipped rather than given; given_at is when it was due.
+      await db.execute(
+          'ALTER TABLE dose_events ADD COLUMN skipped INTEGER NOT NULL DEFAULT 0');
     }
   }
 

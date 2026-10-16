@@ -32,6 +32,7 @@ below is what the PWA did and the Flutter app must do before a first release.
 | A course with an end, by last day or number of doses: reminders stop on their own, history kept | Done |
 | Tapers finish when their last step ends | Done |
 | What each medication is for ("blood pressure"), on the card, in its reminders and in the summary | Done |
+| Skip a dose, now or ahead of time, on the card or a reminder: carries on as if given on time, kept in history | Done |
 
 ---
 

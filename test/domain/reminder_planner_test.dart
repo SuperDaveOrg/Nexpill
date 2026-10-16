@@ -305,6 +305,26 @@ void main() {
           'For Sam · 1 tablet · Chest infection');
     });
 
+    test('Skip is offered unless everything on it is as needed', () {
+      final at = DateTime(2026, 6, 10, 6);
+      Iterable<PlannedNotification> plan(List<Medication> meds) => planner
+          .plan(care(meds, [for (final m in meds) given(m.id, at)]), from: from)
+          .notifications;
+      final prn = med('ibu', const PrnSchedule(480));
+      final amox = med('amox', const IntervalSchedule(480));
+      expect(plan([prn]).first.canSkip, isFalse);
+      expect(plan([prn, amox]).first.canSkip, isTrue);
+    });
+
+    test('an interval never given, then skipped, reminds from the skip', () {
+      final m = med('amox', const IntervalSchedule(480));
+      final skip = DoseEvent(id: 's', medicationId: 'amox',
+          givenAt: DateTime(2026, 6, 10, 8), skipped: true);
+      expect(summary(planner.plan(care([m], []), from: from)), isEmpty);
+      expect(summary(planner.plan(care([m], [skip]), from: from)).first,
+          '10/16:00 dueNow:amox');
+    });
+
     test('alarm mode rings when due or overdue, not for the heads-up', () {
       final m = med('amox', const IntervalSchedule(480),
           reminders: const ReminderSettings(enabled: true, earlyMinutes: 10, alarm: true));

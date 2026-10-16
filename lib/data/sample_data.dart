@@ -104,6 +104,16 @@ CareSnapshot sampleCare(DateTime now) {
           supersedes: 'sample-d2'),
       dose('sample-d4', 'sample-pred', const Duration(hours: 5)),
       dose('sample-d5', 'sample-ibu', const Duration(hours: 2)),
+      // Skipped the day before yesterday, given yesterday.
+      DoseEvent(
+          id: 'sample-d6',
+          medicationId: 'sample-vitd',
+          givenAt: DateTime(today.year, today.month, today.day - 2, 9).toUtc(),
+          skipped: true),
+      DoseEvent(
+          id: 'sample-d7',
+          medicationId: 'sample-vitd',
+          givenAt: DateTime(today.year, today.month, today.day - 1, 9, 10).toUtc()),
     ],
   );
 }

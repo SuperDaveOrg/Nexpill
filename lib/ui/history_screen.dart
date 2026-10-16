@@ -50,7 +50,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
       context: context,
       builder: (context) => SafeArea(
         child: Column(mainAxisSize: MainAxisSize.min, children: [
-          if (!replaced)
+          if (!replaced && !dose.skipped)
             ListTile(
               leading: const Icon(Icons.edit_outlined),
               title: const Text('Correct time or details'),
@@ -61,7 +61,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
             leading: Icon(Icons.delete_outline,
                 color: Theme.of(context).colorScheme.error),
             title: const Text('Delete entry'),
-            subtitle: const Text('Only for a dose that was never given'),
+            subtitle: Text(dose.skipped
+                ? 'The dose becomes due again'
+                : 'Only for a dose that was never given'),
             onTap: () => Navigator.pop(context, 'delete'),
           ),
         ]),
@@ -84,9 +86,12 @@ class _HistoryScreenState extends State<HistoryScreen> {
         final ok = await confirmAction(
           context,
           title: 'Delete this entry?',
-          message: '${medication.name}, ${dateTimeText(dose.givenAt)}. Use this '
-              'only if the dose was never given; to fix its time, correct '
-              'it instead. Any corrections of it go too.',
+          message: dose.skipped
+              ? '${medication.name}, ${dateTimeText(dose.givenAt)}, skipped. '
+                  'Delete it if the dose wasn\'t meant to be skipped.'
+              : '${medication.name}, ${dateTimeText(dose.givenAt)}. Use this '
+                  'only if the dose was never given; to fix its time, correct '
+                  'it instead. Any corrections of it go too.',
           action: 'Delete',
         );
         if (ok) await widget.store.change((repo) => repo.deleteDose(dose.id));
@@ -191,6 +196,16 @@ class _HistoryScreenState extends State<HistoryScreen> {
       if (details.isNotEmpty) details.join(' · '),
       ?d.notes,
     ].join('\n');
+    if (d.skipped) {
+      return ListTile(
+        onTap: () => _open(d, replaced: replaced),
+        title: Text('$name  ·  ${skippedText(d.givenAt)}',
+            style: strike ??
+                TextStyle(color: theme.colorScheme.onSurfaceVariant)),
+        subtitle: replaced ? const Text('corrected') : null,
+        trailing: const Icon(Icons.chevron_right),
+      );
+    }
     return ListTile(
       onTap: () => _open(d, replaced: replaced),
       title: Text('${clockText(d.givenAt)}  ·  $name', style: strike),

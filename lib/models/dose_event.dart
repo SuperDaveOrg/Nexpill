@@ -1,4 +1,4 @@
-/// One dose given, as logged.
+/// One dose given, or skipped, as logged.
 ///
 /// Dose history is an audit trail. A dose logged at the wrong time or with
 /// the wrong details is fixed by logging a *correction* — a new event that
@@ -14,12 +14,13 @@ class DoseEvent {
     this.givenBy,
     this.notes,
     this.supersedesId,
+    this.skipped = false,
   });
 
   final String id;
   final String medicationId;
 
-  /// The instant the dose was given.
+  /// The instant the dose was given; for a [skipped] one, when it was due.
   final DateTime givenAt;
 
   final String? doseText;
@@ -30,6 +31,11 @@ class DoseEvent {
 
   /// The event this one corrects, or null for an ordinary dose.
   final String? supersedesId;
+
+  /// A dose deliberately not given. The medication moves on as if it had
+  /// been given on time, but it uses no supply and doesn't count towards a
+  /// course.
+  final bool skipped;
 
   bool get isCorrection => supersedesId != null;
 
@@ -42,6 +48,7 @@ class DoseEvent {
         'given_by': givenBy,
         'notes': notes,
         'supersedes_id': supersedesId,
+        'skipped': skipped ? 1 : 0,
       };
 
   factory DoseEvent.fromRow(Map<String, Object?> row) => DoseEvent(
@@ -53,5 +60,6 @@ class DoseEvent {
         givenBy: row['given_by'] as String?,
         notes: row['notes'] as String?,
         supersedesId: row['supersedes_id'] as String?,
+        skipped: row['skipped'] == 1,
       );
 }

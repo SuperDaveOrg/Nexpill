@@ -150,11 +150,15 @@ void main() {
     await old.insert('patients', sam.toRow());
     await old.insert('medications',
         med('a', const IntervalSchedule(480)).toRow()..remove('purpose'));
+    await old.insert('dose_events', {
+      'id': 'd', 'medication_id': 'a', 'given_at': 0,
+    });
     await old.close();
 
     final upgraded = NexpillDatabase(path: path, factory: databaseFactoryFfi);
     final upgradedRepo = CareRepository(db: upgraded);
     expect((await upgradedRepo.medication('a'))!.purpose, isNull);
+    expect((await upgradedRepo.doses(medicationId: 'a')).single.skipped, isFalse);
     await upgradedRepo.saveMedication(
         med('a', const IntervalSchedule(480)).copyWith(purpose: 'Blood pressure'));
     expect((await upgradedRepo.medication('a'))!.purpose, 'Blood pressure');
@@ -174,6 +178,18 @@ void main() {
     final doses = await repo.doses(medicationId: 'a');
     expect([for (final d in doses) d.givenAt.hour], [9, 8, 7]);
     expect(doses.first.givenAt.isUtc, isTrue);
+  });
+
+  test('a skipped dose is stored as skipped, at the time it was due', () async {
+    await repo.savePatient(sam);
+    await repo.saveMedication(med('a', const FixedTimesSchedule([ClockTime(8, 0)])));
+    await repo.logDose('a', givenAt: DateTime.utc(2026, 6, 9, 8));
+    await repo.skipDose('a', DateTime.utc(2026, 6, 10, 8));
+    final doses = await repo.doses(medicationId: 'a');
+    expect([for (final d in doses) (d.givenAt, d.skipped)], [
+      (DateTime.utc(2026, 6, 10, 8), true),
+      (DateTime.utc(2026, 6, 9, 8), false),
+    ]);
   });
 
   test('a correction can clear details the original had', () async {
@@ -205,7 +221,7 @@ void main() {
     final left = await repo.snapshot();
     expect([for (final p in left.patients) p.id], ['sample-jordan']);
     expect(left.medications.every((m) => m.patientId == 'sample-jordan'), isTrue);
-    expect(left.doses, isEmpty);
+    expect(left.doses.every((d) => d.medicationId == 'sample-vitd'), isTrue);
   });
 
   test('replaceAll then snapshot gives back the same care', () async {

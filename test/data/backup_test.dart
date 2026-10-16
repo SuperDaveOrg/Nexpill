@@ -70,9 +70,27 @@ void main() {
     expect(text, matches(RegExp(r'"givenAt": "\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d\.\d{3}Z"')));
   });
 
-  test('writes version 2, and still restores version 1', () {
+  test('a skipped dose round-trips, and only skips say so', () {
     final json = sampleJson();
-    expect(json['nexpillBackup'], 2);
+    final doses = [
+      for (final p in json['patients'] as List)
+        for (final m in p['medications'] as List) ...(m['doses'] as List),
+    ];
+    expect([for (final d in doses) if (d['skipped'] == true) d['id']], ['sample-d6']);
+    expect(doses.where((d) => (d as Map).containsKey('skipped')), hasLength(1));
+    final back = decodeBackup(jsonEncode(json));
+    expect([for (final d in back.doses) if (d.skipped) d.id], ['sample-d6']);
+  });
+
+  test('writes version 3, and still restores version 2', () {
+    final json = sampleJson();
+    expect(json['nexpillBackup'], 3);
+    json['nexpillBackup'] = 2;
+    expect(decodeBackup(jsonEncode(json)).medications.length, sample.medications.length);
+  });
+
+  test('still restores version 1', () {
+    final json = sampleJson();
     json['nexpillBackup'] = 1;
     for (final p in json['patients'] as List) {
       for (final m in p['medications'] as List) {
@@ -103,7 +121,7 @@ void main() {
               (e) => e.message, 'message', contains('isn\'t a Nexpill backup'))));
     });
 
-    test('a newer format', () => refuses((j) => j['nexpillBackup'] = 3, 'newer version'));
+    test('a newer format', () => refuses((j) => j['nexpillBackup'] = 4, 'newer version'));
 
     test('a time without an offset', () => refuses(
         (j) => ((firstMed(j)['doses'] as List).first as Map)['givenAt'] = '2026-06-10T08:00:00',

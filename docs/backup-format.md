@@ -11,7 +11,7 @@ in one step: a file with a problem anywhere is refused whole.
 
 ## Versioning
 
-`nexpillBackup` is the format version, currently **2**. Adding an optional
+`nexpillBackup` is the format version, currently **3**. Adding an optional
 field doesn't change it. Changing what a field means, or adding a required
 one, needs a new version, a section here, and a reader that still accepts the
 old versions. Nexpill refuses a file whose version it doesn't know.
@@ -26,12 +26,13 @@ older app refuses the file instead of half-restoring it.
 |---|---|
 | 1 | The first format. |
 | 2 | Adds the medication's optional `course`. Without the version change, an older Nexpill would drop a course and keep reminding after it ended. A version 1 file is read as version 2 with no courses. |
+| 3 | Adds the dose's optional `skipped`. Without the version change, an older Nexpill would read a skip as a dose given, using up supply and counting towards a course. A version 2 file is read as version 3 with no skips. |
 
 ## Example
 
 ```json
 {
-  "nexpillBackup": 2,
+  "nexpillBackup": 3,
   "exportedAt": "2026-06-10T14:30:00.000Z",
   "patients": [
     {
@@ -163,6 +164,17 @@ a course for a taper; if one is there, whichever ends first applies.
 | `givenBy` | string, optional | |
 | `notes` | string, optional | |
 | `corrects` | string, optional | The `id` of a dose of the same medication that this one replaces. The replaced dose stays in history but no longer counts. A correction can itself be corrected. |
+| `skipped` | boolean, optional | `true` for a dose deliberately not given; `givenAt` is then when it was due. Default `false`. |
+
+A skipped dose moves the medication on as if it had been given on time:
+a `fixedTimes` one to its next time, an `interval` or `taper` one to an
+interval after the skipped dose was due. A skip only counts for a dose the
+last given one hasn't already covered: if the dose was given after all,
+even before the time it was skipped for, the next is counted from the dose
+given. A skip is never counted as given: it
+uses no supply, doesn't count towards a course of `doses`, and isn't the
+"last given" dose. `asNeeded` medications ignore it, and Nexpill never
+writes one for them.
 
 An **instant** is an ISO 8601 date and time with its offset, such as
 `2026-06-10T06:00:00.000Z` or `2026-06-10T08:00:00+02:00`. A time without an

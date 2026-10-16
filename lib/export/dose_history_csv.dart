@@ -7,7 +7,8 @@ import 'package:nexpill/models/dose_event.dart';
 ///
 /// Every entry is included, newest first — corrections and the entries they
 /// replaced alike — with a column saying which ones count, so the file is
-/// the full audit trail rather than a tidied summary.
+/// the full audit trail rather than a tidied summary. A skipped dose's time
+/// is when it was due.
 String doseHistoryCsv(CareSnapshot care, {String? patientId}) {
   final replaced = {for (final d in care.doses) ?d.supersedesId};
   final local = DateFormat('yyyy-MM-dd HH:mm');
@@ -37,14 +38,16 @@ String doseHistoryCsv(CareSnapshot care, {String? patientId}) {
       d.givenAt.toUtc().toIso8601String(),
       care.patient(medication.patientId)?.displayName ?? '',
       medication.name,
-      d.doseText ?? medication.defaultDoseText,
+      d.skipped ? '' : d.doseText ?? medication.defaultDoseText,
       d.givenBy ?? '',
       d.notes ?? '',
       replaced.contains(d.id)
           ? 'Replaced by a correction'
-          : d.isCorrection
-              ? 'Correction'
-              : 'Given',
+          : d.skipped
+              ? 'Skipped'
+              : d.isCorrection
+                  ? 'Correction'
+                  : 'Given',
       d.supersedesId ?? '',
       d.id,
     ]);

@@ -19,6 +19,7 @@ class MedicationCard extends StatelessWidget {
     required this.now,
     required this.onGive,
     required this.onAction,
+    this.onSkip,
     this.lastGivenBy,
     this.course,
   });
@@ -32,6 +33,10 @@ class MedicationCard extends StatelessWidget {
   /// How much of a course is left, e.g. "3 doses left"; null if none.
   final String? course;
   final VoidCallback onGive;
+
+  /// Skips the dose due now, or the next one; null for as-needed. A button
+  /// while it's due, and in the menu before then.
+  final VoidCallback? onSkip;
   final ValueChanged<CardAction> onAction;
 
   @override
@@ -49,6 +54,8 @@ class MedicationCard extends StatelessWidget {
       _ => theme.colorScheme.onSurface,
     };
     final last = status.schedule.lastGivenAt;
+    final due = status.schedule.eligibleNow;
+    final next = status.schedule.nextEligibleAt;
 
     return Card(
       clipBehavior: Clip.antiAlias,
@@ -96,6 +103,11 @@ class MedicationCard extends StatelessWidget {
                         value: CardAction.history,
                         child: Text('Dose history'),
                       ),
+                      if (onSkip != null && !due)
+                        PopupMenuItem(
+                          onTap: onSkip,
+                          child: Text('Skip the ${clockText(next)} dose'),
+                        ),
                       const PopupMenuItem(
                         value: CardAction.stop,
                         child: Text('Stop taking'),
@@ -161,6 +173,10 @@ class MedicationCard extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: 12),
+                    if (onSkip != null && due) ...[
+                      TextButton(onPressed: onSkip, child: const Text('Skip')),
+                      const SizedBox(width: 4),
+                    ],
                     FilledButton(onPressed: onGive, child: const Text('Give')),
                   ],
                 ),

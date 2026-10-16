@@ -12,8 +12,9 @@ import 'package:nexpill/models/patient.dart';
 /// Plain, documented JSON on purpose: a backup should be readable in a text
 /// editor and importable by some other app one day, so nobody is locked in.
 ///
-/// Version 2 added `course`. Files of every earlier version still restore.
-const backupFormatVersion = 2;
+/// Version 2 added `course`, version 3 skipped doses. Files of every earlier
+/// version still restore.
+const backupFormatVersion = 3;
 
 /// A file that can't be restored, with a reason fit to show the user.
 class BackupFormatException implements Exception {
@@ -120,6 +121,7 @@ Map<String, Object?> _encodeMedication(Medication m, List<DoseEvent> doses) {
           'givenBy': ?d.givenBy,
           'notes': ?d.notes,
           'corrects': ?d.supersedesId,
+          if (d.skipped) 'skipped': true,
         },
     ],
   };
@@ -206,6 +208,7 @@ CareSnapshot decodeBackup(String text) {
           givenBy: d.optionalString('givenBy'),
           notes: d.optionalString('notes'),
           supersedesId: d.optionalString('corrects'),
+          skipped: d.optionalBool('skipped') ?? false,
         );
         doses.add(dose);
       }

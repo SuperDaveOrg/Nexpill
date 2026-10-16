@@ -23,7 +23,7 @@ Future<void> syncReminders(
   await notifications.apply(plan, care);
 }
 
-/// Handles "Mark given" and "Snooze" on a reminder.
+/// Handles "Mark given", "Skip" and "Snooze" on a reminder.
 ///
 /// Runs in a background isolate when Nexpill isn't open, so it sets up what
 /// it needs itself and must stay a top-level entry point.
@@ -45,6 +45,11 @@ Future<void> onReminderAction(NotificationResponse response) async {
         if (await repository.medication(id) != null) {
           await repository.logDose(id, givenAt: now);
         }
+      }
+    case NotificationService.actionSkip:
+      final skips = tag.dosesToSkip(await repository.snapshot(), now);
+      for (final MapEntry(key: id, value: dueAt) in skips.entries) {
+        await repository.skipDose(id, dueAt);
       }
     case NotificationService.actionSnooze:
       final again = snoozedNotification(
