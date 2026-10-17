@@ -3,16 +3,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// Small conveniences remembered on the phone. Nothing here is care data;
 /// that all lives in the database.
 class Preferences {
-  static const _kPatient = 'last_patient_id';
   static const _kGivenBy = 'last_given_by';
   static const _kClock24 = 'use_24_hour_clock';
-
-  /// Whose medications were on screen last.
-  static Future<String?> lastPatient() async =>
-      (await SharedPreferences.getInstance()).getString(_kPatient);
-
-  static Future<void> setLastPatient(String id) async =>
-      (await SharedPreferences.getInstance()).setString(_kPatient, id);
 
   /// Who gave the last dose logged on this phone, offered next time so a
   /// caregiver doesn't retype their own name.

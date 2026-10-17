@@ -8,6 +8,7 @@ import 'package:nexpill/models/medication.dart';
 import 'package:nexpill/models/patient.dart';
 import 'package:nexpill/services/preferences.dart';
 import 'package:nexpill/ui/care_store.dart';
+import 'package:nexpill/ui/everyone_screen.dart';
 import 'package:nexpill/ui/give_dose_sheet.dart';
 import 'package:nexpill/ui/history_screen.dart';
 import 'package:nexpill/ui/layout.dart';
@@ -17,18 +18,23 @@ import 'package:nexpill/ui/patients_screen.dart';
 import 'package:nexpill/ui/settings_screen.dart';
 
 /// The home screen: one patient's medications, what needs doing first at
-/// the top, each with a button to give it.
+/// the top, each with a button to give it. Caring for more than one person,
+/// it starts on [EveryoneScreen], and back from a person returns there.
 class CareScreen extends StatefulWidget {
   const CareScreen({
     super.key,
     required this.store,
     required this.patientId,
     required this.onSelectPatient,
+    required this.onShowEveryone,
   });
 
   final CareStore store;
+
+  /// Whose medications are on screen; null for everyone.
   final String? patientId;
   final ValueChanged<String> onSelectPatient;
+  final VoidCallback onShowEveryone;
 
   @override
   State<CareScreen> createState() => _CareScreenState();
@@ -207,14 +213,25 @@ class _CareScreenState extends State<CareScreen> with WidgetsBindingObserver {
         }
         final patients = _store.care.patients;
         if (patients.isEmpty) return _Welcome(store: _store, onAdded: widget.onSelectPatient);
-        final patient = patients.firstWhere((p) => p.id == widget.patientId,
-            orElse: () => patients.first);
-        return _patientView(context, patient);
+        if (patients.length == 1) return _patientView(context, patients.single);
+        final patient =
+            patients.where((p) => p.id == widget.patientId).firstOrNull;
+        if (patient == null) {
+          return EveryoneScreen(store: _store, onOpen: widget.onSelectPatient);
+        }
+        return PopScope(
+          canPop: false,
+          onPopInvokedWithResult: (didPop, _) {
+            if (!didPop) widget.onShowEveryone();
+          },
+          child: _patientView(context, patient, backToEveryone: true),
+        );
       },
     );
   }
 
-  Widget _patientView(BuildContext context, Patient patient) {
+  Widget _patientView(BuildContext context, Patient patient,
+      {bool backToEveryone = false}) {
     final theme = Theme.of(context);
     final care = _store.care;
     final now = _store.now;
@@ -240,6 +257,9 @@ class _CareScreenState extends State<CareScreen> with WidgetsBindingObserver {
 
     return Scaffold(
       appBar: AppBar(
+        leading: backToEveryone
+            ? BackButton(onPressed: widget.onShowEveryone)
+            : null,
         title: InkWell(
           borderRadius: BorderRadius.circular(12),
           onTap: () => _switchPatient(patient),

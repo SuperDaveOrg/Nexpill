@@ -45,14 +45,7 @@ class MedicationCard extends StatelessWidget {
     final colors = StatusColors.of(context);
     final m = medication;
     final (headline, detail) = cardText(status, m, now);
-    final accent = switch (status.label) {
-      MedicationStatusLabel.missed ||
-      MedicationStatusLabel.overdue => colors.late,
-      MedicationStatusLabel.dueSoon => colors.soon,
-      MedicationStatusLabel.eligibleNow ||
-      MedicationStatusLabel.availablePrn => colors.ok,
-      _ => theme.colorScheme.onSurface,
-    };
+    final accent = colors.forStatus(status.label, theme.colorScheme.onSurface);
     final last = status.schedule.lastGivenAt;
     final due = status.schedule.eligibleNow;
     final next = status.schedule.nextEligibleAt;
