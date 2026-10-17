@@ -1,0 +1,1 @@
+• Fixed: a medication's set times ("At 8:00 AM and 8:00 PM") now follow your phone's 12- or 24-hour setting, like every other time in the app.
