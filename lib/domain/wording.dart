@@ -31,6 +31,10 @@ bool use24HourClock = false;
 String clockText(DateTime at) =>
     (use24HourClock ? DateFormat.Hm() : DateFormat.jm()).format(at.toLocal());
 
+/// A time on the clock, "8:00 AM" or "08:00", as [clockText] would show it
+/// on any day.
+String clockTimeText(ClockTime t) => clockText(t.on(DateTime(2000)));
+
 /// "Skipped the 8:00 AM dose", for a skip logged at the time it was due.
 String skippedText(DateTime dueAt) => 'Skipped the ${clockText(dueAt)} dose';
 
@@ -56,7 +60,7 @@ String scheduleText(MedicationSchedule schedule) => switch (schedule) {
       IntervalSchedule(:final intervalMinutes) =>
         'Every ${durationText(intervalMinutes)}',
       FixedTimesSchedule(:final times) =>
-        'At ${listText([for (final t in [...times]..sort()) t.toString()])}',
+        'At ${listText([for (final t in [...times]..sort()) clockTimeText(t)])}',
       PrnSchedule(:final minimumIntervalMinutes) =>
         'As needed, at least ${durationText(minimumIntervalMinutes)} apart',
       TaperSchedule(:final rules) => rules.isEmpty

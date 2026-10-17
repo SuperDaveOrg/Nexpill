@@ -129,5 +129,12 @@ void main() {
     expect(clockText(DateTime(2026, 6, 10, 19, 15)), '19:15');
     expect(whenText(DateTime(2026, 6, 9, 21), now), 'yesterday at 21:00');
     expect(dateTimeText(DateTime(2026, 6, 10, 7, 5)), 'Jun 10, 2026 07:05');
+    expect(scheduleText(const FixedTimesSchedule([ClockTime(20, 0), ClockTime(8, 0)])),
+        'At 08:00 and 20:00');
+  });
+
+  test('set times read like every other time', () {
+    expect(plain(scheduleText(const FixedTimesSchedule([ClockTime(20, 0), ClockTime(8, 30)]))),
+        'At 8:30 AM and 8:00 PM');
   });
 }
