@@ -23,6 +23,14 @@ turns that section into the release's own when it's cut.
 - Backups are now format version 3, to carry skipped doses. Older backups
   still restore.
 
+### Changed
+- Caring for more than one person, Nexpill now opens on Everyone: each
+  person with the medication that needs doing first ("Amoxicillin, Overdue
+  25 min") and how many more are due, so a glance says who's next. Tap
+  someone to see all their medications; back returns to Everyone instead
+  of leaving the app. With just one person, it opens straight on their
+  medications as before.
+
 ## [0.4.0] - 2026-10-16
 
 ### Added
