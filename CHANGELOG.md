@@ -9,6 +9,8 @@ turns that section into the release's own when it's cut.
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-10-17
+
 ### Added
 - Skip a dose. When a dose is due, Skip sits next to Give on its card and
   on its reminder; before then, "Skip the 8:00 PM dose" is in the card's ⋮

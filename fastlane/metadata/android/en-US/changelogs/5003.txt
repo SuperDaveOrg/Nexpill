@@ -1,0 +1,2 @@
+• New: Skip a dose. When a dose is due, Skip sits next to Give on its card and its reminder; before then, it's in the card's ⋮ menu. The next dose comes as if it had been given on time, and the skip is kept in history. After three skips in a row, Nexpill offers to turn that medication's reminders off.
+• New: caring for more than one person, Nexpill opens on Everyone, showing who needs what next.
