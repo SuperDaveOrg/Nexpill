@@ -9,6 +9,8 @@ turns that section into the release's own when it's cut.
 
 ## [Unreleased]
 
+## [0.5.1] - 2026-10-17
+
 ### Fixed
 - A medication's set times ("At 8:00 AM and 8:00 PM") follow the phone's
   12- or 24-hour setting, like every other time in the app, on its card and
