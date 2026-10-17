@@ -69,7 +69,7 @@ void main() {
       expect(text, contains('Not medical advice'));
       expect(text, contains('1. Acetaminophen (500 mg)\n   For: Pain after surgery\n'));
       expect(text, contains('   Schedule: Every 4 hours'));
-      expect(text, contains('   Schedule: At 08:00 and 20:00'));
+      expect(text.replaceAll('\u202f', ' '), contains('   Schedule: At 8:00 AM and 8:00 PM'));
       expect(text, contains('   Schedule: As needed, at least 6 hours apart'));
       expect(text, contains('   Remaining: 29 tablets'));
       expect(text, contains('   Reminders: On, 10 minutes early, as an alarm'));
