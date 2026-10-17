@@ -27,8 +27,10 @@ void main() {
   });
 
   /// [tall] lays out every card at once; a list only builds what's on
-  /// screen.
-  Future<void> start(WidgetTester tester, {bool tall = false}) async {
+  /// screen. [open] taps that person on the overview, to see their
+  /// medications.
+  Future<void> start(WidgetTester tester,
+      {bool tall = false, String? open}) async {
     tester.view.physicalSize = Size(1080, tall ? 9000 : 2400);
     tester.view.devicePixelRatio = 2.75;
     addTearDown(tester.view.reset);
@@ -36,6 +38,10 @@ void main() {
     await tester.pumpWidget(NexpillApp(
         store: store, reminderTaps: ValueNotifier<ReminderTag?>(null)));
     await tester.pumpAndSettle();
+    if (open != null) {
+      await tester.tap(find.text(open));
+      await tester.pumpAndSettle();
+    }
   }
 
   testWidgets('first run: add someone, add a medication, give a dose', (tester) async {
@@ -77,7 +83,7 @@ void main() {
 
   testWidgets('giving a dose early asks first', (tester) async {
     await repo.replaceAll(sampleCare(DateTime.now()));
-    await start(tester, tall: true);
+    await start(tester, tall: true, open: 'Alex Rivera');
 
     // Ibuprofen was given 2 hours ago and must wait 6.
     final card = find.ancestor(
@@ -96,7 +102,7 @@ void main() {
 
   testWidgets('most urgent first', (tester) async {
     await repo.replaceAll(sampleCare(DateTime.now()));
-    await start(tester, tall: true);
+    await start(tester, tall: true, open: 'Alex Rivera');
     final names = [
       for (final n in ['Amoxicillin', 'Acetaminophen', 'Prednisone'])
         (n, tester.getTopLeft(find.textContaining(n, findRichText: true).first).dy),
@@ -122,7 +128,7 @@ void main() {
       ],
       doses: sample.doses,
     ));
-    await start(tester, tall: true);
+    await start(tester, tall: true, open: 'Alex Rivera');
 
     expect(find.text('Finished (1)'), findsOneWidget);
     await tester.tap(find.text('Finished (1)'));
@@ -136,11 +142,57 @@ void main() {
 
   testWidgets('tapping a card edits it; the list ends with an add button', (tester) async {
     await repo.replaceAll(sampleCare(DateTime.now()));
-    await start(tester, tall: true);
+    await start(tester, tall: true, open: 'Alex Rivera');
     expect(find.text('Add a medication for Alex Rivera'), findsOneWidget);
     await tester.tap(find.textContaining('Amoxicillin', findRichText: true).first);
     await tester.pumpAndSettle();
     expect(find.text('Edit Amoxicillin'), findsOneWidget);
+  });
+
+  testWidgets('more than one person: everyone first, with what\'s next for each',
+      (tester) async {
+    await repo.replaceAll(sampleCare(DateTime.now()));
+    await start(tester);
+
+    expect(find.text('Everyone'), findsOneWidget);
+    expect(find.text('Alex Rivera'), findsOneWidget);
+    expect(find.text('Jordan Lee'), findsOneWidget);
+    // Alex's amoxicillin is overdue, so it's the one shown.
+    expect(find.textContaining('Amoxicillin', findRichText: true), findsOneWidget);
+    expect(find.textContaining('Prednisone', findRichText: true), findsNothing);
+    expect(find.textContaining('Vitamin D', findRichText: true), findsOneWidget);
+
+    // Opening someone, then back, returns to everyone instead of leaving.
+    await tester.tap(find.text('Jordan Lee'));
+    await tester.pumpAndSettle();
+    expect(find.text('Add a medication for Jordan Lee'), findsOneWidget);
+    await tester.binding.handlePopRoute();
+    await tester.pumpAndSettle();
+    expect(find.text('Everyone'), findsOneWidget);
+
+    // The app bar's back arrow does the same.
+    await tester.tap(find.text('Alex Rivera'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byType(BackButton));
+    await tester.pumpAndSettle();
+    expect(find.text('Everyone'), findsOneWidget);
+  });
+
+  testWidgets('one person: straight to their medications, no back arrow',
+      (tester) async {
+    final sample = sampleCare(DateTime.now());
+    await repo.replaceAll(CareSnapshot(
+      patients: [sample.patients.first],
+      medications: [
+        for (final m in sample.medications)
+          if (m.patientId == sample.patients.first.id) m,
+      ],
+      doses: sample.doses,
+    ));
+    await start(tester);
+    expect(find.text('Everyone'), findsNothing);
+    expect(find.text('Alex Rivera'), findsOneWidget);
+    expect(find.byType(BackButton), findsNothing);
   });
 
   testWidgets('a correction keeps a blank "Given by"', (tester) async {

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:nexpill/domain/status.dart';
+
 /// Nexpill's look: the SuperDaveLab family palette.
 ///
 /// Every app in the family — GridDock, LedgerSprout, Ebb, Nexpill — shares
@@ -84,6 +86,15 @@ class StatusColors extends ThemeExtension<StatusColors> {
 
   static StatusColors of(BuildContext context) =>
       Theme.of(context).extension<StatusColors>()!;
+
+  /// The colour a status headline is drawn in; [otherwise] when nothing
+  /// needs doing soon.
+  Color forStatus(MedicationStatusLabel label, Color otherwise) => switch (label) {
+        MedicationStatusLabel.missed || MedicationStatusLabel.overdue => late,
+        MedicationStatusLabel.dueSoon => soon,
+        MedicationStatusLabel.eligibleNow || MedicationStatusLabel.availablePrn => ok,
+        _ => otherwise,
+      };
 
   @override
   StatusColors copyWith({Color? soon, Color? late, Color? ok}) => StatusColors(

@@ -16,14 +16,12 @@ class NexpillApp extends StatefulWidget {
     super.key,
     required this.store,
     required this.reminderTaps,
-    this.initialPatientId,
   });
 
   final CareStore store;
 
   /// Reminders tapped while the app runs, or the one that launched it.
   final ValueNotifier<ReminderTag?> reminderTaps;
-  final String? initialPatientId;
 
   @override
   State<NexpillApp> createState() => _NexpillAppState();
@@ -31,7 +29,8 @@ class NexpillApp extends StatefulWidget {
 
 class _NexpillAppState extends State<NexpillApp> with WidgetsBindingObserver {
   final _navigator = GlobalKey<NavigatorState>();
-  late String? _patientId = widget.initialPatientId;
+  /// Null shows everyone, when there's more than one person.
+  String? _patientId;
   Timer? _tick;
 
   @override
@@ -73,10 +72,9 @@ class _NexpillAppState extends State<NexpillApp> with WidgetsBindingObserver {
     if (state == AppLifecycleState.resumed) widget.store.refresh();
   }
 
-  void _select(String patientId) {
-    setState(() => _patientId = patientId);
-    Preferences.setLastPatient(patientId);
-  }
+  void _select(String patientId) => setState(() => _patientId = patientId);
+
+  void _showEveryone() => setState(() => _patientId = null);
 
   void _openTapped() {
     final tag = widget.reminderTaps.value;
@@ -105,6 +103,7 @@ class _NexpillAppState extends State<NexpillApp> with WidgetsBindingObserver {
         store: widget.store,
         patientId: _patientId,
         onSelectPatient: _select,
+        onShowEveryone: _showEveryone,
       ),
     );
   }

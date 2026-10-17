@@ -34,6 +34,5 @@ Future<void> main() async {
   runApp(NexpillApp(
     store: store,
     reminderTaps: taps,
-    initialPatientId: await Preferences.lastPatient(),
   ));
 }
