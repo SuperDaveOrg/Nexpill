@@ -9,6 +9,8 @@ turns that section into the release's own when it's cut.
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-10-20
+
 ### Added
 - Track your own medications without making up a name for yourself. The
   first screen asks who the medications are for: "Me" or "Someone I care
