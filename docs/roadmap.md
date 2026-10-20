@@ -34,6 +34,7 @@ below is what the PWA did and the Flutter app must do before a first release.
 | What each medication is for ("blood pressure"), on the card, in its reminders and in the summary | Done |
 | Skip a dose, now or ahead of time, on the card or a reminder: carries on as if given on time, kept in history | Done |
 | Everyone: with more than one person, home shows each one's next medication; back from a person returns there | Done |
+| Your own medications: "Me" as well as people you care for, shown as "you", no name needed | Done |
 
 ---
 

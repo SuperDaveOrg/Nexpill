@@ -120,7 +120,7 @@ class _PersonCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(patient.displayName, style: theme.textTheme.titleLarge),
+                  Text(personName(patient), style: theme.textTheme.titleLarge),
                   const SizedBox(height: 6),
                   if (active.isEmpty)
                     Text(meds.isEmpty ? 'No medications yet' : 'Nothing to give now',

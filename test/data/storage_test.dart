@@ -118,7 +118,7 @@ void main() {
     final old = await databaseFactoryFfi.openDatabase(path,
         options: OpenDatabaseOptions(
             version: 1, onCreate: (d, _) => NexpillDatabase.createVersion1(d)));
-    await old.insert('patients', sam.toRow());
+    await old.insert('patients', sam.toRow()..remove('is_self'));
     final row = med('a', const IntervalSchedule(480)).toRow()
       ..remove('course_last_day')
       ..remove('course_doses')
@@ -147,7 +147,7 @@ void main() {
     await old.execute('ALTER TABLE medications ADD COLUMN course_last_day TEXT');
     await old.execute('ALTER TABLE medications ADD COLUMN course_doses INTEGER');
     await old.setVersion(2);
-    await old.insert('patients', sam.toRow());
+    await old.insert('patients', sam.toRow()..remove('is_self'));
     await old.insert('medications',
         med('a', const IntervalSchedule(480)).toRow()..remove('purpose'));
     await old.insert('dose_events', {
@@ -162,6 +162,33 @@ void main() {
     await upgradedRepo.saveMedication(
         med('a', const IntervalSchedule(480)).copyWith(purpose: 'Blood pressure'));
     expect((await upgradedRepo.medication('a'))!.purpose, 'Blood pressure');
+    await upgraded.close();
+  });
+
+  test('a version 4 database upgrades, and then has room for one of you',
+      () async {
+    final path = '${dir.path}/v4.db';
+    final v4 = NexpillDatabase(path: path, factory: databaseFactoryFfi);
+    final db = await v4.database;
+    // Back to version 4's patients table.
+    await db.execute('DROP INDEX idx_patients_self');
+    await db.execute('ALTER TABLE patients DROP COLUMN is_self');
+    await db.insert('patients', sam.toRow()..remove('is_self'));
+    await db.setVersion(4);
+    await v4.close();
+
+    final upgraded = NexpillDatabase(path: path, factory: databaseFactoryFfi);
+    final upgradedRepo = CareRepository(db: upgraded);
+    expect((await upgradedRepo.patients()).single.isSelf, isFalse);
+    const me = Patient(id: 'me', displayName: '', isSelf: true);
+    await upgradedRepo.savePatient(me);
+    expect((await upgradedRepo.patients()).map((p) => p.id), ['me', 'sam'],
+        reason: 'you come first');
+    await expectLater(
+        upgradedRepo.savePatient(
+            const Patient(id: 'me2', displayName: '', isSelf: true)),
+        throwsA(isA<DatabaseException>()),
+        reason: 'only one of you');
     await upgraded.close();
   });
 

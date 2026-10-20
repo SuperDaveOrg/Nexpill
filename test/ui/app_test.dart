@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nexpill/data/sample_data.dart';
+import 'package:nexpill/domain/wording.dart';
 import 'package:nexpill/models/care_snapshot.dart';
 import 'package:nexpill/models/dose_event.dart';
 import 'package:nexpill/models/medication.dart';
+import 'package:nexpill/models/patient.dart';
 import 'package:nexpill/services/notification_service.dart';
 import 'package:nexpill/ui/app.dart';
 import 'package:nexpill/ui/care_store.dart';
@@ -47,8 +49,9 @@ void main() {
   testWidgets('first run: add someone, add a medication, give a dose', (tester) async {
     await start(tester);
 
-    await tester.tap(find.text('Who are you caring for?'));
+    await tester.tap(find.text('Someone I care for'));
     await tester.pumpAndSettle();
+    expect(find.text('This is me'), findsNothing, reason: 'they chose someone else');
     await tester.enterText(find.byType(TextField), 'Sam');
     await tester.tap(find.text('Add'));
     await tester.pumpAndSettle();
@@ -79,6 +82,65 @@ void main() {
     await tester.pump(const Duration(seconds: 5));
     await tester.pumpAndSettle();
     expect(find.textContaining('logged'), findsNothing);
+  });
+
+  testWidgets('first run, for yourself: no name asked, and it says "you"',
+      (tester) async {
+    await start(tester);
+
+    await tester.tap(find.text('Me'));
+    await tester.pumpAndSettle();
+    expect(find.byType(AlertDialog), findsNothing);
+    final me = (await repo.patients()).single;
+    expect((me.isSelf, me.displayName), (true, ''));
+    expect(find.text('You'), findsOneWidget, reason: 'the title');
+    expect(find.textContaining('Add your first one'), findsOneWidget);
+
+    await tester.tap(find.text('Add medication'));
+    await tester.pumpAndSettle();
+    expect(find.text('For you'), findsOneWidget);
+    await tester.enterText(find.widgetWithText(TextFormField, 'Name'), 'Amoxicillin');
+    await tester.tap(find.text('Save'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Give'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Log dose'));
+    await tester.pumpAndSettle();
+    expect(notifications.lastPlan!.notifications.first.body, startsWith('For you · '));
+
+    // Someone added later can't also be you; you're listed first.
+    await tester.tap(find.text('You'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Add someone'));
+    await tester.pumpAndSettle();
+    expect(find.text('This is me'), findsNothing);
+    await tester.enterText(find.byType(TextField), 'Alex');
+    await tester.tap(find.text('Add'));
+    await tester.pumpAndSettle();
+    expect([for (final p in await repo.patients()) personName(p)], ['You', 'Alex']);
+  });
+
+  testWidgets('someone already added can become you', (tester) async {
+    await repo.savePatient(const Patient(id: 'me', displayName: 'Me'));
+    await start(tester);
+
+    await tester.tap(find.text('Me'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Manage people'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byType(PopupMenuButton<String>));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Rename'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('This is me'));
+    await tester.enterText(find.byType(TextField), '');
+    await tester.tap(find.text('Save'));
+    await tester.pumpAndSettle();
+
+    final me = (await repo.patients()).single;
+    expect((me.isSelf, me.displayName), (true, ''));
+    expect(find.text('You'), findsOneWidget);
+    expect(find.text('All off for you'), findsNothing);
   });
 
   testWidgets('giving a dose early asks first', (tester) async {

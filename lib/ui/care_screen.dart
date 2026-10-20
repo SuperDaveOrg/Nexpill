@@ -174,7 +174,7 @@ class _CareScreenState extends State<CareScreen> with WidgetsBindingObserver {
               leading: Icon(p.id == current.id
                   ? Icons.radio_button_checked
                   : Icons.radio_button_off),
-              title: Text(p.displayName),
+              title: Text(personName(p)),
               onTap: () => Navigator.pop(context, p),
             ),
           const Divider(),
@@ -266,7 +266,7 @@ class _CareScreenState extends State<CareScreen> with WidgetsBindingObserver {
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 6),
             child: Row(mainAxisSize: MainAxisSize.min, children: [
-              Flexible(child: Text(patient.displayName, overflow: TextOverflow.ellipsis)),
+              Flexible(child: Text(personName(patient), overflow: TextOverflow.ellipsis)),
               const Icon(Icons.expand_more),
             ]),
           ),
@@ -318,7 +318,7 @@ class _CareScreenState extends State<CareScreen> with WidgetsBindingObserver {
             if (!patient.notificationsEnabled && active.isNotEmpty)
               Padding(
                 padding: const EdgeInsets.only(bottom: 12, left: 8),
-                child: Text('Reminders are off for ${patient.displayName}.',
+                child: Text('Reminders are off for ${personInSentence(patient)}.',
                     style: theme.textTheme.bodySmall),
               ),
             if (active.isEmpty)
@@ -333,10 +333,12 @@ class _CareScreenState extends State<CareScreen> with WidgetsBindingObserver {
                   const SizedBox(height: 6),
                   Text(
                     meds.isEmpty
-                        ? 'Add ${patient.displayName}\'s first one, and Nexpill '
-                            'will keep track of when each dose can be given.'
-                        : 'Everything for ${patient.displayName} has finished or '
-                            'been stopped. It\'s all below, with its history.',
+                        ? 'Add ${patient.isSelf ? 'your' : '${patient.displayName}\'s'} '
+                            'first one, and Nexpill will keep track of when each '
+                            'dose can be given.'
+                        : 'Everything for ${personInSentence(patient)} has '
+                            'finished or been stopped. It\'s all below, with its '
+                            'history.',
                     textAlign: TextAlign.center,
                     style: theme.textTheme.bodyMedium,
                   ),
@@ -371,7 +373,9 @@ class _CareScreenState extends State<CareScreen> with WidgetsBindingObserver {
                 padding: const EdgeInsets.symmetric(vertical: 4),
                 child: OutlinedButton.icon(
                   icon: const Icon(Icons.add),
-                  label: Text('Add a medication for ${patient.displayName}'),
+                  label: Text(patient.isSelf
+                      ? 'Add another medication'
+                      : 'Add a medication for ${patient.displayName}'),
                   onPressed: () =>
                       _push(MedicationEditor(store: _store, patient: patient)),
                 ),
@@ -414,7 +418,7 @@ class _CareScreenState extends State<CareScreen> with WidgetsBindingObserver {
   }
 }
 
-/// First run: nobody to care for yet.
+/// First run: nobody to care for yet, not even yourself.
 class _Welcome extends StatelessWidget {
   const _Welcome({required this.store, required this.onAdded});
 
@@ -459,17 +463,26 @@ class _Welcome extends StatelessWidget {
                     ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
               ),
               const SizedBox(height: 32),
+              Text('Who are the medications for?',
+                  textAlign: TextAlign.center, style: theme.textTheme.titleMedium),
+              const SizedBox(height: 12),
+              FilledButton.icon(
+                icon: const Icon(Icons.person_outline),
+                label: const Text('Me'),
+                onPressed: () async => onAdded((await addSelf(store)).id),
+              ),
+              const SizedBox(height: 8),
               FilledButton.icon(
                 icon: const Icon(Icons.person_add_alt),
-                label: const Text('Who are you caring for?'),
+                label: const Text('Someone I care for'),
                 onPressed: () async {
-                  final p = await addPatient(context, store);
+                  final p = await addPatient(context, store, offerSelf: false);
                   if (p != null) onAdded(p.id);
                 },
               ),
               const SizedBox(height: 12),
               Text(
-                'It can be yourself. You can add more people later.',
+                'You can add more people later.',
                 textAlign: TextAlign.center,
                 style: theme.textTheme.bodySmall,
               ),

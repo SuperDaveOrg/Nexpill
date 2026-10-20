@@ -12,9 +12,9 @@ import 'package:nexpill/models/patient.dart';
 /// Plain, documented JSON on purpose: a backup should be readable in a text
 /// editor and importable by some other app one day, so nobody is locked in.
 ///
-/// Version 2 added `course`, version 3 skipped doses. Files of every earlier
-/// version still restore.
-const backupFormatVersion = 3;
+/// Version 2 added `course`, version 3 skipped doses, version 4 the phone's
+/// owner, who may have no name. Files of every earlier version still restore.
+const backupFormatVersion = 4;
 
 /// A file that can't be restored, with a reason fit to show the user.
 class BackupFormatException implements Exception {
@@ -46,7 +46,8 @@ String encodeBackup(CareSnapshot care, {required DateTime exportedAt}) {
       for (final p in care.patients)
         {
           'id': p.id,
-          'name': p.displayName,
+          'name': ?(p.hasName ? p.displayName : null),
+          if (p.isSelf) 'self': true,
           'notes': ?p.notes,
           'notificationsEnabled': p.notificationsEnabled,
           'medications': [
@@ -162,12 +163,20 @@ CareSnapshot decodeBackup(String text) {
 
   for (final p in root.list('patients')) {
     final patientId = p.id(ids);
-    final name = p.string('name');
+    final isSelf = p.optionalBool('self') ?? false;
+    if (isSelf && patients.any((other) => other.isSelf)) {
+      throw const BackupFormatException(
+          'More than one person in this file is marked as you.');
+    }
+    // Only the phone's owner may have no name.
+    final name =
+        isSelf ? (p.optionalString('name') ?? '').trim() : p.string('name');
     patients.add(Patient(
       id: patientId,
       displayName: name,
       notes: p.optionalString('notes'),
       notificationsEnabled: p.optionalBool('notificationsEnabled') ?? true,
+      isSelf: isSelf,
     ));
 
     for (final m in p.list('medications')) {

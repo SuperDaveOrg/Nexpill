@@ -17,12 +17,12 @@ class CareRepository {
 
   // --- Patients ------------------------------------------------------------
 
-  /// Everyone, in name order.
+  /// Everyone, the phone's owner first and then in name order.
   Future<List<Patient>> patients() async => _patients(await _db.database);
 
   static Future<List<Patient>> _patients(DatabaseExecutor db) async {
     final rows =
-        await db.query('patients', orderBy: 'display_name COLLATE NOCASE');
+        await db.query('patients', orderBy: 'is_self DESC, display_name COLLATE NOCASE');
     return rows.map(Patient.fromRow).toList();
   }
 
