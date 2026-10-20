@@ -1,0 +1,2 @@
+• New: track your own medications. The first screen asks whether they're yours or someone you care for. Yours need no name: Nexpill calls you "you", and reminders say "For you". Already added yourself as "Me"? Tick "This is me" in Rename.
+• Backups made with this version need Nexpill 0.6.0 or later to restore. Older backups still restore as before.
