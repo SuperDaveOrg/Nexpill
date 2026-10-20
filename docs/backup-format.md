@@ -11,7 +11,7 @@ in one step: a file with a problem anywhere is refused whole.
 
 ## Versioning
 
-`nexpillBackup` is the format version, currently **3**. Adding an optional
+`nexpillBackup` is the format version, currently **4**. Adding an optional
 field doesn't change it. Changing what a field means, or adding a required
 one, needs a new version, a section here, and a reader that still accepts the
 old versions. Nexpill refuses a file whose version it doesn't know.
@@ -27,12 +27,13 @@ older app refuses the file instead of half-restoring it.
 | 1 | The first format. |
 | 2 | Adds the medication's optional `course`. Without the version change, an older Nexpill would drop a course and keep reminding after it ended. A version 1 file is read as version 2 with no courses. |
 | 3 | Adds the dose's optional `skipped`. Without the version change, an older Nexpill would read a skip as a dose given, using up supply and counting towards a course. A version 2 file is read as version 3 with no skips. |
+| 4 | Adds the patient's optional `self`, for the phone's owner, whose `name` may then be absent. Without the version change, an older Nexpill would refuse a file with a nameless patient for the wrong reason, or forget who the owner is. A version 3 file is read as version 4 with no owner. |
 
 ## Example
 
 ```json
 {
-  "nexpillBackup": 3,
+  "nexpillBackup": 4,
   "exportedAt": "2026-06-10T14:30:00.000Z",
   "patients": [
     {
@@ -84,7 +85,8 @@ the whole file; Nexpill writes random UUIDs.
 | Field | Type | |
 |---|---|---|
 | `id` | string | |
-| `name` | string | Not empty. |
+| `name` | string | Not empty. Optional for the phone's owner (`self`), who needn't give a name. |
+| `self` | boolean, optional | `true` for the phone's owner, tracking their own medications: the app says "you" rather than their name. At most one patient has it. Default `false`. |
 | `notes` | string, optional | |
 | `notificationsEnabled` | boolean, optional | `false` silences all this patient's reminders. Default `true`. |
 | `medications` | array | |

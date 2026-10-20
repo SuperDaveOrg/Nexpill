@@ -16,7 +16,9 @@ class InMemoryCareRepository implements CareRepository {
   @override
   Future<CareSnapshot> snapshot() async => CareSnapshot(
         patients: [..._patients.values]
-          ..sort((a, b) => a.displayName.compareTo(b.displayName)),
+          ..sort((a, b) => a.isSelf != b.isSelf
+              ? (a.isSelf ? -1 : 1)
+              : a.displayName.compareTo(b.displayName)),
         medications: [..._medications.values]
           ..sort((a, b) => a.name.compareTo(b.name)),
         doses: [..._doses.values]..sort((a, b) => b.givenAt.compareTo(a.givenAt)),

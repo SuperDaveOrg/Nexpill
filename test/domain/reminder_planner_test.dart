@@ -305,6 +305,22 @@ void main() {
           'For Sam · 1 tablet · Chest infection');
     });
 
+    test('for you, it says "you", with or without your name', () {
+      final at = DateTime(2026, 6, 10, 6);
+      final a = med('amox', const IntervalSchedule(480));
+      final b = med('para', const IntervalSchedule(480));
+      for (final name in ['', 'Dave']) {
+        final me = Patient(id: 'sam', displayName: name, isSelf: true);
+        PlannedNotification first(List<Medication> meds) => planner
+            .plan(care(meds, [for (final m in meds) given(m.id, at)], patients: [me]),
+                from: from)
+            .notifications
+            .first;
+        expect(first([a]).body, 'For you · 1 tablet');
+        expect(first([a, b]).title, '2 medications for you');
+      }
+    });
+
     test('Skip is offered unless everything on it is as needed', () {
       final at = DateTime(2026, 6, 10, 6);
       Iterable<PlannedNotification> plan(List<Medication> meds) => planner

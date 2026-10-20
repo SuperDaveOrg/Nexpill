@@ -3,7 +3,9 @@ import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nexpill/data/backup.dart';
 import 'package:nexpill/data/sample_data.dart';
+import 'package:nexpill/models/care_snapshot.dart';
 import 'package:nexpill/models/medication.dart';
+import 'package:nexpill/models/patient.dart';
 
 void main() {
   final now = DateTime(2026, 6, 10, 12);
@@ -82,11 +84,36 @@ void main() {
     expect([for (final d in back.doses) if (d.skipped) d.id], ['sample-d6']);
   });
 
-  test('writes version 3, and still restores version 2', () {
+  test('writes version 4, and still restores versions 3 and 2', () {
     final json = sampleJson();
-    expect(json['nexpillBackup'], 3);
-    json['nexpillBackup'] = 2;
-    expect(decodeBackup(jsonEncode(json)).medications.length, sample.medications.length);
+    expect(json['nexpillBackup'], 4);
+    for (final version in [3, 2]) {
+      json['nexpillBackup'] = version;
+      final back = decodeBackup(jsonEncode(json));
+      expect(back.medications.length, sample.medications.length);
+      expect(back.patients.any((p) => p.isSelf), isFalse);
+    }
+  });
+
+  test('you round-trip, with or without a name, and only you say so', () {
+    for (final name in ['', 'Dave']) {
+      final care = CareSnapshot(
+        patients: [
+          Patient(id: 'me', displayName: name, isSelf: true),
+          const Patient(id: 'sam', displayName: 'Sam'),
+        ],
+        medications: const [],
+        doses: const [],
+      );
+      final json = jsonDecode(encodeBackup(care, exportedAt: now)) as Map;
+      final [me, sam] = json['patients'] as List;
+      expect(me['self'], isTrue);
+      expect((me as Map).containsKey('name'), name.isNotEmpty);
+      expect((sam as Map).containsKey('self'), isFalse);
+      final back = decodeBackup(jsonEncode(json));
+      expect([for (final p in back.patients) (p.displayName, p.isSelf)],
+          [(name, true), ('Sam', false)]);
+    }
   });
 
   test('still restores version 1', () {
@@ -121,7 +148,17 @@ void main() {
               (e) => e.message, 'message', contains('isn\'t a Nexpill backup'))));
     });
 
-    test('a newer format', () => refuses((j) => j['nexpillBackup'] = 4, 'newer version'));
+    test('a newer format', () => refuses((j) => j['nexpillBackup'] = 5, 'newer version'));
+
+    test('someone else without a name', () => refuses(
+        (j) => ((j['patients'] as List).first as Map).remove('name'),
+        'missing "name"'));
+
+    test('more than one of you', () => refuses((j) {
+          for (final p in j['patients'] as List) {
+            (p as Map)['self'] = true;
+          }
+        }, 'More than one person'));
 
     test('a time without an offset', () => refuses(
         (j) => ((firstMed(j)['doses'] as List).first as Map)['givenAt'] = '2026-06-10T08:00:00',

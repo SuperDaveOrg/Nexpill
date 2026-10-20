@@ -8,6 +8,7 @@ import 'package:nexpill/domain/scheduling.dart';
 import 'package:nexpill/domain/status.dart';
 import 'package:nexpill/models/dose_event.dart';
 import 'package:nexpill/models/medication.dart';
+import 'package:nexpill/models/patient.dart';
 
 /// How timing is put into words, shared by the screens, the exports and the
 /// reminders, so the same thing is always said the same way.
@@ -229,3 +230,11 @@ String _doses(int n) => n == 1 ? '1 dose' : '$n doses';
     MedicationStatusLabel.finished => ('Finished', finishedText(medication)),
   };
 }
+
+/// A person on their own, as a heading or in a list: their name, or "You"
+/// for the phone's owner when they haven't given one.
+String personName(Patient p) => p.hasName ? p.displayName : 'You';
+
+/// A person inside a sentence: "for Sam", "for you". The phone's owner is
+/// "you" even with a name set; it's them reading.
+String personInSentence(Patient p) => p.isSelf ? 'you' : p.displayName;

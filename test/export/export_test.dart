@@ -60,6 +60,27 @@ void main() {
     });
   });
 
+  test('you, without a name: "You" in the CSV, no name on the summary', () {
+    final care = CareSnapshot(
+      patients: const [Patient(id: 'me', displayName: '', isSelf: true)],
+      medications: const [
+        Medication(
+            id: 'm',
+            patientId: 'me',
+            name: 'Drops',
+            defaultDoseText: '1',
+            schedule: IntervalSchedule(60),
+            reminders: ReminderSettings(enabled: true)),
+      ],
+      doses: [DoseEvent(id: 'd', medicationId: 'm', givenAt: DateTime.utc(2026))],
+    );
+    expect(doseHistoryCsv(care).split('\r\n')[1], contains(',You,Drops,'));
+    expect(patientSummary(care, care.patients.single, now: now),
+        startsWith('Medication summary\n'));
+    expect(patientSummaryFileName(care.patients.single, DateTime(2026, 6, 10)),
+        'nexpill-summary-2026-06-10.txt');
+  });
+
   group('patient summary', () {
     final alex = sample.patient('sample-alex')!;
     final text = patientSummary(sample, alex, now: now);

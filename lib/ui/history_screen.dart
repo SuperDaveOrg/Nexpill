@@ -126,7 +126,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
         return Scaffold(
           appBar: AppBar(
             title: Text(filter == null
-                ? '${widget.patient.displayName}\'s doses'
+                ? widget.patient.isSelf
+                    ? 'Your doses'
+                    : '${widget.patient.displayName}\'s doses'
                 : meds[filter]?.name ?? 'Doses'),
             actions: [
               IconButton(

@@ -9,6 +9,19 @@ turns that section into the release's own when it's cut.
 
 ## [Unreleased]
 
+### Added
+- Track your own medications without making up a name for yourself. The
+  first screen asks who the medications are for: "Me" or "Someone I care
+  for". You're "you" throughout: "Your doses", and reminders that say
+  "For you". A name is optional, and the printable summary asks for one if
+  it's missing. Someone already added as "Me" can become you with "This
+  is me" in Rename. There can be one of you on a phone, listed first.
+
+### Changed
+- Backups are format version 4, which records who on the phone is you.
+  Older versions of Nexpill can't restore them; this version restores every
+  earlier file.
+
 ## [0.5.1] - 2026-10-17
 
 ### Fixed

@@ -90,7 +90,7 @@ class _MedicationEditorState extends State<MedicationEditor> {
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(24, 4, 24, 0),
-            child: Text('For ${widget.patient.displayName}',
+            child: Text('For ${personInSentence(widget.patient)}',
                 style: theme.textTheme.bodySmall),
           ),
           _fields([

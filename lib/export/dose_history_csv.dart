@@ -1,5 +1,6 @@
 import 'package:intl/intl.dart';
 
+import 'package:nexpill/domain/wording.dart';
 import 'package:nexpill/models/care_snapshot.dart';
 import 'package:nexpill/models/dose_event.dart';
 
@@ -36,7 +37,10 @@ String doseHistoryCsv(CareSnapshot care, {String? patientId}) {
     rows.add([
       local.format(d.givenAt.toLocal()),
       d.givenAt.toUtc().toIso8601String(),
-      care.patient(medication.patientId)?.displayName ?? '',
+      switch (care.patient(medication.patientId)) {
+        final p? => personName(p),
+        null => '',
+      },
       medication.name,
       d.skipped ? '' : d.doseText ?? medication.defaultDoseText,
       d.givenBy ?? '',

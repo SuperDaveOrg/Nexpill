@@ -13,7 +13,10 @@ String patientSummary(CareSnapshot care, Patient patient, {required DateTime now
   ];
 
   final lines = <String>[
-    'Medication summary for ${patient.displayName}',
+    // The phone's owner may have no name to put here.
+    patient.hasName
+        ? 'Medication summary for ${patient.displayName}'
+        : 'Medication summary',
     'As of ${dateTimeText(now)}. Active medications only.',
     'From Nexpill, a timing tracker. Not medical advice.',
     '',

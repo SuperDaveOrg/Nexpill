@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import 'package:nexpill/data/backup.dart';
 import 'package:nexpill/data/sample_data.dart';
+import 'package:nexpill/domain/wording.dart';
 import 'package:nexpill/export/file_names.dart';
 import 'package:nexpill/export/patient_summary.dart';
 import 'package:nexpill/models/care_snapshot.dart';
@@ -151,20 +152,54 @@ class _SettingsScreenState extends State<SettingsScreen>
                 for (final p in patients)
                   SimpleDialogOption(
                     onPressed: () => Navigator.pop(context, p),
-                    child: Text(p.displayName),
+                    child: Text(personName(p)),
                   ),
               ],
             ),
           );
     if (patient == null || !mounted) return;
+    // A summary is often for a doctor, who'll want a name on it.
+    final named = patient.hasName ? patient : await _nameForSummary(patient);
+    if (named == null || !mounted) return;
     final now = DateTime.now();
     await saveToFile(
       context,
-      name: patientSummaryFileName(patient, now),
-      text: patientSummary(_store.care, patient, now: now),
+      name: patientSummaryFileName(named, now),
+      text: patientSummary(_store.care, named, now: now),
       mimeType: 'text/plain',
       done: 'Summary saved',
     );
+  }
+
+  /// Asks the phone's owner, who has no name set, what to put on their
+  /// summary: their name, or nothing. Null if cancelled.
+  Future<Patient?> _nameForSummary(Patient self) async {
+    final controller = TextEditingController();
+    final name = await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Your name on the summary'),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          textCapitalization: TextCapitalization.words,
+          decoration: const InputDecoration(
+            labelText: 'Your name',
+            hintText: 'Optional',
+          ),
+          onSubmitted: (v) => Navigator.pop(context, v.trim()),
+        ),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel')),
+          TextButton(
+              onPressed: () => Navigator.pop(context, controller.text.trim()),
+              child: const Text('Continue')),
+        ],
+      ),
+    );
+    return name == null ? null : self.copyWith(displayName: name);
   }
 
   Future<void> _deleteAll() async {

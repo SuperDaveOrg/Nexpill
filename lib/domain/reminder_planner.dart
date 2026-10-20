@@ -274,11 +274,11 @@ class PlannedNotification {
 
   String get title => items.length == 1
       ? '${items.single.medication.name} ${items.single.phrase}'
-      : '${items.length} medications for ${patient.displayName}';
+      : '${items.length} medications for ${personInSentence(patient)}';
 
   String get body => items.length == 1
       ? [
-          'For ${patient.displayName}',
+          'For ${personInSentence(patient)}',
           items.single.medication.defaultDoseText,
           ?items.single.medication.purpose,
         ].join(' · ')
