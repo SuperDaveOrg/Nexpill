@@ -173,6 +173,26 @@ tool/deploy_site.sh                # deploy
 The page promotes LedgerSprout, which pays for Nexpill staying free; keep
 that section when editing.
 
+### Beta builds
+
+`nexpill.superdavelab.com/beta/` (`site/beta/`) is for testers, above all
+native speakers checking translations. It isn't linked from the main page or
+in the sitemap; hand people the link. It offers the newest **snapshot**: a
+build of an untagged commit, signed with the release key, built after the
+current release. Once that release is newer, the page says there's no beta.
+
+```bash
+tool/bump_version.sh minor          # on the branch, so the beta is labelled 0.7.0-<commit>
+git push origin <branch>            # the page links to the commit on GitHub
+tool/build_release.sh --ref <branch>
+tool/deploy_site.sh
+```
+
+A beta has the same version code as the release it leads up to, so testers
+update from the current release to the beta, and from the beta to that
+release, keeping their records. Reports from the beta page's form arrive as
+Nexpill website feedback, starting `[Beta <version>, language: …]`.
+
 
 ## Reproducible builds
 
