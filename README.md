@@ -15,6 +15,9 @@ Everything stays on your phone: no account, no server, and no internet
 permission.
 
 <p align="center">
+Testers wanted: Nexpill in your language. A beta of the next version speaks German, Spanish, French, Italian, Portuguese (Portugal) and Russian, and each translation needs a native speaker to check it before release. If you'd like to help, the beta and what to look for are at nexpill.superdavelab.com/beta.
+</p>
+<p align="center">
   <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/1_care.png" alt="Home screen: one patient's medications, an overdue dose at the top in red, the next due in 7 minutes in amber" width="200">
   <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/2_reminder.png" alt="A reminder in the notification shade with Mark given and Snooze buttons" width="200">
   <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/3_history.png" alt="Dose history for the day, with a corrected entry struck through" width="200">
