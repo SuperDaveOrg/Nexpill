@@ -9,6 +9,7 @@ import 'package:nexpill/ui/layout.dart';
 import 'package:nexpill/ui/patients_screen.dart';
 import 'package:nexpill/ui/settings_screen.dart';
 import 'package:nexpill/ui/theme.dart';
+import 'package:nexpill/ui/language.dart';
 
 /// The home screen when caring for more than one person: each of them with
 /// the medication that needs doing first, so a glance answers "who's next?"
@@ -29,16 +30,16 @@ class EveryoneScreen extends StatelessWidget {
     final care = store.care;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Everyone'),
+        title: Text(context.l.everyone),
         actions: [
           IconButton(
-            tooltip: 'Manage people',
+            tooltip: context.l.managePeople,
             icon: const Icon(Icons.manage_accounts_outlined),
             onPressed: () =>
                 _push(context, PatientsScreen(store: store, onOpen: onOpen)),
           ),
           IconButton(
-            tooltip: 'Settings',
+            tooltip: context.l.settings,
             icon: const Icon(Icons.settings_outlined),
             onPressed: () => _push(
                 context, SettingsScreen(store: store, onSelectPatient: onOpen)),
@@ -51,7 +52,7 @@ class EveryoneScreen extends StatelessWidget {
           if (p != null) onOpen(p.id);
         },
         icon: const Icon(Icons.person_add_alt),
-        label: const Text('Add someone'),
+        label: Text(context.l.addSomeone),
       ),
       body: RefreshIndicator(
         onRefresh: store.refresh,
@@ -123,7 +124,9 @@ class _PersonCard extends StatelessWidget {
                   Text(personName(patient), style: theme.textTheme.titleLarge),
                   const SizedBox(height: 6),
                   if (active.isEmpty)
-                    Text(meds.isEmpty ? 'No medications yet' : 'Nothing to give now',
+                    Text(meds.isEmpty
+                            ? context.l.noMedicationsYet
+                            : context.l.nothingToGiveNow,
                         style: muted)
                   else ...[
                     _next(context, active.first.$1, active.first.$2,
@@ -132,14 +135,15 @@ class _PersonCard extends StatelessWidget {
                     if (alsoDue > 0)
                       Padding(
                         padding: const EdgeInsets.only(top: 4),
-                        child: Text('+ $alsoDue more due now',
+                        child: Text(context.l.moreDueNow(alsoDue),
                             style: theme.textTheme.bodyMedium),
                       ),
                   ],
                   if (!patient.notificationsEnabled && active.isNotEmpty)
                     Padding(
                       padding: const EdgeInsets.only(top: 4),
-                      child: Text('Reminders off', style: theme.textTheme.bodySmall),
+                      child: Text(context.l.remindersOffShort,
+                          style: theme.textTheme.bodySmall),
                     ),
                 ],
               ),

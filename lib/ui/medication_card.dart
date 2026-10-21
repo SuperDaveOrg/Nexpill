@@ -5,6 +5,7 @@ import 'package:nexpill/domain/status.dart';
 import 'package:nexpill/domain/wording.dart';
 import 'package:nexpill/models/medication.dart';
 import 'package:nexpill/ui/theme.dart';
+import 'package:nexpill/ui/language.dart';
 
 enum CardAction { edit, history, stop, resume }
 
@@ -85,25 +86,25 @@ class MedicationCard extends StatelessWidget {
                     ),
                   ),
                   PopupMenuButton<CardAction>(
-                    tooltip: 'More for ${m.name}',
+                    tooltip: context.l.cardMoreFor(m.name),
                     onSelected: onAction,
                     itemBuilder: (_) => [
-                      const PopupMenuItem(
+                      PopupMenuItem(
                         value: CardAction.edit,
-                        child: Text('Edit'),
+                        child: Text(context.l.edit),
                       ),
-                      const PopupMenuItem(
+                      PopupMenuItem(
                         value: CardAction.history,
-                        child: Text('Dose history'),
+                        child: Text(context.l.doseHistory),
                       ),
                       if (onSkip != null && !due)
                         PopupMenuItem(
                           onTap: onSkip,
-                          child: Text('Skip the ${clockText(next)} dose'),
+                          child: Text(context.l.skipTheDose(clockText(next))),
                         ),
-                      const PopupMenuItem(
+                      PopupMenuItem(
                         value: CardAction.stop,
-                        child: Text('Stop taking'),
+                        child: Text(context.l.stopTaking),
                       ),
                     ],
                   ),
@@ -147,13 +148,15 @@ class MedicationCard extends StatelessWidget {
                           Text(detail, style: theme.textTheme.bodyMedium),
                           if (last != null)
                             Text(
-                              'Last given ${whenText(last, now)}'
-                              '${lastGivenBy == null ? '' : ' by $lastGivenBy'}',
+                              lastGivenBy == null
+                                  ? context.l.lastGiven(whenText(last, now))
+                                  : context.l.lastGivenBy(
+                                      whenText(last, now), lastGivenBy!),
                               style: theme.textTheme.bodySmall,
                             ),
                           if (inventory.configured)
                             Text(
-                              _supplyText(inventory, m.doseUnit),
+                              _supplyText(context, inventory, m.doseUnit),
                               style: theme.textTheme.bodySmall?.copyWith(
                                 color: switch (inventory.level) {
                                   InventoryLevel.out => colors.late,
@@ -167,10 +170,10 @@ class MedicationCard extends StatelessWidget {
                     ),
                     const SizedBox(width: 12),
                     if (onSkip != null && due) ...[
-                      TextButton(onPressed: onSkip, child: const Text('Skip')),
+                      TextButton(onPressed: onSkip, child: Text(context.l.skip)),
                       const SizedBox(width: 4),
                     ],
-                    FilledButton(onPressed: onGive, child: const Text('Give')),
+                    FilledButton(onPressed: onGive, child: Text(context.l.give)),
                   ],
                 ),
               ),
@@ -181,13 +184,14 @@ class MedicationCard extends StatelessWidget {
     );
   }
 
-  static String _supplyText(InventoryStatus i, String? unit) {
-    final left =
+  static String _supplyText(
+      BuildContext context, InventoryStatus i, String? unit) {
+    final left = context.l.supplyLeft(
         '${quantityText(i.remaining! < 0 ? 0 : i.remaining!)}'
-        '${unit == null ? '' : ' $unit'} left';
+        '${unit == null ? '' : ' $unit'}');
     return switch (i.level) {
-      InventoryLevel.out => 'None left: time to refill',
-      InventoryLevel.low => '$left: running low',
+      InventoryLevel.out => context.l.supplyNoneLeft,
+      InventoryLevel.low => context.l.supplyRunningLow(left),
       _ => left,
     };
   }

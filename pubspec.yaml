@@ -13,6 +13,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
   flutter_local_notifications: ^22.3.1
   intl: ^0.20.3
   path: ^1.9.1
@@ -29,6 +31,8 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  # The app's words, from lib/l10n/*.arb. See docs/translating.md.
+  generate: true
 
   assets:
     - assets/brand/nexpill_logo_512.png

@@ -12,20 +12,21 @@ import 'package:nexpill/models/dose_event.dart';
 /// is when it was due.
 String doseHistoryCsv(CareSnapshot care, {String? patientId}) {
   final replaced = {for (final d in care.doses) ?d.supersedesId};
-  final local = DateFormat('yyyy-MM-dd HH:mm');
+  // Machine-readable in any language.
+  final local = DateFormat('yyyy-MM-dd HH:mm', 'en_US');
 
   final rows = <List<String>>[
     [
-      'Given at',
-      'Given at (UTC)',
-      'Patient',
-      'Medication',
-      'Dose',
-      'Given by',
-      'Notes',
-      'Status',
-      'Corrects entry',
-      'Entry',
+      strings.csvGivenAt,
+      strings.csvGivenAtUtc,
+      strings.csvPatient,
+      strings.csvMedication,
+      strings.csvDose,
+      strings.csvGivenBy,
+      strings.csvNotes,
+      strings.csvStatus,
+      strings.csvCorrects,
+      strings.csvEntry,
     ],
   ];
 
@@ -46,12 +47,12 @@ String doseHistoryCsv(CareSnapshot care, {String? patientId}) {
       d.givenBy ?? '',
       d.notes ?? '',
       replaced.contains(d.id)
-          ? 'Replaced by a correction'
+          ? strings.csvReplaced
           : d.skipped
-              ? 'Skipped'
+              ? strings.csvSkipped
               : d.isCorrection
-                  ? 'Correction'
-                  : 'Given',
+                  ? strings.csvCorrection
+                  : strings.csvGiven,
       d.supersedesId ?? '',
       d.id,
     ]);

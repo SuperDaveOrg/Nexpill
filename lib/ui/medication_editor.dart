@@ -9,6 +9,7 @@ import 'package:nexpill/models/patient.dart';
 import 'package:nexpill/ui/care_store.dart';
 import 'package:nexpill/ui/dialogs.dart';
 import 'package:nexpill/ui/duration_field.dart';
+import 'package:nexpill/ui/language.dart';
 import 'package:nexpill/ui/layout.dart';
 import 'package:nexpill/ui/medication_draft.dart';
 import 'package:nexpill/ui/section.dart';
@@ -64,10 +65,9 @@ class _MedicationEditorState extends State<MedicationEditor> {
     final m = widget.existing!;
     final ok = await confirmAction(
       context,
-      title: 'Delete ${m.name}?',
-      message: 'Its dose history goes with it. To stop it but keep the history, '
-          'turn off "Taking this now" instead.',
-      action: 'Delete',
+      title: context.l.deleteMedicationTitle(m.name),
+      message: context.l.deleteMedicationMessage,
+      action: context.l.delete,
     );
     if (!ok) return;
     await widget.store.change((repo) => repo.deleteMedication(m.id));
@@ -77,11 +77,12 @@ class _MedicationEditorState extends State<MedicationEditor> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l = context.l;
     return Scaffold(
       appBar: AppBar(
-        title: Text(_d.isNew ? 'New medication' : 'Edit ${widget.existing!.name}'),
+        title: Text(_d.isNew ? l.newMedication : l.editMedication(widget.existing!.name)),
         actions: [
-          TextButton(onPressed: _saving ? null : _save, child: const Text('Save')),
+          TextButton(onPressed: _saving ? null : _save, child: Text(l.save)),
           const SizedBox(width: 8),
         ],
       ),
@@ -90,39 +91,37 @@ class _MedicationEditorState extends State<MedicationEditor> {
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(24, 4, 24, 0),
-            child: Text('For ${personInSentence(widget.patient)}',
+            child: Text(l.forPerson(personInSentence(widget.patient)),
                 style: theme.textTheme.bodySmall),
           ),
           _fields([
-            _text('Name', _d.name, (v) => _d.name = v,
-                error: _errors['name'], autofocus: _d.isNew, hint: 'e.g. Amoxicillin'),
-            _text('Strength', _d.strength, (v) => _d.strength = v,
-                hint: 'Optional, e.g. 500 mg'),
-            _text('What it\'s for', _d.purpose, (v) => _d.purpose = v,
-                hint: 'Optional, e.g. blood pressure'),
-            _text('Usual dose', _d.dose, (v) => _d.dose = v,
-                error: _errors['dose'], hint: 'e.g. 1 tablet, 5 ml'),
-            _text('Instructions', _d.instructions, (v) => _d.instructions = v,
-                hint: 'Optional, e.g. with food', maxLines: 3),
+            _text(l.fieldName, _d.name, (v) => _d.name = v,
+                error: _errors['name'], autofocus: _d.isNew, hint: l.fieldNameHint),
+            _text(l.fieldStrength, _d.strength, (v) => _d.strength = v,
+                hint: l.fieldStrengthHint),
+            _text(l.fieldPurpose, _d.purpose, (v) => _d.purpose = v,
+                hint: l.fieldPurposeHint),
+            _text(l.fieldUsualDose, _d.dose, (v) => _d.dose = v,
+                error: _errors['dose'], hint: l.fieldUsualDoseHint),
+            _text(l.fieldInstructions, _d.instructions, (v) => _d.instructions = v,
+                hint: l.fieldInstructionsHint, maxLines: 3),
           ]),
-          Section(title: 'When', children: [_schedule(theme)]),
+          Section(title: l.sectionWhen, children: [_schedule(theme)]),
           if (_d.courseAvailable)
-            Section(title: 'How long', children: [_course(theme)]),
-          Section(title: 'Reminders', children: _reminders()),
-          Section(title: 'Supply', children: _supply()),
+            Section(title: l.sectionHowLong, children: [_course(theme)]),
+          Section(title: l.sectionReminders, children: _reminders()),
+          Section(title: l.sectionSupply, children: _supply()),
           if (!_d.isNew)
             Section(children: [
               SwitchListTile(
-                title: const Text('Taking this now'),
-                subtitle: const Text(
-                    'Turn off when it\'s stopped. It keeps its history but '
-                    'stops reminding.'),
+                title: Text(l.takingThisNow),
+                subtitle: Text(l.takingThisNowHint),
                 value: _d.active,
                 onChanged: (v) => _update(() => _d.active = v),
               ),
               ListTile(
                 leading: Icon(Icons.delete_outline, color: theme.colorScheme.error),
-                title: Text('Delete medication',
+                title: Text(l.deleteMedication,
                     style: TextStyle(color: theme.colorScheme.error)),
                 onTap: _delete,
               ),
@@ -131,7 +130,7 @@ class _MedicationEditorState extends State<MedicationEditor> {
             padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
             child: FilledButton(
               onPressed: _saving ? null : _save,
-              child: Text(_d.isNew ? 'Add medication' : 'Save changes'),
+              child: Text(_d.isNew ? l.addMedication : l.saveChanges),
             ),
           ),
         ],
@@ -171,6 +170,7 @@ class _MedicationEditorState extends State<MedicationEditor> {
       );
 
   Widget _schedule(ThemeData theme) {
+    final l = context.l;
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -180,11 +180,11 @@ class _MedicationEditorState extends State<MedicationEditor> {
             spacing: 8,
             runSpacing: 8,
             children: [
-              for (final (kind, label) in const [
-                (ScheduleKind.interval, 'Every few hours'),
-                (ScheduleKind.fixedTimes, 'At set times'),
-                (ScheduleKind.prn, 'As needed'),
-                (ScheduleKind.taper, 'Taper'),
+              for (final (kind, label) in [
+                (ScheduleKind.interval, l.kindInterval),
+                (ScheduleKind.fixedTimes, l.kindFixedTimes),
+                (ScheduleKind.prn, l.kindAsNeeded),
+                (ScheduleKind.taper, l.kindTaper),
               ])
                 ChoiceChip(
                   label: Text(label),
@@ -196,23 +196,22 @@ class _MedicationEditorState extends State<MedicationEditor> {
           const SizedBox(height: 16),
           ...switch (_d.kind) {
             ScheduleKind.interval => [
-                Text('Every', style: theme.textTheme.titleSmall),
+                Text(l.every, style: theme.textTheme.titleSmall),
                 const SizedBox(height: 8),
                 DurationField(
                   minutes: _d.everyMinutes,
                   onChanged: (v) => _update(() => _d.everyMinutes = v),
                 ),
-                _hint(theme, 'Counted from the last dose given.'),
+                _hint(theme, l.intervalHint),
               ],
             ScheduleKind.prn => [
-                Text('At least this long apart', style: theme.textTheme.titleSmall),
+                Text(l.atLeastApart, style: theme.textTheme.titleSmall),
                 const SizedBox(height: 8),
                 DurationField(
                   minutes: _d.prnMinutes,
                   onChanged: (v) => _update(() => _d.prnMinutes = v),
                 ),
-                _hint(theme, 'Never "due" — Nexpill shows when it can be '
-                    'given again.'),
+                _hint(theme, l.asNeededHint),
               ],
             ScheduleKind.fixedTimes => [
                 Wrap(
@@ -226,12 +225,12 @@ class _MedicationEditorState extends State<MedicationEditor> {
                       ),
                     ActionChip(
                       avatar: const Icon(Icons.add),
-                      label: const Text('Add time'),
+                      label: Text(l.addTime),
                       onPressed: _addTime,
                     ),
                   ],
                 ),
-                _hint(theme, 'Every day, on this phone\'s clock.'),
+                _hint(theme, l.fixedTimesHint),
               ],
             ScheduleKind.taper => _taper(theme),
           },
@@ -255,7 +254,7 @@ class _MedicationEditorState extends State<MedicationEditor> {
     final picked = await showTimePicker(
       context: context,
       initialTime: const TimeOfDay(hour: 8, minute: 0),
-      helpText: 'Time of dose',
+      helpText: context.l.timeOfDose,
     );
     if (picked == null) return;
     _update(() {
@@ -265,6 +264,7 @@ class _MedicationEditorState extends State<MedicationEditor> {
   }
 
   Widget _course(ThemeData theme) {
+    final l = context.l;
     final given = _d.givenSoFar;
     return Padding(
       padding: const EdgeInsets.all(16),
@@ -275,10 +275,10 @@ class _MedicationEditorState extends State<MedicationEditor> {
             spacing: 8,
             runSpacing: 8,
             children: [
-              for (final (kind, label) in const [
-                (CourseKind.ongoing, 'Until stopped'),
-                (CourseKind.lastDay, 'Until a date'),
-                (CourseKind.doses, 'A number of doses'),
+              for (final (kind, label) in [
+                (CourseKind.ongoing, l.courseUntilStopped),
+                (CourseKind.lastDay, l.courseUntilDate),
+                (CourseKind.doses, l.courseNumberOfDoses),
               ])
                 ChoiceChip(
                   label: Text(label),
@@ -290,29 +290,24 @@ class _MedicationEditorState extends State<MedicationEditor> {
           const SizedBox(height: 12),
           ...switch (_d.courseKind) {
             CourseKind.ongoing => [
-                _hint(theme, 'Reminders carry on until you turn off "Taking '
-                    'this now".'),
+                _hint(theme, l.courseOngoingHint),
               ],
             CourseKind.lastDay => [
                 ActionChip(
                   avatar: const Icon(Icons.event_outlined),
-                  label: Text('Last day: ${dateText(_d.courseLastDay)}'),
+                  label: Text(l.courseLastDayChip(dateText(_d.courseLastDay))),
                   onPressed: _pickLastDay,
                 ),
-                _hint(theme, 'Doses carry on through that day; reminders stop '
-                    'at midnight at the end of it.'),
+                _hint(theme, l.courseLastDayHint),
               ],
             CourseKind.doses => [
-                _text(given > 0 ? 'Doses still to give' : 'Number of doses',
+                _text(given > 0 ? l.dosesStillToGive : l.numberOfDoses,
                     _d.dosesLeft, (v) => _d.dosesLeft = v,
                     error: _errors['course'],
-                    hint: 'e.g. 10',
+                    hint: l.dosesHint,
                     keyboard: TextInputType.number),
-                _hint(
-                    theme,
-                    '${given > 0 ? '${given == 1 ? '1 dose' : '$given doses'} '
-                        'given so far. ' : ''}Reminders stop once the last '
-                        'one is given.'),
+                _hint(theme,
+                    given > 0 ? l.courseDosesGivenHint(given) : l.courseDosesHint),
               ],
           },
         ],
@@ -331,12 +326,13 @@ class _MedicationEditorState extends State<MedicationEditor> {
       initialDate: initial.isBefore(first) ? first : initial,
       firstDate: first,
       lastDate: DateTime(today.year + 2, today.month, today.day),
-      helpText: 'Last day of the course',
+      helpText: context.l.lastDayOfCourse,
     );
     if (picked != null) _update(() => _d.courseLastDay = picked);
   }
 
   List<Widget> _taper(ThemeData theme) {
+    final l = context.l;
     final now = DateTime.now();
     Future<DateTime?> pick(DateTime initial) => showDatePicker(
           context: context,
@@ -360,17 +356,18 @@ class _MedicationEditorState extends State<MedicationEditor> {
                 children: [
                   Row(children: [
                     Expanded(
-                        child: Text('Step ${i + 1}', style: theme.textTheme.titleSmall)),
+                        child: Text(l.taperStepNumber(i + 1),
+                            style: theme.textTheme.titleSmall)),
                     if (_d.taperSteps.length > 1)
                       IconButton(
-                        tooltip: 'Remove step',
+                        tooltip: l.removeStep,
                         icon: const Icon(Icons.close),
                         onPressed: () => _update(() => _d.taperSteps.removeAt(i)),
                       ),
                   ]),
                   Wrap(spacing: 8, children: [
                     ActionChip(
-                      label: Text('From ${dateText(step.start)}'),
+                      label: Text(l.stepFrom(dateText(step.start))),
                       onPressed: () async {
                         final d = await pick(step.start);
                         if (d != null) _update(() => step.start = d);
@@ -378,8 +375,8 @@ class _MedicationEditorState extends State<MedicationEditor> {
                     ),
                     ActionChip(
                       label: Text(step.end == null
-                          ? 'No end date'
-                          : 'Until ${dateText(step.end!)}'),
+                          ? l.noEndDate
+                          : l.stepUntil(dateText(step.end!))),
                       onPressed: () async {
                         final d = await pick(step.end ?? step.start.add(const Duration(days: 7)));
                         if (d != null) _update(() => step.end = d);
@@ -387,7 +384,7 @@ class _MedicationEditorState extends State<MedicationEditor> {
                     ),
                     if (step.end != null)
                       ActionChip(
-                        label: const Text('Clear end'),
+                        label: Text(l.clearEnd),
                         onPressed: () => _update(() => step.end = null),
                       ),
                   ]),
@@ -406,7 +403,7 @@ class _MedicationEditorState extends State<MedicationEditor> {
         ),
       OutlinedButton.icon(
         icon: const Icon(Icons.add),
-        label: const Text('Add a step'),
+        label: Text(l.addStep),
         onPressed: () => _update(() {
           final last = _d.taperSteps.isEmpty ? null : _d.taperSteps.last;
           final start = last?.end ?? dateOnly(now).add(const Duration(days: 7));
@@ -414,19 +411,17 @@ class _MedicationEditorState extends State<MedicationEditor> {
           _d.taperSteps.add(TaperStepDraft(start: start, minutes: last?.minutes ?? 480));
         }),
       ),
-      _hint(theme, 'Each step runs from midnight on its first day until midnight '
-          'on its end day. The last step can be open-ended.'),
+      _hint(theme, l.taperHint),
     ];
   }
 
   List<Widget> _reminders() {
+    final l = context.l;
     final prn = _d.kind == ScheduleKind.prn;
     return [
       SwitchListTile(
-        title: const Text('Remind me'),
-        subtitle: Text(prn
-            ? 'When it can be given again.'
-            : 'When a dose is due, and again while it\'s overdue.'),
+        title: Text(l.remindMe),
+        subtitle: Text(prn ? l.remindAsNeededHint : l.remindHint),
         value: _d.remindersOn,
         onChanged: (v) => _update(() {
           _d.remindersOn = v;
@@ -435,13 +430,14 @@ class _MedicationEditorState extends State<MedicationEditor> {
       ),
       if (_d.remindersOn && !prn) ...[
         ListTile(
-          title: const Text('Heads-up before it\'s due'),
+          title: Text(l.headsUp),
           subtitle: Padding(
             padding: const EdgeInsets.only(top: 8),
             child: SegmentedButton<int>(
               segments: [
                 for (final m in ReminderSettings.earlyChoices)
-                  ButtonSegment(value: m, label: Text(m == 0 ? 'None' : '$m min')),
+                  ButtonSegment(
+                      value: m, label: Text(m == 0 ? l.none : l.minutesShort(m))),
               ],
               selected: {
                 ReminderSettings.earlyChoices.contains(_d.earlyMinutes)
@@ -453,22 +449,22 @@ class _MedicationEditorState extends State<MedicationEditor> {
           ),
         ),
         ListTile(
-          title: const Text('Repeat while overdue'),
+          title: Text(l.repeatWhileOverdue),
           trailing: DropdownButton<int>(
             value: _d.overdueRepeatMinutes,
             underline: const SizedBox(),
             items: [
               for (final m in {15, 30, 60, _d.overdueRepeatMinutes}.toList()..sort())
-                DropdownMenuItem(value: m, child: Text('every ${shortDurationText(m)}')),
+                DropdownMenuItem(
+                    value: m, child: Text(l.everyDuration(shortDurationText(m)))),
             ],
             onChanged: (v) => _update(() => _d.overdueRepeatMinutes = v ?? 30),
           ),
         ),
         if (_d.alarmAvailable)
           SwitchListTile(
-            title: const Text('Ring like an alarm'),
-            subtitle: const Text(
-                'The alarm sound, repeating until you mark it given or snooze it.'),
+            title: Text(l.ringLikeAlarm),
+            subtitle: Text(l.ringLikeAlarmHint),
             value: _d.alarm,
             onChanged: (v) => _update(() => _d.alarm = v),
           ),
@@ -478,8 +474,8 @@ class _MedicationEditorState extends State<MedicationEditor> {
 
   List<Widget> _supply() => [
         SwitchListTile(
-          title: const Text('Track how much is left'),
-          subtitle: const Text('Counts down with each dose logged.'),
+          title: Text(context.l.trackSupply),
+          subtitle: Text(context.l.trackSupplyHint),
           value: _d.trackSupply,
           onChanged: (v) => _update(() => _d.trackSupply = v),
         ),
@@ -489,25 +485,26 @@ class _MedicationEditorState extends State<MedicationEditor> {
             child: Column(children: [
               Row(children: [
                 Expanded(
-                  child: _text('Starting amount', _d.startingQuantity ?? '',
+                  child: _text(context.l.startingAmount, _d.startingQuantity ?? '',
                       (v) => _d.startingQuantity = v,
                       keyboard: const TextInputType.numberWithOptions(decimal: true)),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: _text('Unit', _d.unit, (v) => _d.unit = v, hint: 'tablets'),
+                  child: _text(context.l.unit, _d.unit, (v) => _d.unit = v,
+                      hint: context.l.unitHint),
                 ),
               ]),
               const SizedBox(height: 12),
               Row(children: [
                 Expanded(
-                  child: _text('Each dose uses', _d.perDose, (v) => _d.perDose = v,
+                  child: _text(context.l.eachDoseUses, _d.perDose, (v) => _d.perDose = v,
                       keyboard: const TextInputType.numberWithOptions(decimal: true)),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: _text('Warn at', _d.lowAt ?? '', (v) => _d.lowAt = v,
-                      hint: 'Optional',
+                  child: _text(context.l.warnAt, _d.lowAt ?? '', (v) => _d.lowAt = v,
+                      hint: context.l.optional,
                       keyboard: const TextInputType.numberWithOptions(decimal: true)),
                 ),
               ]),

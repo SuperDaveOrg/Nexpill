@@ -1,0 +1,7 @@
+# Flutter's gen-l10n: lib/l10n/app_<language>.arb into AppLocalizations.
+# English is the template; every other file translates its keys.
+arb-dir: lib/l10n
+template-arb-file: app_en.arb
+output-localization-file: app_localizations.dart
+untranslated-messages-file: build/untranslated.json
+nullable-getter: false

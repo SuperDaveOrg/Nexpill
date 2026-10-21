@@ -1,0 +1,1404 @@
+{
+  "@@locale": "en",
+  "durationHours": "{count, plural, =1{1 hour} other{{count} hours}}",
+  "@durationHours": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "durationMinutes": "{count, plural, =1{1 minute} other{{count} minutes}}",
+  "@durationMinutes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "durationHoursMinutes": "{hours} {minutes}",
+  "@durationHoursMinutes": {
+    "placeholders": {
+      "hours": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "skippedDose": "Skipped the {time} dose",
+  "@skippedDose": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "listAnd": "{items} and {last}",
+  "@listAnd": {
+    "placeholders": {
+      "items": {
+        "type": "String"
+      },
+      "last": {
+        "type": "String"
+      }
+    }
+  },
+  "listSeparator": ", ",
+  "scheduleEvery": "Every {duration}",
+  "@scheduleEvery": {
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "scheduleAt": "At {times}",
+  "@scheduleAt": {
+    "placeholders": {
+      "times": {
+        "type": "String"
+      }
+    }
+  },
+  "scheduleAsNeeded": "As needed, at least {duration} apart",
+  "@scheduleAsNeeded": {
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "taperNoSteps": "Taper with no steps",
+  "taperStepFrom": "From {date}",
+  "@taperStepFrom": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "taperStepRange": "{from} to {until}",
+  "@taperStepRange": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "until": {
+        "type": "String"
+      }
+    }
+  },
+  "taperStep": "{when}: every {duration}",
+  "@taperStep": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      },
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "taperFinished": "Taper finished",
+  "taperShortEvery": "Taper: every {duration}",
+  "@taperShortEvery": {
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "taperShortFrom": "{text} from {date}",
+  "@taperShortFrom": {
+    "placeholders": {
+      "text": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "taperShortUntil": "{text} until {date}",
+  "@taperShortUntil": {
+    "placeholders": {
+      "text": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "taperShortThen": "{text}, then every {duration}",
+  "@taperShortThen": {
+    "placeholders": {
+      "text": {
+        "type": "String"
+      },
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "statusNotGiven": "Not given yet",
+  "statusCanGiveNow": "Can be given now",
+  "statusDueNow": "Due now",
+  "statusNextAt": "Next at {time}",
+  "@statusNextAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "statusOverdueBy": "Overdue by {duration}",
+  "@statusOverdueBy": {
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "statusMissed": "Missed: was due {duration} ago",
+  "@statusMissed": {
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "statusFinished": "Finished",
+  "remindersOff": "Off",
+  "remindersOn": "On",
+  "remindersEarly": "{duration} early",
+  "@remindersEarly": {
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "remindersAlarm": "as an alarm",
+  "whenToday": "{time}",
+  "@whenToday": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "whenTomorrow": "tomorrow at {time}",
+  "@whenTomorrow": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "whenYesterday": "yesterday at {time}",
+  "@whenYesterday": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "whenOnDay": "{date} at {time}",
+  "@whenOnDay": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "shortMinutes": "{count} min",
+  "@shortMinutes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "shortHours": "{count} hr",
+  "@shortHours": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "shortHoursMinutes": "{hours} hr {minutes} min",
+  "@shortHoursMinutes": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "shortDays": "{count, plural, =1{1 day} other{{count} days}}",
+  "@shortDays": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "today": "Today",
+  "yesterday": "Yesterday",
+  "courseFinishedLastDay": "Course finished: last day was {date}",
+  "@courseFinishedLastDay": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "courseFinishedDoses": "{count, plural, =1{Course finished: its 1 dose given} other{Course finished: all {count} doses given}}",
+  "@courseFinishedDoses": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "courseLastDay": "Last day {date}",
+  "@courseLastDay": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "courseDosesSoFar": "{total, plural, =1{1 dose, {given} given so far} other{{total} doses, {given} given so far}}",
+  "@courseDosesSoFar": {
+    "placeholders": {
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "courseShortLastDay": "last day {date}",
+  "@courseShortLastDay": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "courseDosesLeft": "{count, plural, =1{1 dose left} other{{count} doses left}}",
+  "@courseDosesLeft": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "cardFirstDue": "First due {when}",
+  "@cardFirstDue": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "cardAsNeeded": "As needed",
+  "cardAvailableFrom": "Next dose from {when}",
+  "@cardAvailableFrom": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "cardNextDose": "Next dose {when}",
+  "@cardNextDose": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "cardIn": "in {duration}",
+  "@cardIn": {
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "cardDueIn": "Due in {duration}",
+  "@cardDueIn": {
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "cardAt": "at {when}",
+  "@cardAt": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "cardSince": "since {when}",
+  "@cardSince": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "cardOverdue": "Overdue {duration}",
+  "@cardOverdue": {
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "cardWasDue": "was due {when}",
+  "@cardWasDue": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "cardMissed": "Missed",
+  "cardMissedWasDue": "was due {when}, {duration} ago",
+  "@cardMissedWasDue": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      },
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "personYou": "You",
+  "personYouAfterFor": "you",
+  "reminderDueAt": "{medication} due at {time}",
+  "@reminderDueAt": {
+    "placeholders": {
+      "medication": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderDueNow": "{medication} due now",
+  "@reminderDueNow": {
+    "placeholders": {
+      "medication": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderOverdueSince": "{medication} overdue since {time}",
+  "@reminderOverdueSince": {
+    "placeholders": {
+      "medication": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderAvailable": "{medication} can be given again",
+  "@reminderAvailable": {
+    "placeholders": {
+      "medication": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderManyFor": "{count} medications for {person}",
+  "@reminderManyFor": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "person": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderFor": "For {person}",
+  "@reminderFor": {
+    "placeholders": {
+      "person": {
+        "type": "String"
+      }
+    }
+  },
+  "channelAlarms": "Medication alarms",
+  "channelAlarmsDescription": "For medications set to ring like an alarm when a dose is due.",
+  "channelReminders": "Medication reminders",
+  "channelRemindersDescription": "Heads-ups, doses due, and overdue doses.",
+  "channelUpkeep": "Keeping reminders going",
+  "channelUpkeepDescription": "A note when Nexpill needs opening so reminders don't run out.",
+  "actionMarkGiven": "Mark given",
+  "actionSkip": "Skip",
+  "actionSnooze": "Snooze {minutes} min",
+  "@actionSnooze": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "upkeepTitle": "Open Nexpill to keep reminders coming",
+  "upkeepBody": "Reminders are set a week ahead each time Nexpill is used. Open it to set the next ones.",
+  "testReminderTitle": "Test reminder",
+  "testReminderBody": "Reminders are working. This is how they'll look.",
+  "csvGivenAt": "Given at",
+  "csvGivenAtUtc": "Given at (UTC)",
+  "csvPatient": "Patient",
+  "csvMedication": "Medication",
+  "csvDose": "Dose",
+  "csvGivenBy": "Given by",
+  "csvNotes": "Notes",
+  "csvStatus": "Status",
+  "csvCorrects": "Corrects entry",
+  "csvEntry": "Entry",
+  "csvReplaced": "Replaced by a correction",
+  "csvSkipped": "Skipped",
+  "csvCorrection": "Correction",
+  "csvGiven": "Given",
+  "summaryTitleFor": "Medication summary for {name}",
+  "@summaryTitleFor": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "summaryTitle": "Medication summary",
+  "summaryAsOf": "As of {dateTime}. Active medications only.",
+  "@summaryAsOf": {
+    "placeholders": {
+      "dateTime": {
+        "type": "String"
+      }
+    }
+  },
+  "summaryNotAdvice": "From Nexpill, a timing tracker. Not medical advice.",
+  "summaryNoActive": "No active medications.",
+  "summaryPurpose": "For: {value}",
+  "@summaryPurpose": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "summaryDose": "Dose: {value}",
+  "@summaryDose": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "summarySchedule": "Schedule: {value}",
+  "@summarySchedule": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "summaryCourse": "Course: {value}",
+  "@summaryCourse": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "summaryInstructions": "Instructions: {value}",
+  "@summaryInstructions": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "summaryLastGiven": "Last given: {value}",
+  "@summaryLastGiven": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "summaryNotYet": "Not yet",
+  "summaryStatus": "Status: {value}",
+  "@summaryStatus": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "summaryReminders": "Reminders: {value}",
+  "@summaryReminders": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "summaryRemaining": "Remaining: {value}",
+  "@summaryRemaining": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "summaryRunningLow": "{amount} (running low)",
+  "@summaryRunningLow": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "summaryNoneLeft": "{amount} (none left)",
+  "@summaryNoneLeft": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "backupNotNexpill": "This file isn't a Nexpill backup.",
+  "backupTooNew": "This backup is from a newer version of Nexpill. Update the app, then try again.",
+  "backupTwoOfYou": "More than one person in this file is marked as you.",
+  "backupCorrectsMissing": "A dose of {medication} corrects one that isn't in its history.",
+  "@backupCorrectsMissing": {
+    "placeholders": {
+      "medication": {
+        "type": "String"
+      }
+    }
+  },
+  "backupCorrectionsCircle": "Corrections to {medication}'s doses go round in a circle.",
+  "@backupCorrectionsCircle": {
+    "placeholders": {
+      "medication": {
+        "type": "String"
+      }
+    }
+  },
+  "backupCourseBoth": "{where} needs either \"lastDay\" or \"doses\", not both.",
+  "@backupCourseBoth": {
+    "placeholders": {
+      "where": {
+        "type": "String"
+      }
+    }
+  },
+  "backupBadTime": "{where} has a time that isn't HH:mm: {time}.",
+  "@backupBadTime": {
+    "placeholders": {
+      "where": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "backupUnknownSchedule": "{where} has an unknown schedule type \"{type}\".",
+  "@backupUnknownSchedule": {
+    "placeholders": {
+      "where": {
+        "type": "String"
+      },
+      "type": {
+        "type": "String"
+      }
+    }
+  },
+  "backupWrongForm": "{where} isn't in the expected form.",
+  "@backupWrongForm": {
+    "placeholders": {
+      "where": {
+        "type": "String"
+      }
+    }
+  },
+  "backupMissing": "{where} is missing \"{key}\" or it is the wrong kind of value.",
+  "@backupMissing": {
+    "placeholders": {
+      "where": {
+        "type": "String"
+      },
+      "key": {
+        "type": "String"
+      }
+    }
+  },
+  "backupEmpty": "{where} has an empty \"{key}\".",
+  "@backupEmpty": {
+    "placeholders": {
+      "where": {
+        "type": "String"
+      },
+      "key": {
+        "type": "String"
+      }
+    }
+  },
+  "backupImpossible": "{where} has an impossible \"{key}\": {value}.",
+  "@backupImpossible": {
+    "placeholders": {
+      "where": {
+        "type": "String"
+      },
+      "key": {
+        "type": "String"
+      },
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "backupBadDate": "{where} has a \"{key}\" that isn't a YYYY-MM-DD date.",
+  "@backupBadDate": {
+    "placeholders": {
+      "where": {
+        "type": "String"
+      },
+      "key": {
+        "type": "String"
+      }
+    }
+  },
+  "backupBadInstant": "{where} has a \"{key}\" that isn't a date and time with a time zone.",
+  "@backupBadInstant": {
+    "placeholders": {
+      "where": {
+        "type": "String"
+      },
+      "key": {
+        "type": "String"
+      }
+    }
+  },
+  "backupDuplicateId": "The id \"{id}\" appears more than once.",
+  "@backupDuplicateId": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "backupNone": "{where} has no \"{key}\".",
+  "@backupNone": {
+    "placeholders": {
+      "where": {
+        "type": "String"
+      },
+      "key": {
+        "type": "String"
+      }
+    }
+  },
+  "backupWhereFile": "The file",
+  "backupWhereItem": "{where}, {key} {number}",
+  "@backupWhereItem": {
+    "placeholders": {
+      "where": {
+        "type": "String"
+      },
+      "key": {
+        "type": "String"
+      },
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "cancel": "Cancel",
+  "couldNotSave": "Couldn't save the file.",
+  "hours": "Hours",
+  "minutes": "Minutes",
+  "cardMoreFor": "More for {medication}",
+  "@cardMoreFor": {
+    "placeholders": {
+      "medication": {
+        "type": "String"
+      }
+    }
+  },
+  "edit": "Edit",
+  "doseHistory": "Dose history",
+  "skipTheDose": "Skip the {time} dose",
+  "@skipTheDose": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "stopTaking": "Stop taking",
+  "lastGiven": "Last given {when}",
+  "@lastGiven": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "lastGivenBy": "Last given {when} by {name}",
+  "@lastGivenBy": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "skip": "Skip",
+  "give": "Give",
+  "supplyLeft": "{amount} left",
+  "@supplyLeft": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "supplyNoneLeft": "None left: time to refill",
+  "supplyRunningLow": "{left}: running low",
+  "@supplyRunningLow": {
+    "placeholders": {
+      "left": {
+        "type": "String"
+      }
+    }
+  },
+  "earlyTitle": "This is early",
+  "earlyMessageDue": "{medication} is next due {when}, in {duration}. Log a dose now anyway?",
+  "@earlyMessageDue": {
+    "placeholders": {
+      "medication": {
+        "type": "String"
+      },
+      "when": {
+        "type": "String"
+      },
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "earlyMessageAvailable": "{medication} can next be given {when}, in {duration}. Log a dose now anyway?",
+  "@earlyMessageAvailable": {
+    "placeholders": {
+      "medication": {
+        "type": "String"
+      },
+      "when": {
+        "type": "String"
+      },
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "notYet": "Not yet",
+  "logItNow": "Log it now",
+  "dayGiven": "Day it was given",
+  "timeGiven": "Time it was given",
+  "timeInFuture": "That time hasn't happened yet.",
+  "correctEntry": "Correct this {medication} entry",
+  "@correctEntry": {
+    "placeholders": {
+      "medication": {
+        "type": "String"
+      }
+    }
+  },
+  "giveMedication": "Give {medication}",
+  "@giveMedication": {
+    "placeholders": {
+      "medication": {
+        "type": "String"
+      }
+    }
+  },
+  "originalStays": "The original stays in history, marked as corrected.",
+  "now": "Now",
+  "earlier": "Earlier",
+  "givenWhen": "Given {when}",
+  "@givenWhen": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "change": "Change",
+  "dose": "Dose",
+  "givenBy": "Given by",
+  "optional": "Optional",
+  "notes": "Notes",
+  "saveCorrection": "Save correction",
+  "logDose": "Log dose",
+  "doseHistorySaved": "Dose history saved",
+  "correctTimeOrDetails": "Correct time or details",
+  "keepsOriginal": "Keeps the original, marked as corrected",
+  "deleteEntry": "Delete entry",
+  "deleteEntrySkippedHint": "The dose becomes due again",
+  "deleteEntryHint": "Only for a dose that was never given",
+  "deleteEntryTitle": "Delete this entry?",
+  "deleteSkippedMessage": "{medication}, {dateTime}, skipped. Delete it if the dose wasn't meant to be skipped.",
+  "@deleteSkippedMessage": {
+    "placeholders": {
+      "medication": {
+        "type": "String"
+      },
+      "dateTime": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteDoseMessage": "{medication}, {dateTime}. Use this only if the dose was never given; to fix its time, correct it instead. Any corrections of it go too.",
+  "@deleteDoseMessage": {
+    "placeholders": {
+      "medication": {
+        "type": "String"
+      },
+      "dateTime": {
+        "type": "String"
+      }
+    }
+  },
+  "delete": "Delete",
+  "yourDoses": "Your doses",
+  "personsDoses": "{name}'s doses",
+  "@personsDoses": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "doses": "Doses",
+  "saveAsCsv": "Save as a spreadsheet (CSV)",
+  "onlyMedication": "Only {medication}",
+  "@onlyMedication": {
+    "placeholders": {
+      "medication": {
+        "type": "String"
+      }
+    }
+  },
+  "nothingLogged": "Nothing logged yet.",
+  "historyBy": "by {name}",
+  "@historyBy": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "historyCorrection": "correction",
+  "historyCorrected": "corrected",
+  "defaultDose": "1 tablet",
+  "errorName": "Give the medication a name.",
+  "errorDose": "Say what one dose is, like \"1 tablet\".",
+  "errorHowOften": "Choose how often.",
+  "errorShortestGap": "Choose the shortest gap between doses.",
+  "errorAddTime": "Add at least one time.",
+  "errorDosesStillToGive": "Enter how many doses are still to give.",
+  "errorCourseDoses": "Enter how many doses the course has.",
+  "errorStartingSupply": "Enter how much there is to start with.",
+  "errorPerDose": "Enter how much one dose uses.",
+  "errorLowAt": "Enter when to warn, or leave it empty.",
+  "errorNoSteps": "Add at least one step.",
+  "errorStepInterval": "Every step needs an interval.",
+  "errorStepEnds": "A step has to end after it starts.",
+  "errorOpenEnded": "Only the last step can be open-ended.",
+  "errorStepsOverlap": "Two steps overlap.",
+  "deleteMedicationTitle": "Delete {medication}?",
+  "@deleteMedicationTitle": {
+    "placeholders": {
+      "medication": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteMedicationMessage": "Its dose history goes with it. To stop it but keep the history, turn off \"Taking this now\" instead.",
+  "newMedication": "New medication",
+  "editMedication": "Edit {medication}",
+  "@editMedication": {
+    "placeholders": {
+      "medication": {
+        "type": "String"
+      }
+    }
+  },
+  "save": "Save",
+  "forPerson": "For {person}",
+  "@forPerson": {
+    "placeholders": {
+      "person": {
+        "type": "String"
+      }
+    }
+  },
+  "fieldName": "Name",
+  "fieldNameHint": "e.g. Amoxicillin",
+  "fieldStrength": "Strength",
+  "fieldStrengthHint": "Optional, e.g. 500 mg",
+  "fieldPurpose": "What it's for",
+  "fieldPurposeHint": "Optional, e.g. blood pressure",
+  "fieldUsualDose": "Usual dose",
+  "fieldUsualDoseHint": "e.g. 1 tablet, 5 ml",
+  "fieldInstructions": "Instructions",
+  "fieldInstructionsHint": "Optional, e.g. with food",
+  "sectionWhen": "When",
+  "sectionHowLong": "How long",
+  "sectionReminders": "Reminders",
+  "sectionSupply": "Supply",
+  "takingThisNow": "Taking this now",
+  "takingThisNowHint": "Turn off when it's stopped. It keeps its history but stops reminding.",
+  "deleteMedication": "Delete medication",
+  "addMedication": "Add medication",
+  "saveChanges": "Save changes",
+  "kindInterval": "Every few hours",
+  "kindFixedTimes": "At set times",
+  "kindAsNeeded": "As needed",
+  "kindTaper": "Taper",
+  "every": "Every",
+  "intervalHint": "Counted from the last dose given.",
+  "atLeastApart": "At least this long apart",
+  "asNeededHint": "Never \"due\" — Nexpill shows when it can be given again.",
+  "addTime": "Add time",
+  "fixedTimesHint": "Every day, on this phone's clock.",
+  "timeOfDose": "Time of dose",
+  "courseUntilStopped": "Until stopped",
+  "courseUntilDate": "Until a date",
+  "courseNumberOfDoses": "A number of doses",
+  "courseOngoingHint": "Reminders carry on until you turn off \"Taking this now\".",
+  "courseLastDayChip": "Last day: {date}",
+  "@courseLastDayChip": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "courseLastDayHint": "Doses carry on through that day; reminders stop at midnight at the end of it.",
+  "dosesStillToGive": "Doses still to give",
+  "numberOfDoses": "Number of doses",
+  "dosesHint": "e.g. 10",
+  "courseDosesHint": "Reminders stop once the last one is given.",
+  "courseDosesGivenHint": "{count, plural, =1{1 dose given so far. Reminders stop once the last one is given.} other{{count} doses given so far. Reminders stop once the last one is given.}}",
+  "@courseDosesGivenHint": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "lastDayOfCourse": "Last day of the course",
+  "taperStepNumber": "Step {number}",
+  "@taperStepNumber": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "removeStep": "Remove step",
+  "stepFrom": "From {date}",
+  "@stepFrom": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "noEndDate": "No end date",
+  "stepUntil": "Until {date}",
+  "@stepUntil": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "clearEnd": "Clear end",
+  "addStep": "Add a step",
+  "taperHint": "Each step runs from midnight on its first day until midnight on its end day. The last step can be open-ended.",
+  "remindMe": "Remind me",
+  "remindAsNeededHint": "When it can be given again.",
+  "remindHint": "When a dose is due, and again while it's overdue.",
+  "headsUp": "Heads-up before it's due",
+  "none": "None",
+  "minutesShort": "{count} min",
+  "@minutesShort": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "repeatWhileOverdue": "Repeat while overdue",
+  "everyDuration": "every {duration}",
+  "@everyDuration": {
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "ringLikeAlarm": "Ring like an alarm",
+  "ringLikeAlarmHint": "The alarm sound, repeating until you mark it given or snooze it.",
+  "trackSupply": "Track how much is left",
+  "trackSupplyHint": "Counts down with each dose logged.",
+  "startingAmount": "Starting amount",
+  "unit": "Unit",
+  "unitHint": "tablets",
+  "eachDoseUses": "Each dose uses",
+  "warnAt": "Warn at",
+  "everyone": "Everyone",
+  "managePeople": "Manage people",
+  "settings": "Settings",
+  "addSomeone": "Add someone",
+  "noMedicationsYet": "No medications yet",
+  "nothingToGiveNow": "Nothing to give now",
+  "moreDueNow": "+ {count} more due now",
+  "@moreDueNow": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "remindersOffShort": "Reminders off",
+  "errorEnterName": "Enter a name.",
+  "errorNameTaken": "Someone already has that name.",
+  "whoAreYouCaringFor": "Who are you caring for?",
+  "rename": "Rename",
+  "yourName": "Your name",
+  "nameHint": "A first name or nickname is fine",
+  "thisIsMe": "This is me",
+  "forYourOwnMedications": "For your own medications",
+  "add": "Add",
+  "deleteYourMedicationsTitle": "Delete your medications?",
+  "deletePersonTitle": "Delete {name}?",
+  "@deletePersonTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteYourMedicationsMessage": "{count, plural, =1{Your medication and all dose history go too, and can't be brought back unless you have a backup file.} other{Your {count} medications and all dose history go too, and can't be brought back unless you have a backup file.}}",
+  "@deleteYourMedicationsMessage": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "deletePersonMessage": "{count, plural, =1{Their medication and all dose history go too, and can't be brought back unless you have a backup file.} other{Their {count} medications and all dose history go too, and can't be brought back unless you have a backup file.}}",
+  "@deletePersonMessage": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "people": "People",
+  "tapToSeeThem": "{count} · tap to see them",
+  "@tapToSeeThem": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "addYourName": "Add your name",
+  "asSetForEach": "As set for each medication",
+  "allOffFor": "All off for {person}",
+  "@allOffFor": {
+    "placeholders": {
+      "person": {
+        "type": "String"
+      }
+    }
+  },
+  "medicationCount": "{count, plural, =1{1 medication} other{{count} medications}}",
+  "@medicationCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "doseLogged": "{medication} logged, {when}",
+  "@doseLogged": {
+    "placeholders": {
+      "medication": {
+        "type": "String"
+      },
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "undo": "Undo",
+  "skippedInARow": "{medication}: skipped {count} times in a row",
+  "@skippedInARow": {
+    "placeholders": {
+      "medication": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "medicationSkipped": "{medication}: {skipped}",
+  "@medicationSkipped": {
+    "placeholders": {
+      "medication": {
+        "type": "String"
+      },
+      "skipped": {
+        "type": "String"
+      }
+    }
+  },
+  "remindersOffFor": "Reminders off for {medication}. Turn them on again in Edit.",
+  "@remindersOffFor": {
+    "placeholders": {
+      "medication": {
+        "type": "String"
+      }
+    }
+  },
+  "medicationStopped": "{medication} stopped. Its history is kept.",
+  "@medicationStopped": {
+    "placeholders": {
+      "medication": {
+        "type": "String"
+      }
+    }
+  },
+  "remindersAreOff": "Reminders are off",
+  "allowNotificationsHint": "Allow notifications so they can reach you.",
+  "allow": "Allow",
+  "remindersAreOffFor": "Reminders are off for {person}.",
+  "@remindersAreOffFor": {
+    "placeholders": {
+      "person": {
+        "type": "String"
+      }
+    }
+  },
+  "addYourFirst": "Add your first one, and Nexpill will keep track of when each dose can be given.",
+  "addPersonsFirst": "Add {name}'s first one, and Nexpill will keep track of when each dose can be given.",
+  "@addPersonsFirst": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "allEndedForYou": "Everything for you has finished or been stopped. It's all below, with its history.",
+  "allEndedForPerson": "Everything for {name} has finished or been stopped. It's all below, with its history.",
+  "@allEndedForPerson": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "addAMedication": "Add a medication",
+  "addAnotherMedication": "Add another medication",
+  "addMedicationFor": "Add a medication for {name}",
+  "@addMedicationFor": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "endedStopped": "Stopped ({count})",
+  "@endedStopped": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "endedFinished": "Finished ({count})",
+  "@endedFinished": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "endedBoth": "Finished and stopped ({count})",
+  "@endedBoth": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "resume": "Resume",
+  "logoLabel": "Nexpill logo",
+  "welcomeWhat": "Keeps track of when each dose was given and when the next one can be, and reminds you on time.",
+  "welcomePrivate": "Everything stays on this phone. No account, no internet.",
+  "whoAreTheMedicationsFor": "Who are the medications for?",
+  "me": "Me",
+  "someoneICareFor": "Someone I care for",
+  "addMoreLater": "You can add more people later.",
+  "noBrowser": "No browser to open it with. Visit {website} instead.",
+  "@noBrowser": {
+    "placeholders": {
+      "website": {
+        "type": "String"
+      }
+    }
+  },
+  "backupSaved": "Backup saved",
+  "couldNotOpen": "Couldn't open that file.",
+  "cantRestore": "Can't restore this file",
+  "ok": "OK",
+  "restoreTitle": "Replace everything with this backup?",
+  "peopleCount": "{count, plural, =1{1 person} other{{count} people}}",
+  "@peopleCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dosesLoggedCount": "{count, plural, =1{1 dose logged} other{{count} doses logged}}",
+  "@dosesLoggedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "restoreMessage": "It has {people}, {medications} and {doses}. Everything now on this phone will be replaced by it.",
+  "@restoreMessage": {
+    "placeholders": {
+      "people": {
+        "type": "String"
+      },
+      "medications": {
+        "type": "String"
+      },
+      "doses": {
+        "type": "String"
+      }
+    }
+  },
+  "replace": "Replace",
+  "restored": "Restored",
+  "summaryFor": "Summary for",
+  "summarySaved": "Summary saved",
+  "yourNameOnSummary": "Your name on the summary",
+  "continueAction": "Continue",
+  "deleteAllTitle": "Delete all data?",
+  "deleteAllMessage": "Every person, medication and dose on this phone, and every reminder. This can't be undone; if you might want it back, save a backup first.",
+  "deleteEverything": "Delete everything",
+  "notificationsOff": "Notifications are off",
+  "notificationsOn": "Notifications are on",
+  "notificationsOffHint": "Reminders can't be shown until they're allowed.",
+  "notificationsOnHint": "Reminders will show on this phone.",
+  "mayBeLate": "Reminders may be late",
+  "mayBeLateHint": "Android has turned off exact alarms for Nexpill. Turn \"Alarms & reminders\" back on in the phone's settings for the app.",
+  "sendTest": "Send a test reminder",
+  "sendTestHint": "Arrives in a few seconds.",
+  "testOnItsWay": "Test reminder on its way",
+  "peopleYouCareFor": "People you care for",
+  "onThisPhone": "{count} on this phone",
+  "@onThisPhone": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "yourData": "Your data",
+  "backUp": "Back up to a file",
+  "backUpHint": "Everything, saved wherever you choose.",
+  "restore": "Restore from a backup",
+  "restoreHint": "Replaces what's on this phone.",
+  "medicationSummary": "Medication summary",
+  "medicationSummaryHint": "Plain text, for a doctor or a handover.",
+  "deleteAllData": "Delete all data",
+  "about": "About",
+  "aboutNexpill": "About Nexpill",
+  "aboutNexpillHint": "Where your data lives, and why it's free",
+  "website": "Website",
+  "sendFeedback": "Send feedback",
+  "sendFeedbackHint": "A form on the website, in your browser.",
+  "version": "Version",
+  "language": "Language",
+  "sameAsPhone": "Same as the phone",
+  "sameAsPhoneNow": "Same as the phone: {language}",
+  "@sameAsPhoneNow": {
+    "placeholders": {
+      "language": {
+        "type": "String"
+      }
+    }
+  },
+  "aboutStaysTitle": "It stays on your phone",
+  "aboutStaysBody": "Everything you log is written to a database on this device. There is no account and no server. It only goes anywhere else if you move it yourself, as a backup file or an export.",
+  "aboutCannotSeeTitle": "We cannot see it",
+  "aboutCannotSeeBody": "Nexpill is built without permission to use the internet at all. Android enforces that, and you can check it in the app's permission list.",
+  "aboutRemindersTitle": "Reminders come from the phone itself",
+  "aboutRemindersBody": "Each reminder is an alarm this phone holds, so it arrives on time with no signal, in airplane mode, and after a restart.",
+  "aboutPermissionsTitle": "What the permissions are for",
+  "aboutPermissionsBody": "Notifications, for reminders. Exact alarms, so they arrive on the minute. Starting after a restart, to set them again. Vibration. That is the whole list.",
+  "aboutFreeTitle": "Free, for good",
+  "aboutFreeBody": "Nexpill was written by a caregiver, for caregivers. It will always be free and open source: no price, no premium tier, no ads.",
+  "aboutCheckTitle": "You can check our work",
+  "aboutCheckBody": "Nexpill is open source under the GNU General Public License. Anyone can read exactly what it does.",
+  "aboutHeadline": "Your records stay with you.",
+  "aboutIntro": "Nexpill keeps track of when each dose was given and when the next one can be, and reminds you on time. It doesn't give medical advice.",
+  "aboutTradeOff": "One trade-off worth knowing: there is no cloud copy, so a lost or wiped phone means lost history. Save a backup file from Settings now and then, and keep it somewhere other than this phone.",
+  "versionNumber": "Version {version}",
+  "@versionNumber": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  }
+}

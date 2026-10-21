@@ -10,6 +10,7 @@ import 'package:nexpill/ui/care_store.dart';
 import 'package:nexpill/ui/dialogs.dart';
 import 'package:nexpill/ui/give_dose_sheet.dart';
 import 'package:nexpill/ui/layout.dart';
+import 'package:nexpill/ui/language.dart';
 
 /// Everything given to one patient, newest first, grouped by day — or to
 /// one medication, given [medicationId].
@@ -40,7 +41,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
         name: doseHistoryFileName(widget.patient, DateTime.now()),
         text: doseHistoryCsv(widget.store.care, patientId: widget.patient.id),
         mimeType: 'text/csv',
-        done: 'Dose history saved',
+        done: context.l.doseHistorySaved,
       );
 
   Future<void> _open(DoseEvent dose, {required bool replaced}) async {
@@ -53,17 +54,17 @@ class _HistoryScreenState extends State<HistoryScreen> {
           if (!replaced && !dose.skipped)
             ListTile(
               leading: const Icon(Icons.edit_outlined),
-              title: const Text('Correct time or details'),
-              subtitle: const Text('Keeps the original, marked as corrected'),
+              title: Text(context.l.correctTimeOrDetails),
+              subtitle: Text(context.l.keepsOriginal),
               onTap: () => Navigator.pop(context, 'correct'),
             ),
           ListTile(
             leading: Icon(Icons.delete_outline,
                 color: Theme.of(context).colorScheme.error),
-            title: const Text('Delete entry'),
+            title: Text(context.l.deleteEntry),
             subtitle: Text(dose.skipped
-                ? 'The dose becomes due again'
-                : 'Only for a dose that was never given'),
+                ? context.l.deleteEntrySkippedHint
+                : context.l.deleteEntryHint),
             onTap: () => Navigator.pop(context, 'delete'),
           ),
         ]),
@@ -85,14 +86,13 @@ class _HistoryScreenState extends State<HistoryScreen> {
       case 'delete':
         final ok = await confirmAction(
           context,
-          title: 'Delete this entry?',
+          title: context.l.deleteEntryTitle,
           message: dose.skipped
-              ? '${medication.name}, ${dateTimeText(dose.givenAt)}, skipped. '
-                  'Delete it if the dose wasn\'t meant to be skipped.'
-              : '${medication.name}, ${dateTimeText(dose.givenAt)}. Use this '
-                  'only if the dose was never given; to fix its time, correct '
-                  'it instead. Any corrections of it go too.',
-          action: 'Delete',
+              ? context.l.deleteSkippedMessage(
+                  medication.name, dateTimeText(dose.givenAt))
+              : context.l.deleteDoseMessage(
+                  medication.name, dateTimeText(dose.givenAt)),
+          action: context.l.delete,
         );
         if (ok) await widget.store.change((repo) => repo.deleteDose(dose.id));
     }
@@ -127,12 +127,12 @@ class _HistoryScreenState extends State<HistoryScreen> {
           appBar: AppBar(
             title: Text(filter == null
                 ? widget.patient.isSelf
-                    ? 'Your doses'
-                    : '${widget.patient.displayName}\'s doses'
-                : meds[filter]?.name ?? 'Doses'),
+                    ? context.l.yourDoses
+                    : context.l.personsDoses(widget.patient.displayName)
+                : meds[filter]?.name ?? context.l.doses),
             actions: [
               IconButton(
-                tooltip: 'Save as a spreadsheet (CSV)',
+                tooltip: context.l.saveAsCsv,
                 icon: const Icon(Icons.file_download_outlined),
                 onPressed: doses.isEmpty ? null : _export,
               ),
@@ -146,14 +146,14 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 Align(
                   alignment: Alignment.centerLeft,
                   child: InputChip(
-                    label: Text('Only ${meds[filter]?.name ?? ''}'),
+                    label: Text(context.l.onlyMedication(meds[filter]?.name ?? '')),
                     onDeleted: () => setState(() => _medicationId = null),
                   ),
                 ),
               if (doses.isEmpty)
                 Padding(
                   padding: const EdgeInsets.only(top: 48),
-                  child: Text('Nothing logged yet.',
+                  child: Text(context.l.nothingLogged,
                       textAlign: TextAlign.center,
                       style: theme.textTheme.bodyLarge),
                 ),
@@ -185,9 +185,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
   Widget _entry(ThemeData theme, DoseEvent d, String name, {required bool replaced}) {
     final details = [
       ?d.doseText,
-      if (d.givenBy != null) 'by ${d.givenBy}',
-      if (d.isCorrection) 'correction',
-      if (replaced) 'corrected',
+      if (d.givenBy != null) context.l.historyBy(d.givenBy!),
+      if (d.isCorrection) context.l.historyCorrection,
+      if (replaced) context.l.historyCorrected,
     ];
     final strike = replaced
         ? TextStyle(
@@ -204,7 +204,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
         title: Text('$name  ·  ${skippedText(d.givenAt)}',
             style: strike ??
                 TextStyle(color: theme.colorScheme.onSurfaceVariant)),
-        subtitle: replaced ? const Text('corrected') : null,
+        subtitle: replaced ? Text(context.l.historyCorrected) : null,
         trailing: const Icon(Icons.chevron_right),
       );
     }

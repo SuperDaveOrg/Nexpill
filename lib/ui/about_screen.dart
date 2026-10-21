@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:nexpill/l10n/app_localizations.dart';
+import 'package:nexpill/ui/language.dart';
 import 'package:nexpill/ui/layout.dart';
 
 /// Explains, in plain language, where the data lives and why Nexpill is
@@ -13,53 +15,21 @@ class AboutScreen extends StatelessWidget {
 
   final String? version;
 
-  static const _points = <(IconData, String, String)>[
-    (
-      Icons.phone_android,
-      'It stays on your phone',
-      'Everything you log is written to a database on this device. There is '
-          'no account and no server. It only goes anywhere else if you move '
-          'it yourself, as a backup file or an export.',
-    ),
-    (
-      Icons.cloud_off_outlined,
-      'We cannot see it',
-      'Nexpill is built without permission to use the internet at all. '
-          'Android enforces that, and you can check it in the app\'s '
-          'permission list.',
-    ),
-    (
-      Icons.alarm,
-      'Reminders come from the phone itself',
-      'Each reminder is an alarm this phone holds, so it arrives on time with '
-          'no signal, in airplane mode, and after a restart.',
-    ),
-    (
-      Icons.checklist,
-      'What the permissions are for',
-      'Notifications, for reminders. Exact alarms, so they arrive on the '
-          'minute. Starting after a restart, to set them again. Vibration. '
-          'That is the whole list.',
-    ),
-    (
-      Icons.volunteer_activism_outlined,
-      'Free, for good',
-      'Nexpill was written by a caregiver, for caregivers. It will always be '
-          'free and open source: no price, no premium tier, no ads.',
-    ),
-    (
-      Icons.code,
-      'You can check our work',
-      'Nexpill is open source under the GNU General Public License. Anyone '
-          'can read exactly what it does.',
-    ),
-  ];
+  static List<(IconData, String, String)> _points(AppLocalizations l) => [
+        (Icons.phone_android, l.aboutStaysTitle, l.aboutStaysBody),
+        (Icons.cloud_off_outlined, l.aboutCannotSeeTitle, l.aboutCannotSeeBody),
+        (Icons.alarm, l.aboutRemindersTitle, l.aboutRemindersBody),
+        (Icons.checklist, l.aboutPermissionsTitle, l.aboutPermissionsBody),
+        (Icons.volunteer_activism_outlined, l.aboutFreeTitle, l.aboutFreeBody),
+        (Icons.code, l.aboutCheckTitle, l.aboutCheckBody),
+      ];
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l = context.l;
     return Scaffold(
-      appBar: AppBar(title: const Text('About Nexpill')),
+      appBar: AppBar(title: Text(l.aboutNexpill)),
       body: ListView(
         padding: readablePadding(context,
             base: const EdgeInsets.fromLTRB(20, 8, 20, 32)),
@@ -71,17 +41,15 @@ class AboutScreen extends StatelessWidget {
                   width: 96, height: 96, semanticLabel: 'Nexpill'),
             ),
           ),
-          Text('Your records stay with you.', style: theme.textTheme.headlineSmall),
+          Text(l.aboutHeadline, style: theme.textTheme.headlineSmall),
           const SizedBox(height: 8),
           Text(
-            'Nexpill keeps track of when each dose was given and when the next '
-            'one can be, and reminds you on time. It doesn\'t give medical '
-            'advice.',
+            l.aboutIntro,
             style: theme.textTheme.bodyLarge
                 ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
           ),
           const SizedBox(height: 28),
-          for (final (icon, title, body) in _points) ...[
+          for (final (icon, title, body) in _points(l)) ...[
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -103,14 +71,12 @@ class AboutScreen extends StatelessWidget {
           ],
           const Divider(height: 32),
           Text(
-            'One trade-off worth knowing: there is no cloud copy, so a lost or '
-            'wiped phone means lost history. Save a backup file from Settings '
-            'now and then, and keep it somewhere other than this phone.',
+            l.aboutTradeOff,
             style: theme.textTheme.bodySmall,
           ),
           if (version != null) ...[
             const SizedBox(height: 16),
-            Text('Version $version', style: theme.textTheme.bodySmall),
+            Text(l.versionNumber(version!), style: theme.textTheme.bodySmall),
           ],
         ],
       ),

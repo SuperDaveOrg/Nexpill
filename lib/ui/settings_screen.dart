@@ -15,6 +15,7 @@ import 'package:nexpill/services/preferences.dart';
 import 'package:nexpill/ui/about_screen.dart';
 import 'package:nexpill/ui/care_store.dart';
 import 'package:nexpill/ui/dialogs.dart';
+import 'package:nexpill/ui/language.dart';
 import 'package:nexpill/ui/layout.dart';
 import 'package:nexpill/ui/patients_screen.dart';
 import 'package:nexpill/ui/section.dart';
@@ -80,8 +81,8 @@ class _SettingsScreenState extends State<SettingsScreen>
   }
 
   Future<void> _openLink(Uri uri) async {
-    if (!await openInBrowser(uri)) {
-      _say('No browser to open it with. Visit $websiteLabel instead.');
+    if (!await openInBrowser(uri) && mounted) {
+      _say(context.l.noBrowser(websiteLabel));
     }
   }
 
@@ -93,7 +94,7 @@ class _SettingsScreenState extends State<SettingsScreen>
         name: backupFileName(DateTime.now()),
         text: encodeBackup(_store.care, exportedAt: DateTime.now()),
         mimeType: 'application/json',
-        done: 'Backup saved',
+        done: context.l.backupSaved,
       );
 
   Future<void> _restore() async {
@@ -101,7 +102,7 @@ class _SettingsScreenState extends State<SettingsScreen>
     try {
       text = await _documents.open();
     } catch (_) {
-      _say('Couldn\'t open that file.');
+      if (mounted) _say(context.l.couldNotOpen);
       return;
     }
     if (text == null || !mounted) return;
@@ -112,12 +113,12 @@ class _SettingsScreenState extends State<SettingsScreen>
       await showDialog<void>(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text('Can\'t restore this file'),
+          title: Text(context.l.cantRestore),
           content: Text(e.message),
           actions: [
             TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text('OK')),
+                child: Text(context.l.ok)),
           ],
         ),
       );
@@ -127,16 +128,16 @@ class _SettingsScreenState extends State<SettingsScreen>
     final people = backup.patients.length;
     final ok = await confirmAction(
       context,
-      title: 'Replace everything with this backup?',
-      message: 'It has $people ${people == 1 ? 'person' : 'people'}, '
-          '${backup.medications.length} medications and '
-          '${backup.doses.length} doses logged. Everything now on this phone '
-          'will be replaced by it.',
-      action: 'Replace',
+      title: context.l.restoreTitle,
+      message: context.l.restoreMessage(
+          context.l.peopleCount(people),
+          context.l.medicationCount(backup.medications.length),
+          context.l.dosesLoggedCount(backup.doses.length)),
+      action: context.l.replace,
     );
     if (!ok) return;
     await _store.change((repo) => repo.replaceAll(backup));
-    _say('Restored');
+    if (mounted) _say(context.l.restored);
   }
 
   Future<void> _summary() async {
@@ -147,7 +148,7 @@ class _SettingsScreenState extends State<SettingsScreen>
         : await showDialog<Patient>(
             context: context,
             builder: (context) => SimpleDialog(
-              title: const Text('Summary for'),
+              title: Text(context.l.summaryFor),
               children: [
                 for (final p in patients)
                   SimpleDialogOption(
@@ -167,7 +168,7 @@ class _SettingsScreenState extends State<SettingsScreen>
       name: patientSummaryFileName(named, now),
       text: patientSummary(_store.care, named, now: now),
       mimeType: 'text/plain',
-      done: 'Summary saved',
+      done: context.l.summarySaved,
     );
   }
 
@@ -178,38 +179,63 @@ class _SettingsScreenState extends State<SettingsScreen>
     final name = await showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Your name on the summary'),
+        title: Text(context.l.yourNameOnSummary),
         content: TextField(
           controller: controller,
           autofocus: true,
           textCapitalization: TextCapitalization.words,
-          decoration: const InputDecoration(
-            labelText: 'Your name',
-            hintText: 'Optional',
+          decoration: InputDecoration(
+            labelText: context.l.yourName,
+            hintText: context.l.optional,
           ),
           onSubmitted: (v) => Navigator.pop(context, v.trim()),
         ),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel')),
+              child: Text(context.l.cancel)),
           TextButton(
               onPressed: () => Navigator.pop(context, controller.text.trim()),
-              child: const Text('Continue')),
+              child: Text(context.l.continueAction)),
         ],
       ),
     );
     return name == null ? null : self.copyWith(displayName: name);
   }
 
+  /// The phone's language, or one of Nexpill's by its own name.
+  Future<void> _chooseLanguage() async {
+    final current = chosenLanguage.value;
+    final picked = await showDialog<(String?,)>(
+      context: context,
+      builder: (context) => SimpleDialog(
+        title: Text(context.l.language),
+        children: [
+          for (final (code, name) in [
+            (null, context.l.sameAsPhone),
+            for (final MapEntry(:key, :value) in languageNames.entries) (key, value),
+          ])
+            ListTile(
+              leading: Icon(code == current
+                  ? Icons.radio_button_checked
+                  : Icons.radio_button_off),
+              title: Text(name),
+              onTap: () => Navigator.pop(context, (code,)),
+            ),
+        ],
+      ),
+    );
+    if (picked == null) return;
+    chosenLanguage.value = picked.$1;
+    await Preferences.setLanguage(picked.$1);
+  }
+
   Future<void> _deleteAll() async {
     final ok = await confirmAction(
       context,
-      title: 'Delete all data?',
-      message: 'Every person, medication and dose on this phone, and every '
-          'reminder. This can\'t be undone; if you might want it back, save '
-          'a backup first.',
-      action: 'Delete everything',
+      title: context.l.deleteAllTitle,
+      message: context.l.deleteAllMessage,
+      action: context.l.deleteEverything,
     );
     if (!ok) return;
     await _store.change((repo) => repo.deleteAllData());
@@ -223,55 +249,53 @@ class _SettingsScreenState extends State<SettingsScreen>
     final theme = Theme.of(context);
     final notifications = _notificationsAllowed;
     final exact = _exactAllowed;
+    final l = context.l;
     return Scaffold(
-      appBar: AppBar(title: const Text('Settings')),
+      appBar: AppBar(title: Text(l.settings)),
       body: ListView(
         padding: readablePadding(context, base: const EdgeInsets.only(bottom: 32)),
         children: [
-          Section(title: 'Reminders', children: [
+          Section(title: l.sectionReminders, children: [
             ListTile(
               leading: Icon(notifications == false
                   ? Icons.notifications_off_outlined
                   : Icons.notifications_active_outlined),
               title: Text(notifications == false
-                  ? 'Notifications are off'
-                  : 'Notifications are on'),
+                  ? l.notificationsOff
+                  : l.notificationsOn),
               subtitle: Text(notifications == false
-                  ? 'Reminders can\'t be shown until they\'re allowed.'
-                  : 'Reminders will show on this phone.'),
+                  ? l.notificationsOffHint
+                  : l.notificationsOnHint),
               trailing: notifications == false
                   ? FilledButton(
                       onPressed: () async {
                         await _store.notifications.requestPermission();
                         await _checkPermissions();
                       },
-                      child: const Text('Allow'))
+                      child: Text(l.allow))
                   : null,
             ),
             if (exact == false)
               ListTile(
                 leading: Icon(Icons.warning_amber, color: theme.colorScheme.error),
-                title: const Text('Reminders may be late'),
-                subtitle: const Text(
-                    'Android has turned off exact alarms for Nexpill. Turn '
-                    '"Alarms & reminders" back on in the phone\'s settings for '
-                    'the app.'),
+                title: Text(l.mayBeLate),
+                subtitle: Text(l.mayBeLateHint),
               ),
             ListTile(
               leading: const Icon(Icons.send_outlined),
-              title: const Text('Send a test reminder'),
-              subtitle: const Text('Arrives in a few seconds.'),
+              title: Text(l.sendTest),
+              subtitle: Text(l.sendTestHint),
               onTap: () async {
                 await _store.notifications.sendTest();
-                _say('Test reminder on its way');
+                if (mounted) _say(l.testOnItsWay);
               },
             ),
           ]),
-          Section(title: 'People', children: [
+          Section(title: l.people, children: [
             ListTile(
               leading: const Icon(Icons.people_outline),
-              title: const Text('People you care for'),
-              subtitle: Text('${_store.care.patients.length} on this phone'),
+              title: Text(l.peopleYouCareFor),
+              subtitle: Text(l.onThisPhone(_store.care.patients.length)),
               trailing: const Icon(Icons.chevron_right),
               onTap: () => Navigator.push(context,
                   MaterialPageRoute(
@@ -279,58 +303,68 @@ class _SettingsScreenState extends State<SettingsScreen>
                           store: _store, onOpen: widget.onSelectPatient))),
             ),
           ]),
-          Section(title: 'Your data', children: [
+          Section(title: l.yourData, children: [
             ListTile(
               leading: const Icon(Icons.save_alt),
-              title: const Text('Back up to a file'),
-              subtitle: const Text('Everything, saved wherever you choose.'),
+              title: Text(l.backUp),
+              subtitle: Text(l.backUpHint),
               onTap: _backUp,
             ),
             ListTile(
               leading: const Icon(Icons.restore),
-              title: const Text('Restore from a backup'),
-              subtitle: const Text('Replaces what\'s on this phone.'),
+              title: Text(l.restore),
+              subtitle: Text(l.restoreHint),
               onTap: _restore,
             ),
             ListTile(
               leading: const Icon(Icons.description_outlined),
-              title: const Text('Medication summary'),
-              subtitle: const Text('Plain text, for a doctor or a handover.'),
+              title: Text(l.medicationSummary),
+              subtitle: Text(l.medicationSummaryHint),
               onTap: _store.care.patients.isEmpty ? null : _summary,
             ),
             ListTile(
               leading: Icon(Icons.delete_forever_outlined,
                   color: theme.colorScheme.error),
-              title: Text('Delete all data',
+              title: Text(l.deleteAllData,
                   style: TextStyle(color: theme.colorScheme.error)),
               onTap: _deleteAll,
             ),
           ]),
-          Section(title: 'About', children: [
+          Section(title: l.language, children: [
+            ListTile(
+              leading: const Icon(Icons.translate),
+              title: Text(l.language),
+              subtitle: Text(chosenLanguage.value == null
+                  ? l.sameAsPhoneNow(languageNames[l.localeName] ?? l.localeName)
+                  : languageNames[chosenLanguage.value] ?? chosenLanguage.value!),
+              onTap: _chooseLanguage,
+            ),
+          ]),
+          Section(title: l.about, children: [
             ListTile(
               leading: const Icon(Icons.info_outline),
-              title: const Text('About Nexpill'),
-              subtitle: const Text('Where your data lives, and why it\'s free'),
+              title: Text(l.aboutNexpill),
+              subtitle: Text(l.aboutNexpillHint),
               trailing: const Icon(Icons.chevron_right),
               onTap: () => Navigator.push(context,
                   MaterialPageRoute(builder: (_) => AboutScreen(version: _version))),
             ),
             ListTile(
               leading: const Icon(Icons.public),
-              title: const Text('Website'),
+              title: Text(l.website),
               subtitle: const Text(websiteLabel),
               trailing: const Icon(Icons.open_in_new),
               onTap: () => _openLink(websiteUri),
             ),
             ListTile(
               leading: const Icon(Icons.feedback_outlined),
-              title: const Text('Send feedback'),
-              subtitle: const Text('A form on the website, in your browser.'),
+              title: Text(l.sendFeedback),
+              subtitle: Text(l.sendFeedbackHint),
               trailing: const Icon(Icons.open_in_new),
               onTap: () => _openLink(feedbackUri),
             ),
             if (_version != null)
-              ListTile(title: const Text('Version'), subtitle: Text(_version!)),
+              ListTile(title: Text(l.version), subtitle: Text(_version!)),
           ]),
           if (kDebugMode)
             Section(title: 'Development', children: [

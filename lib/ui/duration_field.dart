@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nexpill/ui/language.dart';
 
 /// Hours and minutes as two drop-downs, for intervals like 4 h 45 min.
 /// Minutes go in fives; nobody schedules a dose every 4 h 43 min.
@@ -25,7 +26,7 @@ class DurationField extends StatelessWidget {
         Expanded(
           child: DropdownButtonFormField<int>(
             initialValue: h.clamp(0, maxHours),
-            decoration: const InputDecoration(labelText: 'Hours'),
+            decoration: InputDecoration(labelText: context.l.hours),
             items: [
               for (var i = 0; i <= maxHours; i++)
                 DropdownMenuItem(value: i, child: Text('$i')),
@@ -37,7 +38,7 @@ class DurationField extends StatelessWidget {
         Expanded(
           child: DropdownButtonFormField<int>(
             initialValue: m,
-            decoration: const InputDecoration(labelText: 'Minutes'),
+            decoration: InputDecoration(labelText: context.l.minutes),
             items: [
               for (final i in minuteChoices)
                 DropdownMenuItem(value: i, child: Text('$i')),

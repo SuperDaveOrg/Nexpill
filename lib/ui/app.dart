@@ -3,10 +3,12 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import 'package:nexpill/domain/wording.dart';
+import 'package:nexpill/l10n/app_localizations.dart';
 import 'package:nexpill/services/notification_service.dart';
 import 'package:nexpill/services/preferences.dart';
 import 'package:nexpill/ui/care_screen.dart';
 import 'package:nexpill/ui/care_store.dart';
+import 'package:nexpill/ui/language.dart';
 import 'package:nexpill/ui/theme.dart';
 
 /// Holds whose medications are on screen, keeps the clock and the data
@@ -91,19 +93,42 @@ class _NexpillAppState extends State<NexpillApp> with WidgetsBindingObserver {
     _navigator.currentState?.popUntil((r) => r.isFirst);
   }
 
+  /// Keeps the words outside the widgets — reminders, exports, the
+  /// timing phrases — in the language on screen. Reminders say things, so
+  /// a change replans them, after this frame.
+  void _languageOnScreen(Locale locale) {
+    if (locale.languageCode == strings.localeName) return;
+    useLanguage(locale);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Preferences.setLanguageInUse(locale.languageCode);
+      widget.store.refresh();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Nexpill',
-      debugShowCheckedModeBanner: false,
-      navigatorKey: _navigator,
-      theme: NexpillTheme.light(),
-      darkTheme: NexpillTheme.dark(),
-      home: CareScreen(
-        store: widget.store,
-        patientId: _patientId,
-        onSelectPatient: _select,
-        onShowEveryone: _showEveryone,
+    return ValueListenableBuilder(
+      valueListenable: chosenLanguage,
+      builder: (context, chosen, _) => MaterialApp(
+        title: 'Nexpill',
+        debugShowCheckedModeBanner: false,
+        navigatorKey: _navigator,
+        theme: NexpillTheme.light(),
+        darkTheme: NexpillTheme.dark(),
+        // Null follows the phone, among the languages Nexpill speaks.
+        locale: chosen == null ? null : Locale(chosen),
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        builder: (context, child) {
+          _languageOnScreen(Localizations.localeOf(context));
+          return child!;
+        },
+        home: CareScreen(
+          store: widget.store,
+          patientId: _patientId,
+          onSelectPatient: _select,
+          onShowEveryone: _showEveryone,
+        ),
       ),
     );
   }

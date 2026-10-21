@@ -52,6 +52,11 @@ From the PWA roadmap, still wanted:
 - **Structured doctor-visit export** (PDF).
 - **Photo of the prescription label.** Adds `CAMERA` and storage decisions.
 
+- **Native review of the translations.** German, Spanish, French, Italian,
+  Portuguese (Portugal) and Russian are first drafts. See
+  [translating.md](translating.md). 🟡 Each needs a native speaker to
+  review it before release.
+
 ## Open questions 🟡
 
 - **Sharing between caregivers.** Several people often look after one

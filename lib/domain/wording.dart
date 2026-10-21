@@ -1,11 +1,14 @@
 import 'dart:math' as math;
+import 'dart:ui' show Locale;
 
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 
 import 'package:nexpill/domain/dates.dart';
 import 'package:nexpill/domain/dose_history.dart';
 import 'package:nexpill/domain/scheduling.dart';
 import 'package:nexpill/domain/status.dart';
+import 'package:nexpill/l10n/app_localizations.dart';
 import 'package:nexpill/models/dose_event.dart';
 import 'package:nexpill/models/medication.dart';
 import 'package:nexpill/models/patient.dart';
@@ -13,14 +16,27 @@ import 'package:nexpill/models/patient.dart';
 /// How timing is put into words, shared by the screens, the exports and the
 /// reminders, so the same thing is always said the same way.
 
+/// The app's words, in the language on screen. Like [use24HourClock], the
+/// app sets it with [useLanguage] and the reminder isolate from the copy
+/// kept in Preferences. English until then, as in tests.
+AppLocalizations strings = lookupAppLocalizations(const Locale('en'));
+
+/// Switches [strings], and the way dates are written, to [locale], which
+/// must be one of [AppLocalizations.supportedLocales].
+Future<void> useLanguage(Locale locale) async {
+  strings = lookupAppLocalizations(locale);
+  Intl.defaultLocale = strings.localeName;
+  await initializeDateFormatting(strings.localeName);
+}
+
 /// "8 hours", "4 hours 45 minutes", "30 minutes", "1 minute".
 String durationText(int minutes) {
   final h = minutes ~/ 60;
   final m = minutes % 60;
-  String unit(int n, String word) => '$n $word${n == 1 ? '' : 's'}';
-  if (h == 0) return unit(m, 'minute');
-  if (m == 0) return unit(h, 'hour');
-  return '${unit(h, 'hour')} ${unit(m, 'minute')}';
+  if (h == 0) return strings.durationMinutes(m);
+  if (m == 0) return strings.durationHours(h);
+  return strings.durationHoursMinutes(
+      strings.durationHours(h), strings.durationMinutes(m));
 }
 
 /// Whether times read "14:30" rather than "2:30 PM". Follows the phone's
@@ -28,22 +44,27 @@ String durationText(int minutes) {
 /// isolate from the copy kept in Preferences.
 bool use24HourClock = false;
 
+/// The clock as the phone has it set. A language whose usual clock is
+/// 24-hour still gets 12 hours on a phone set that way.
+DateFormat _clock() {
+  if (use24HourClock) return DateFormat.Hm();
+  final usual = DateFormat.jm();
+  return usual.pattern!.contains('a') ? usual : DateFormat('h:mm a');
+}
+
 /// "2:30 PM", or "14:30" with [use24HourClock].
-String clockText(DateTime at) =>
-    (use24HourClock ? DateFormat.Hm() : DateFormat.jm()).format(at.toLocal());
+String clockText(DateTime at) => _clock().format(at.toLocal());
 
 /// A time on the clock, "8:00 AM" or "08:00", as [clockText] would show it
 /// on any day.
 String clockTimeText(ClockTime t) => clockText(t.on(DateTime(2000)));
 
 /// "Skipped the 8:00 AM dose", for a skip logged at the time it was due.
-String skippedText(DateTime dueAt) => 'Skipped the ${clockText(dueAt)} dose';
+String skippedText(DateTime dueAt) => strings.skippedDose(clockText(dueAt));
 
 /// "Jun 10, 2026, 2:30 PM", or "Jun 10, 2026, 14:30" with [use24HourClock].
-String dateTimeText(DateTime at) {
-  final date = DateFormat.yMMMd();
-  return (use24HourClock ? date.add_Hm() : date.add_jm()).format(at.toLocal());
-}
+String dateTimeText(DateTime at) =>
+    DateFormat.yMMMd().addPattern(_clock().pattern).format(at.toLocal());
 
 /// "Jun 10, 2026".
 String dateText(DateTime day) => DateFormat.yMMMd().format(day);
@@ -52,24 +73,30 @@ String dateText(DateTime day) => DateFormat.yMMMd().format(day);
 String listText(List<String> items) => switch (items.length) {
       0 => '',
       1 => items.single,
-      _ => '${items.sublist(0, items.length - 1).join(', ')} and ${items.last}',
+      _ => strings.listAnd(
+          items.sublist(0, items.length - 1).join(strings.listSeparator),
+          items.last),
     };
 
 /// The schedule in a phrase: "Every 8 hours", "At 08:00 and 20:00",
 /// "As needed, at least 6 hours apart", or the taper's steps.
 String scheduleText(MedicationSchedule schedule) => switch (schedule) {
       IntervalSchedule(:final intervalMinutes) =>
-        'Every ${durationText(intervalMinutes)}',
-      FixedTimesSchedule(:final times) =>
-        'At ${listText([for (final t in [...times]..sort()) clockTimeText(t)])}',
+        strings.scheduleEvery(durationText(intervalMinutes)),
+      FixedTimesSchedule(:final times) => strings.scheduleAt(
+          listText([for (final t in [...times]..sort()) clockTimeText(t)])),
       PrnSchedule(:final minimumIntervalMinutes) =>
-        'As needed, at least ${durationText(minimumIntervalMinutes)} apart',
+        strings.scheduleAsNeeded(durationText(minimumIntervalMinutes)),
       TaperSchedule(:final rules) => rules.isEmpty
-          ? 'Taper with no steps'
+          ? strings.taperNoSteps
           : [
               for (final r in rules)
-                '${r.endDate == null ? 'From ${dateText(r.startDate)}' : '${dateText(r.startDate)} to ${dateText(r.endDate!)}'}: '
-                    'every ${durationText(r.intervalMinutes)}',
+                strings.taperStep(
+                    r.endDate == null
+                        ? strings.taperStepFrom(dateText(r.startDate))
+                        : strings.taperStepRange(
+                            dateText(r.startDate), dateText(r.endDate!)),
+                    durationText(r.intervalMinutes)),
             ].join('; '),
     };
 
@@ -80,19 +107,21 @@ String scheduleShortText(MedicationSchedule schedule, DateTime now) {
   if (schedule is! TaperSchedule || schedule.rules.isEmpty) {
     return scheduleText(schedule);
   }
-  if (taperFinished(schedule.rules, now)) return 'Taper finished';
+  if (taperFinished(schedule.rules, now)) return strings.taperFinished;
   final r = activeTaperRule(schedule.rules, now)!;
-  final every = 'Taper: every ${durationText(r.intervalMinutes)}';
+  var text = strings.taperShortEvery(durationText(r.intervalMinutes));
   if (now.isBefore(dateOnly(r.startDate))) {
-    return '$every from ${DateFormat.MMMd().format(r.startDate)}';
+    return strings.taperShortFrom(text, DateFormat.MMMd().format(r.startDate));
   }
   final rules = orderedTaperRules(schedule.rules);
   final i = rules.indexOf(r);
-  final until = r.endDate == null ? '' : ' until ${DateFormat.MMMd().format(r.endDate!)}';
-  final next = i + 1 < rules.length
-      ? ', then every ${durationText(rules[i + 1].intervalMinutes)}'
-      : '';
-  return '$every$until$next';
+  if (r.endDate != null) {
+    text = strings.taperShortUntil(text, DateFormat.MMMd().format(r.endDate!));
+  }
+  if (i + 1 < rules.length) {
+    text = strings.taperShortThen(text, durationText(rules[i + 1].intervalMinutes));
+  }
+  return text;
 }
 
 /// One line saying where a medication stands, e.g. "Due at 2:30 PM" or
@@ -100,28 +129,28 @@ String scheduleShortText(MedicationSchedule schedule, DateTime now) {
 String statusText(MedicationStatus status) {
   final s = status.schedule;
   return switch (status.label) {
-    MedicationStatusLabel.neverTaken => 'Not given yet',
-    MedicationStatusLabel.availablePrn => 'Can be given now',
-    MedicationStatusLabel.eligibleNow => 'Due now',
+    MedicationStatusLabel.neverTaken => strings.statusNotGiven,
+    MedicationStatusLabel.availablePrn => strings.statusCanGiveNow,
+    MedicationStatusLabel.eligibleNow => strings.statusDueNow,
     MedicationStatusLabel.dueSoon ||
     MedicationStatusLabel.tooEarly =>
-      'Next at ${clockText(s.nextEligibleAt)}',
+      strings.statusNextAt(clockText(s.nextEligibleAt)),
     MedicationStatusLabel.overdue =>
-      'Overdue by ${durationText(s.overdueByMinutes ?? 0)}',
+      strings.statusOverdueBy(durationText(s.overdueByMinutes ?? 0)),
     MedicationStatusLabel.missed =>
-      'Missed: was due ${durationText(s.overdueByMinutes ?? 0)} ago',
-    MedicationStatusLabel.finished => 'Finished',
+      strings.statusMissed(durationText(s.overdueByMinutes ?? 0)),
+    MedicationStatusLabel.finished => strings.statusFinished,
   };
 }
 
 /// How reminders are set, e.g. "On, 10 minutes early" or "Off".
 String remindersText(ReminderSettings r) {
-  if (!r.enabled) return 'Off';
+  if (!r.enabled) return strings.remindersOff;
   return [
-    'On',
-    if (r.earlyMinutes > 0) '${durationText(r.earlyMinutes)} early',
-    if (r.alarm) 'as an alarm',
-  ].join(', ');
+    strings.remindersOn,
+    if (r.earlyMinutes > 0) strings.remindersEarly(durationText(r.earlyMinutes)),
+    if (r.alarm) strings.remindersAlarm,
+  ].join(strings.listSeparator);
 }
 
 /// A quantity without a pointless ".0": "21", "2.5".
@@ -138,22 +167,22 @@ String whenText(DateTime at, DateTime now) {
       .inDays;
   final clock = clockText(at);
   return switch (days) {
-    0 => clock,
-    1 => 'tomorrow at $clock',
-    -1 => 'yesterday at $clock',
-    _ => '${DateFormat.MMMd().format(day)} at $clock',
+    0 => strings.whenToday(clock),
+    1 => strings.whenTomorrow(clock),
+    -1 => strings.whenYesterday(clock),
+    _ => strings.whenOnDay(DateFormat.MMMd().format(day), clock),
   };
 }
 
 /// A short span for countdowns: "8 min", "3 hr 12 min", "2 days".
 String shortDurationText(int minutes) {
-  if (minutes < 60) return '$minutes min';
+  if (minutes < 60) return strings.shortMinutes(minutes);
   if (minutes < 48 * 60) {
     final h = minutes ~/ 60;
     final m = minutes % 60;
-    return m == 0 ? '$h hr' : '$h hr $m min';
+    return m == 0 ? strings.shortHours(h) : strings.shortHoursMinutes(h, m);
   }
-  return '${minutes ~/ (24 * 60)} days';
+  return strings.shortDays(minutes ~/ (24 * 60));
 }
 
 /// A calendar day heading: "Today", "Yesterday", or "Mon, Sep 28".
@@ -161,8 +190,8 @@ String dayHeading(DateTime day, DateTime now) {
   final d = DateTime.utc(day.year, day.month, day.day);
   final t = DateTime.utc(now.year, now.month, now.day);
   return switch (t.difference(d).inDays) {
-    0 => 'Today',
-    1 => 'Yesterday',
+    0 => strings.today,
+    1 => strings.yesterday,
     _ => DateFormat.MMMEd().format(day),
   };
 }
@@ -172,31 +201,29 @@ String dayHeading(DateTime day, DateTime now) {
 /// doses given".
 String finishedText(Medication m) => switch (m.course) {
       EndsAfterDay(:final lastDay) =>
-        'Course finished: last day was ${dateText(lastDay)}',
-      EndsAfterDoses(:final doses) =>
-        'Course finished: ${doses == 1 ? 'its 1 dose' : 'all $doses doses'} given',
-      null => 'Taper finished',
+        strings.courseFinishedLastDay(dateText(lastDay)),
+      EndsAfterDoses(:final doses) => strings.courseFinishedDoses(doses),
+      null => strings.taperFinished,
     };
 
 /// How long [m]'s course runs, for a summary: "Last day Jun 14, 2026" or
 /// "5 doses, 2 given so far". Null for a medication that carries on.
 String? courseText(Medication m, Iterable<DoseEvent> doses) => switch (m.course) {
-      EndsAfterDay(:final lastDay) => 'Last day ${dateText(lastDay)}',
+      EndsAfterDay(:final lastDay) => strings.courseLastDay(dateText(lastDay)),
       EndsAfterDoses(doses: final total) =>
-        '${_doses(total)}, ${effectiveDoses(m.id, doses).length} given so far',
+        strings.courseDosesSoFar(total, effectiveDoses(m.id, doses).length),
       null => null,
     };
 
 /// The same, short enough for a card: "last day Jun 14" or "3 doses left".
 String? courseShortText(Medication m, Iterable<DoseEvent> doses) =>
     switch (m.course) {
-      EndsAfterDay(:final lastDay) => 'last day ${DateFormat.MMMd().format(lastDay)}',
-      EndsAfterDoses(doses: final total) =>
-        '${_doses(math.max(0, total - effectiveDoses(m.id, doses).length))} left',
+      EndsAfterDay(:final lastDay) =>
+        strings.courseShortLastDay(DateFormat.MMMd().format(lastDay)),
+      EndsAfterDoses(doses: final total) => strings.courseDosesLeft(
+          math.max(0, total - effectiveDoses(m.id, doses).length)),
       null => null,
     };
-
-String _doses(int n) => n == 1 ? '1 dose' : '$n doses';
 
 /// What a medication card says, in two lines: the one thing to know
 /// ("Due in 8 min", "Overdue 25 min"), and when that is.
@@ -205,36 +232,36 @@ String _doses(int n) => n == 1 ? '1 dose' : '$n doses';
   final schedule = medication.schedule;
   final s = status.schedule;
   final next = whenText(s.nextEligibleAt, now);
-  final late = s.overdueByMinutes ?? 0;
+  final late = shortDurationText(s.overdueByMinutes ?? 0);
+  final until = shortDurationText(status.minutesUntilEligible);
   return switch (status.label) {
     MedicationStatusLabel.neverTaken => s.eligibleNow
-        ? ('Not given yet', 'Can be given now')
-        : ('Not given yet', 'First due $next'),
-    MedicationStatusLabel.availablePrn => ('Can be given now', 'As needed'),
+        ? (strings.statusNotGiven, strings.statusCanGiveNow)
+        : (strings.statusNotGiven, strings.cardFirstDue(next)),
+    MedicationStatusLabel.availablePrn =>
+      (strings.statusCanGiveNow, strings.cardAsNeeded),
     MedicationStatusLabel.tooEarly => schedule is PrnSchedule
-        ? ('Next dose from $next', 'in ${shortDurationText(status.minutesUntilEligible)}')
-        : ('Next dose $next', 'in ${shortDurationText(status.minutesUntilEligible)}'),
-    MedicationStatusLabel.dueSoon => (
-        'Due in ${shortDurationText(status.minutesUntilEligible)}',
-        'at $next',
-      ),
-    MedicationStatusLabel.eligibleNow => ('Due now', 'since $next'),
-    MedicationStatusLabel.overdue => (
-        'Overdue ${shortDurationText(late)}',
-        'was due $next',
-      ),
-    MedicationStatusLabel.missed => (
-        'Missed',
-        'was due $next, ${shortDurationText(late)} ago',
-      ),
-    MedicationStatusLabel.finished => ('Finished', finishedText(medication)),
+        ? (strings.cardAvailableFrom(next), strings.cardIn(until))
+        : (strings.cardNextDose(next), strings.cardIn(until)),
+    MedicationStatusLabel.dueSoon =>
+      (strings.cardDueIn(until), strings.cardAt(next)),
+    MedicationStatusLabel.eligibleNow =>
+      (strings.statusDueNow, strings.cardSince(next)),
+    MedicationStatusLabel.overdue =>
+      (strings.cardOverdue(late), strings.cardWasDue(next)),
+    MedicationStatusLabel.missed =>
+      (strings.cardMissed, strings.cardMissedWasDue(next, late)),
+    MedicationStatusLabel.finished =>
+      (strings.statusFinished, finishedText(medication)),
   };
 }
 
 /// A person on their own, as a heading or in a list: their name, or "You"
 /// for the phone's owner when they haven't given one.
-String personName(Patient p) => p.hasName ? p.displayName : 'You';
+String personName(Patient p) => p.hasName ? p.displayName : strings.personYou;
 
-/// A person inside a sentence: "for Sam", "for you". The phone's owner is
-/// "you" even with a name set; it's them reading.
-String personInSentence(Patient p) => p.isSelf ? 'you' : p.displayName;
+/// A person after "for": "for Sam", "for you". The phone's owner is "you"
+/// even with a name set; it's them reading. Other sentences about the owner
+/// have their own wording, since languages build them differently.
+String personInSentence(Patient p) =>
+    p.isSelf ? strings.personYouAfterFor : p.displayName;

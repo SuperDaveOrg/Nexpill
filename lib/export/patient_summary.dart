@@ -15,35 +15,44 @@ String patientSummary(CareSnapshot care, Patient patient, {required DateTime now
   final lines = <String>[
     // The phone's owner may have no name to put here.
     patient.hasName
-        ? 'Medication summary for ${patient.displayName}'
-        : 'Medication summary',
-    'As of ${dateTimeText(now)}. Active medications only.',
-    'From Nexpill, a timing tracker. Not medical advice.',
+        ? strings.summaryTitleFor(patient.displayName)
+        : strings.summaryTitle,
+    strings.summaryAsOf(dateTimeText(now)),
+    strings.summaryNotAdvice,
     '',
   ];
 
-  if (medications.isEmpty) lines.add('No active medications.');
+  if (medications.isEmpty) lines.add(strings.summaryNoActive);
 
   for (final (i, m) in medications.indexed) {
     final status = computeMedicationStatus(m, care.doses, now);
     final last = status.schedule.lastGivenAt;
     final finished = status.label == MedicationStatusLabel.finished;
     final inventory = computeInventoryStatus(m, care.doses);
+    final amount = '${quantityText(inventory.remaining ?? 0)}'
+        '${m.doseUnit == null ? '' : ' ${m.doseUnit}'}';
     lines.addAll([
       '${i + 1}. ${m.name}${m.strengthText == null ? '' : ' (${m.strengthText})'}',
-      if (m.purpose != null) '   For: ${m.purpose}',
-      '   Dose: ${m.defaultDoseText}',
-      '   Schedule: ${scheduleText(m.schedule)}',
-      if (courseText(m, care.doses) case final course?) '   Course: $course',
-      if (m.instructions != null) '   Instructions: ${m.instructions}',
-      '   Last given: ${last == null ? 'Not yet' : dateTimeText(last)}',
-      if (last != null || finished)
-        '   Status: ${finished ? finishedText(m) : statusText(status)}',
-      '   Reminders: ${remindersText(m.reminders)}',
-      if (inventory.configured)
-        '   Remaining: ${quantityText(inventory.remaining!)}'
-            '${m.doseUnit == null ? '' : ' ${m.doseUnit}'}'
-            '${inventory.level == InventoryLevel.low ? ' (running low)' : inventory.level == InventoryLevel.out ? ' (none left)' : ''}',
+      for (final line in [
+        if (m.purpose != null) strings.summaryPurpose(m.purpose!),
+        strings.summaryDose(m.defaultDoseText),
+        strings.summarySchedule(scheduleText(m.schedule)),
+        if (courseText(m, care.doses) case final course?)
+          strings.summaryCourse(course),
+        if (m.instructions != null) strings.summaryInstructions(m.instructions!),
+        strings.summaryLastGiven(
+            last == null ? strings.summaryNotYet : dateTimeText(last)),
+        if (last != null || finished)
+          strings.summaryStatus(finished ? finishedText(m) : statusText(status)),
+        strings.summaryReminders(remindersText(m.reminders)),
+        if (inventory.configured)
+          strings.summaryRemaining(switch (inventory.level) {
+            InventoryLevel.low => strings.summaryRunningLow(amount),
+            InventoryLevel.out => strings.summaryNoneLeft(amount),
+            _ => amount,
+          }),
+      ])
+        '   $line',
       '',
     ]);
   }

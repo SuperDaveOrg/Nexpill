@@ -8,6 +8,7 @@ import 'package:nexpill/models/care_snapshot.dart';
 import 'package:nexpill/domain/dose_history.dart';
 import 'package:nexpill/domain/reminder_planner.dart';
 import 'package:nexpill/domain/scheduling.dart';
+import 'package:nexpill/domain/wording.dart';
 import 'package:nexpill/models/medication.dart';
 
 /// Hands the reminder plan to Android as exact alarms, and keeps the
@@ -44,9 +45,8 @@ class NotificationService {
     if (rings) {
       return AndroidNotificationDetails(
         'alarms',
-        'Medication alarms',
-        channelDescription:
-            'For medications set to ring like an alarm when a dose is due.',
+        strings.channelAlarms,
+        channelDescription: strings.channelAlarmsDescription,
         importance: Importance.max,
         priority: Priority.max,
         category: AndroidNotificationCategory.alarm,
@@ -64,8 +64,8 @@ class NotificationService {
     }
     return AndroidNotificationDetails(
       'reminders',
-      'Medication reminders',
-      channelDescription: 'Heads-ups, doses due, and overdue doses.',
+      strings.channelReminders,
+      channelDescription: strings.channelRemindersDescription,
       importance: Importance.high,
       priority: Priority.high,
       category: AndroidNotificationCategory.reminder,
@@ -76,20 +76,22 @@ class NotificationService {
     );
   }
 
-  static const _upkeep = AndroidNotificationDetails(
-    'upkeep',
-    'Keeping reminders going',
-    channelDescription:
-        'A note when Nexpill needs opening so reminders don\'t run out.',
-    icon: _icon,
-  );
+  static AndroidNotificationDetails get _upkeep => AndroidNotificationDetails(
+        'upkeep',
+        strings.channelUpkeep,
+        channelDescription: strings.channelUpkeepDescription,
+        icon: _icon,
+      );
 
   static const _icon = 'ic_stat_nexpill';
 
-  static const _given = AndroidNotificationAction(actionGiven, 'Mark given');
-  static const _skip = AndroidNotificationAction(actionSkip, 'Skip');
-  static const _snooze =
-      AndroidNotificationAction(actionSnooze, 'Snooze $snoozeMinutes min');
+  // In the language on screen when the reminder was planned.
+  static AndroidNotificationAction get _given =>
+      AndroidNotificationAction(actionGiven, strings.actionMarkGiven);
+  static AndroidNotificationAction get _skip =>
+      AndroidNotificationAction(actionSkip, strings.actionSkip);
+  static AndroidNotificationAction get _snooze => AndroidNotificationAction(
+      actionSnooze, strings.actionSnooze(snoozeMinutes));
 
   static const actionGiven = 'given';
   static const actionSkip = 'skip';
@@ -155,11 +157,10 @@ class NotificationService {
     if (plan.refreshNoticeAt case final at?) {
       await _plugin.zonedSchedule(
         id: _refreshNoticeId,
-        title: 'Open Nexpill to keep reminders coming',
-        body: 'Reminders are set a week ahead each time Nexpill is used. '
-            'Open it to set the next ones.',
+        title: strings.upkeepTitle,
+        body: strings.upkeepBody,
         scheduledDate: tz.TZDateTime.from(at, tz.UTC),
-        notificationDetails: const NotificationDetails(android: _upkeep),
+        notificationDetails: NotificationDetails(android: _upkeep),
         androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
       );
     }
@@ -211,8 +212,8 @@ class NotificationService {
   Future<void> sendTest() async {
     await _plugin.zonedSchedule(
       id: _testId,
-      title: 'Test reminder',
-      body: 'Reminders are working. This is how they\'ll look.',
+      title: strings.testReminderTitle,
+      body: strings.testReminderBody,
       scheduledDate:
           tz.TZDateTime.from(DateTime.now().add(const Duration(seconds: 5)), tz.UTC),
       // No actions: there's no dose to mark given or snooze.
