@@ -222,17 +222,32 @@
 
     <section id="download">
       <div class="wrap download">
-        <div class="release">
-          <span class="badge">Public beta</span>
-          <h2>Nexpill {{VERSION}} for Android</h2>
-          <p class="note">Released {{RELEASE_DATE}} · Android {{MIN_ANDROID}} or newer</p>
-          <a class="btn" href="downloads/{{APK_FILE}}" download>Download APK <small>{{APK_SIZE}}</small></a>
-          <dl>
-            <dt>File</dt><dd>{{APK_FILE}}</dd>
-            <dt>SHA-256</dt><dd><code>{{APK_SHA256}}</code></dd>
-            <dt>Signed by</dt><dd>SuperDaveLab</dd>
-            <dt>Source</dt><dd><a href="https://github.com/SuperDaveOrg/Nexpill/tree/v{{VERSION}}">Built from tag v{{VERSION}}</a></dd>
-          </dl>
+        <div>
+          <div class="release">
+            <span class="badge">Public beta</span>
+            <h2>Nexpill {{VERSION}} for Android</h2>
+            <p class="note">Released {{RELEASE_DATE}} · Android {{MIN_ANDROID}} or newer</p>
+            <a class="btn" href="downloads/{{APK_FILE}}" download>Download APK <small>{{APK_SIZE}}</small></a>
+            <dl>
+              <dt>File</dt><dd>{{APK_FILE}}</dd>
+              <dt>SHA-256</dt><dd><code>{{APK_SHA256}}</code></dd>
+              <dt>Signed by</dt><dd>SuperDaveLab</dd>
+              <dt>Source</dt><dd><a href="https://github.com/SuperDaveOrg/Nexpill/tree/v{{VERSION}}">Built from tag v{{VERSION}}</a></dd>
+            </dl>
+          </div>
+          <!-- BETA -->
+          <div class="beta-callout">
+            <p class="eyebrow">Testers wanted</p>
+            <h3>Speak German, Spanish, French, Italian, Portuguese or Russian?</h3>
+            <p>
+              The next version of Nexpill speaks all six, and each translation
+              needs a native speaker to read it before it reaches everyone. A
+              wrong word for “due” or “overdue” could mean a dose given at the
+              wrong time, so half an hour of your eyes makes a real difference.
+            </p>
+            <a class="btn btn-ghost" href="beta/">Try the beta and help check it</a>
+          </div>
+          <!-- /BETA -->
         </div>
         <div>
           <h3>Installing</h3>
@@ -303,6 +318,9 @@
             included. Leave your email out if you don't need a reply. Please leave out patients' names and medical details; we don't need them to help.
           </p>
           <p class="note">Prefer email? <a href="mailto:feedback@superdavelab.com">feedback@superdavelab.com</a></p>
+          <!-- BETA -->
+          <p class="note">Checking a translation? The <a href="beta/">beta page</a> says what to look for, and has its own form.</p>
+          <!-- /BETA -->
         </div>
         <form class="feedback-form" id="feedback-form" novalidate>
           <label>Message

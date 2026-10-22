@@ -187,8 +187,10 @@ sed -i \
   -e "s|{{YEAR}}|$YEAR|g" \
   "$OUT/index.html"
 
-# The beta page keeps one of its two download blocks.
+# The beta page keeps one of its two download blocks, and the main page's
+# call for testers shows only while there's a beta to test.
 if [[ -n $beta ]]; then
+  sed -i -e '/<!-- \/\?BETA -->/d' "$OUT/index.html"
   sed -i \
     -e '/<!-- NO-BETA -->/,/<!-- \/NO-BETA -->/d' -e '/<!-- \/\?BETA -->/d' \
     -e "s|{{BETA_VERSION}}|$BETA_VERSION|g" \
@@ -202,6 +204,7 @@ if [[ -n $beta ]]; then
     -e "s|{{MIN_ANDROID}}|$BETA_MIN_ANDROID|g" \
     "$OUT/beta/index.html"
 else
+  sed -i -e '/<!-- BETA -->/,/<!-- \/BETA -->/d' "$OUT/index.html"
   sed -i \
     -e '/<!-- BETA -->/,/<!-- \/BETA -->/d' -e '/<!-- \/\?NO-BETA -->/d' \
     -e "s|{{BETA_LABEL}}|none|g" \
