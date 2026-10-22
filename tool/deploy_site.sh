@@ -10,11 +10,11 @@ set -euo pipefail
 # double-brace placeholders are filled from that release: version, date,
 # size, SHA-256, minimum Android version.
 #
-# site/beta/ (nexpill.superdavelab.com/beta/, handed to testers as a link and
-# not linked from the main page) offers the newest *snapshot* build instead:
-# an untagged commit, signed with the release key, built after that release
-# (tool/build_release.sh --ref <branch>). With none, the page says there's no
-# beta right now.
+# site/beta/ (nexpill.superdavelab.com/beta/) offers a preview of the next
+# version instead: the newest *snapshot* build, an untagged commit signed with
+# the release key and built after that release (tool/build_release.sh --ref
+# <branch>). The main page asks for testers only while there's one; with
+# none, the beta page says there's no preview right now.
 #
 # Before the first release, --build-only still works: the placeholders get
 # marked preview values so the page can be looked at. Deploying needs a real
@@ -221,9 +221,9 @@ done
 echo "    $APK_FILE ($APK_SIZE), released $RELEASE_DATE"
 echo "    sha256 $APK_SHA256"
 if [[ -n $beta ]]; then
-  echo "    beta: $BETA_APK_FILE ($BETA_APK_SIZE), built $BETA_BUILT"
+  echo "    preview: $BETA_APK_FILE ($BETA_APK_SIZE), built $BETA_BUILT"
 else
-  echo "    beta: none newer than the release; /beta/ says so"
+  echo "    preview: none newer than the release; /beta/ says so"
 fi
 
 case "$MODE" in

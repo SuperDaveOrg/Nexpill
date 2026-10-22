@@ -1,18 +1,18 @@
 <!doctype html>
 <!--
-  nexpill.superdavelab.com/beta/ — for testers checking a build before it's
-  released, translations above all. Not linked from the main page or listed in
-  the sitemap: it's handed out as a link. Built by tool/deploy_site.sh, which
-  fills the double-brace placeholders from the newest signed snapshot build in
-  dist/release/ and keeps either the BETA or the NO-BETA block below. Edit
-  this file, not the copy in dist/site/.
+  nexpill.superdavelab.com/beta/ — a preview of the next version, for testers
+  checking it before it's released, translations above all. Linked from the
+  main page only while there's a preview, and not in the sitemap. Built by
+  tool/deploy_site.sh, which fills the double-brace placeholders from the
+  newest signed snapshot build in dist/release/ and keeps either the BETA or
+  the NO-BETA block below. Edit this file, not the copy in dist/site/.
 -->
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Nexpill beta — help check it in your language</title>
-  <meta name="description" content="Test builds of Nexpill, for people helping check its translations before they're released." />
+  <title>Nexpill preview — help check it in your language</title>
+  <meta name="description" content="A preview of the next Nexpill, for people helping check its translations before it's released." />
   <meta name="robots" content="noindex" />
   <link rel="icon" href="../assets/logo.png" type="image/png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -47,7 +47,7 @@
         <a href="#check">What to check</a>
         <a href="#words">The key words</a>
         <a href="#report">Report</a>
-        <a class="nav-cta" href="#download">Download beta</a>
+        <a class="nav-cta" href="#download">Download preview</a>
       </nav>
     </div>
   </header>
@@ -55,7 +55,7 @@
   <main id="top">
     <section class="hero wrap">
       <div>
-        <p class="eyebrow">Nexpill beta testing</p>
+        <p class="eyebrow">Preview of the next version</p>
         <h1>Help check Nexpill in your language.</h1>
         <p class="lede">
           Nexpill is a free medication timing app for caregivers. It has just
@@ -73,7 +73,7 @@
           <li lang="ru">Русский</li>
         </ul>
         <div class="hero-cta">
-          <a class="btn" href="#download">Download the beta</a>
+          <a class="btn" href="#download">Download the preview</a>
           <a class="btn btn-ghost" href="#check">What to check</a>
         </div>
       </div>
@@ -86,22 +86,22 @@
       <div class="wrap download">
         <!-- NO-BETA -->
         <div class="release">
-          <span class="badge">No beta right now</span>
+          <span class="badge">No preview right now</span>
           <h2>Nothing to test at the moment</h2>
           <p class="note">
-            Everything from the last beta is in the released version,
+            Everything from the last preview is in the released version,
             Nexpill {{VERSION}}. Thank you if you helped check it. The next
-            beta will appear here.
+            preview will appear here.
           </p>
           <a class="btn" href="../#download">Get Nexpill {{VERSION}}</a>
         </div>
         <!-- /NO-BETA -->
         <!-- BETA -->
         <div class="release">
-          <span class="badge">Beta · not yet released</span>
+          <span class="badge">Preview · not yet released</span>
           <h2>Nexpill {{BETA_VERSION}}</h2>
           <p class="note">Built {{BETA_BUILT}} · Android {{MIN_ANDROID}} or newer</p>
-          <a class="btn" href="../downloads/{{BETA_APK_FILE}}" download>Download beta APK <small>{{BETA_APK_SIZE}}</small></a>
+          <a class="btn" href="../downloads/{{BETA_APK_FILE}}" download>Download preview APK <small>{{BETA_APK_SIZE}}</small></a>
           <dl>
             <dt>File</dt><dd>{{BETA_APK_FILE}}</dd>
             <dt>SHA-256</dt><dd><code>{{BETA_APK_SHA256}}</code></dd>
@@ -112,16 +112,16 @@
         <div>
           <h3>Installing</h3>
           <ol class="steps">
-            <li>Tap <strong>Download beta APK</strong> on your phone. Chrome warns that the <strong>file might be harmful</strong>, as it does for every app from outside the Play Store. Tap <strong>Download anyway</strong>.</li>
+            <li>Tap <strong>Download preview APK</strong> on your phone. Chrome warns that the <strong>file might be harmful</strong>, as it does for every app from outside the Play Store. Tap <strong>Download anyway</strong>.</li>
             <li>Open the download and tap <strong>Install</strong> (or <strong>Update</strong>, if you already have Nexpill). The first time, your phone may ask you to allow Chrome to <strong>install unknown apps</strong>.</li>
             <li>If you see <strong>App blocked to protect your device</strong>, tap <strong>More details</strong>, then <strong>Install anyway</strong>.</li>
             <li>Open Nexpill and allow notifications, so you can check the reminders too.</li>
           </ol>
           <p class="note">
-            A beta installs over the released app and keeps its records, and
-            the next release installs over the beta. A beta can have bugs the
-            release doesn't: if you use Nexpill for real medications, save
-            <em>Back up to a file</em> in Settings before installing.
+            A preview installs over the released app and keeps its records,
+            and the next release installs over the preview. A preview can have
+            bugs the release doesn't: if you use Nexpill for real medications,
+            save <em>Back up to a file</em> in Settings before installing.
           </p>
         </div>
         <!-- /BETA -->
@@ -227,7 +227,7 @@
             from the app is included. Leave your email out if you'd rather not
             be asked follow-up questions.
           </p>
-          <p class="note">Email instead: <a href="mailto:feedback@superdavelab.com?subject=Nexpill%20beta">feedback@superdavelab.com</a></p>
+          <p class="note">Email instead: <a href="mailto:feedback@superdavelab.com?subject=Nexpill%20preview">feedback@superdavelab.com</a></p>
         </div>
         <form class="feedback-form" id="feedback-form" novalidate>
           <label>Language you checked
@@ -278,7 +278,7 @@
 
   <script>
     // Sends the report to SuperDaveLab's API, which emails it on, as the main
-    // page's feedback form does. The API has no beta field, so the language
+    // page's feedback form does. The API has no preview field, so the language
     // and build lead the message.
     (() => {
       const form = document.getElementById('feedback-form');
@@ -306,7 +306,7 @@
             body: JSON.stringify({
               product: 'nexpill',
               source: 'website',
-              message: `[Beta {{BETA_LABEL}}, language: ${field('language')}]\n\n${message}`,
+              message: `[Preview {{BETA_LABEL}}, language: ${field('language')}]\n\n${message}`,
               name: field('name'),
               email: field('email'),
               website: field('website'),
