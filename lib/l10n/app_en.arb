@@ -2,6 +2,7 @@
   "@@locale": "en",
   "durationHours": "{count, plural, =1{1 hour} other{{count} hours}}",
   "@durationHours": {
+    "description": "A whole number of hours, inside bigger phrases: 'Every 8 hours' on the card and in the summary, '10 minutes early' in the reminder summary. Also the first half of durationHoursMinutes.",
     "placeholders": {
       "count": {
         "type": "int"
@@ -10,6 +11,7 @@
   },
   "durationMinutes": "{count, plural, =1{1 minute} other{{count} minutes}}",
   "@durationMinutes": {
+    "description": "A whole number of minutes, inside bigger phrases: 'Every 30 minutes', 'On, 10 minutes early'. Also the second half of durationHoursMinutes.",
     "placeholders": {
       "count": {
         "type": "int"
@@ -18,6 +20,7 @@
   },
   "durationHoursMinutes": "{hours} {minutes}",
   "@durationHoursMinutes": {
+    "description": "A duration with both parts: {hours} is durationHours and {minutes} is durationMinutes, e.g. '4 hours 45 minutes'.",
     "placeholders": {
       "hours": {
         "type": "String"
@@ -38,6 +41,7 @@
   },
   "listAnd": "{items} and {last}",
   "@listAnd": {
+    "description": "Joins the last item of a list to the rest, 'a, b and c': {items} is the earlier items already joined with listSeparator, {last} the final one. Used for 'At 08:00 and 20:00'.",
     "placeholders": {
       "items": {
         "type": "String"
@@ -48,8 +52,12 @@
     }
   },
   "listSeparator": ", ",
+  "@listSeparator": {
+    "description": "The separator between list items before the last one ('a, b and c'), and between the parts of the reminder summary ('On, 10 minutes early, as an alarm'). Keep the trailing space if your language uses one."
+  },
   "scheduleEvery": "Every {duration}",
   "@scheduleEvery": {
+    "description": "Schedule of an interval medication, on the card, in the summary and under a stopped medication: a dose every {duration}, e.g. 'Every 8 hours'. {duration} is a duration… message.",
     "placeholders": {
       "duration": {
         "type": "String"
@@ -58,6 +66,7 @@
   },
   "scheduleAt": "At {times}",
   "@scheduleAt": {
+    "description": "Schedule of a set-times medication: {times} is a list of clock times, e.g. 'At 08:00 and 20:00'.",
     "placeholders": {
       "times": {
         "type": "String"
@@ -66,6 +75,7 @@
   },
   "scheduleAsNeeded": "As needed, at least {duration} apart",
   "@scheduleAsNeeded": {
+    "description": "Schedule of an as-needed medication: {duration} is the minimum gap between doses. Allowed when the gap has passed, never required.",
     "placeholders": {
       "duration": {
         "type": "String"
@@ -73,6 +83,9 @@
     }
   },
   "taperNoSteps": "Taper with no steps",
+  "@taperNoSteps": {
+    "description": "Schedule line for a taper whose list of steps is empty. The editor refuses to save one, so this is rarely seen."
+  },
   "taperStepFrom": "From {date}",
   "@taperStepFrom": {
     "description": "In a taper summary: a step that starts on {date} and has no end date.",
@@ -84,6 +97,7 @@
   },
   "taperStepRange": "{from} to {until}",
   "@taperStepRange": {
+    "description": "In a taper summary: a step that runs from {from} to {until}, both dates. The open-ended form is taperStepFrom.",
     "placeholders": {
       "from": {
         "type": "String"
@@ -95,6 +109,7 @@
   },
   "taperStep": "{when}: every {duration}",
   "@taperStep": {
+    "description": "One step in a taper summary: {when} is taperStepFrom or taperStepRange, {duration} the gap between doses during it, e.g. 'Jun 1, 2026 to Jun 7, 2026: every 8 hours'. Steps are joined with semicolons.",
     "placeholders": {
       "when": {
         "type": "String"
@@ -105,8 +120,12 @@
     }
   },
   "taperFinished": "Taper finished",
+  "@taperFinished": {
+    "description": "Card detail under 'Finished', the card's schedule line, and the summary status: the taper's last step has ended, so nothing more is due."
+  },
   "scheduleOnce": "Once, {when}",
   "@scheduleOnce": {
+    "description": "Schedule of a single dose: {when} is its date and time ('Once, Jun 10, 2026, 2:30 PM') or, on the card, one of the when… messages ('Once, tomorrow at 3:00 PM').",
     "placeholders": {
       "when": {
         "type": "String"
@@ -115,6 +134,7 @@
   },
   "scheduleOnceToday": "Once, today at {time}",
   "@scheduleOnceToday": {
+    "description": "Card schedule line for a single dose due today: {time} is a clock time.",
     "placeholders": {
       "time": {
         "type": "String"
@@ -122,8 +142,12 @@
     }
   },
   "singleDoseFinished": "Single dose logged",
+  "@singleDoseFinished": {
+    "description": "Card detail under 'Finished' and summary status for a single dose that has been given or skipped: nothing more to give."
+  },
   "taperShortEvery": "Taper: every {duration}",
   "@taperShortEvery": {
+    "description": "Card schedule line for a taper: the gap between doses in the step currently in force, e.g. 'Taper: every 8 hours'. The other taperShort… messages wrap this text.",
     "placeholders": {
       "duration": {
         "type": "String"
@@ -132,6 +156,7 @@
   },
   "taperShortFrom": "{text} from {date}",
   "@taperShortFrom": {
+    "description": "Card schedule line for a taper whose first step hasn't started: {text} is taperShortEvery, {date} the step's first day (month and day), e.g. 'Taper: every 8 hours from Jun 1'.",
     "placeholders": {
       "text": {
         "type": "String"
@@ -143,6 +168,7 @@
   },
   "taperShortUntil": "{text} until {date}",
   "@taperShortUntil": {
+    "description": "Card schedule line for a taper: {text} is taperShortEvery, {date} the current step's last day (month and day), e.g. 'Taper: every 8 hours until Jun 7'.",
     "placeholders": {
       "text": {
         "type": "String"
@@ -154,6 +180,7 @@
   },
   "taperShortThen": "{text}, then every {duration}",
   "@taperShortThen": {
+    "description": "Card schedule line for a taper with a step still to come: {text} is the current step (taperShortEvery or taperShortUntil), {duration} the gap in the next step, e.g. 'Taper: every 8 hours until Jun 7, then every 12 hours'.",
     "placeholders": {
       "text": {
         "type": "String"
@@ -277,6 +304,7 @@
   },
   "shortHours": "{count} hr",
   "@shortHours": {
+    "description": "Short duration on a card, a whole number of hours, e.g. '3 hr'; used in 'in 3 hr', 'Overdue 3 hr'. Pairs with shortMinutes and shortHoursMinutes.",
     "placeholders": {
       "count": {
         "type": "int"
@@ -285,6 +313,7 @@
   },
   "shortHoursMinutes": "{hours} hr {minutes} min",
   "@shortHoursMinutes": {
+    "description": "Short duration on a card, hours and minutes, e.g. '3 hr 12 min'; used in 'in 3 hr 12 min', 'Overdue 3 hr 12 min'. {hours} and {minutes} are numbers.",
     "placeholders": {
       "hours": {
         "type": "int"
@@ -296,6 +325,7 @@
   },
   "shortDays": "{count, plural, =1{1 day} other{{count} days}}",
   "@shortDays": {
+    "description": "Short duration on a card for two days or more, e.g. 'Next dose … in 2 days'.",
     "placeholders": {
       "count": {
         "type": "int"
@@ -307,8 +337,12 @@
     "description": "Heading of today's entries in the dose history."
   },
   "yesterday": "Yesterday",
+  "@yesterday": {
+    "description": "Heading of yesterday's entries in the dose history."
+  },
   "courseFinishedLastDay": "Course finished: last day was {date}",
   "@courseFinishedLastDay": {
+    "description": "Card detail under 'Finished' and summary status: the course ended because its last day, {date}, has passed.",
     "placeholders": {
       "date": {
         "type": "String"
@@ -317,6 +351,7 @@
   },
   "courseFinishedDoses": "{count, plural, =1{Course finished: its 1 dose given} other{Course finished: all {count} doses given}}",
   "@courseFinishedDoses": {
+    "description": "Card detail under 'Finished' and summary status: the course ended because all its {count} doses have been given.",
     "placeholders": {
       "count": {
         "type": "int"
@@ -325,6 +360,7 @@
   },
   "courseLastDay": "Last day {date}",
   "@courseLastDay": {
+    "description": "Course line in the exported medication summary: the course runs through {date}, its last day.",
     "placeholders": {
       "date": {
         "type": "String"
@@ -333,6 +369,7 @@
   },
   "courseDosesSoFar": "{total, plural, =1{1 dose, {given} given so far} other{{total} doses, {given} given so far}}",
   "@courseDosesSoFar": {
+    "description": "Course line in the exported medication summary: the course is {total} doses long and {given} of them have been given. Only {total} chooses the plural form; {given} is a number.",
     "placeholders": {
       "total": {
         "type": "int"
@@ -341,6 +378,7 @@
   },
   "courseShortLastDay": "last day {date}",
   "@courseShortLastDay": {
+    "description": "On the medication card after the schedule, e.g. '1 tablet · Every 8 hours · last day Jun 14': the course runs through {date} (month and day).",
     "placeholders": {
       "date": {
         "type": "String"
@@ -349,6 +387,7 @@
   },
   "courseDosesLeft": "{count, plural, =1{1 dose left} other{{count} doses left}}",
   "@courseDosesLeft": {
+    "description": "On the medication card after the schedule, e.g. '1 tablet · Every 8 hours · 3 doses left': how many doses of the course are still to give.",
     "placeholders": {
       "count": {
         "type": "int"
@@ -457,7 +496,13 @@
     }
   },
   "personYou": "You",
+  "@personYou": {
+    "description": "The phone's owner where a name would stand alone, when they haven't given one: the home screen title, the People list, the Patient column of the exported history. Capitalised."
+  },
   "personYouAfterFor": "you",
+  "@personYouAfterFor": {
+    "description": "The phone's owner after 'for' in a sentence: 'For you' in reminders, 'Reminders are off for you', 'All off for you'. Lower-case; it fills {person} in those messages, so make sure it reads well in each."
+  },
   "reminderDueAt": "{medication} due at {time}",
   "@reminderDueAt": {
     "description": "Reminder notification title, read half-asleep: keep it short. {medication} is a name typed by the user.",
@@ -502,6 +547,7 @@
   },
   "reminderManyFor": "{count} medications for {person}",
   "@reminderManyFor": {
+    "description": "Reminder notification title when several medications for one person fall due at the same minute: {count} is 2 or more, {person} a name typed by the user or personYouAfterFor. The body then lists each medication.",
     "placeholders": {
       "count": {
         "type": "int"
@@ -521,18 +567,40 @@
     }
   },
   "channelAlarms": "Medication alarms",
+  "@channelAlarms": {
+    "description": "Name of the Android notification channel for reminders set to ring like an alarm; shown in the phone's notification settings for Nexpill."
+  },
   "channelAlarmsDescription": "For medications set to ring like an alarm when a dose is due.",
+  "@channelAlarmsDescription": {
+    "description": "Description of the alarms channel in the phone's notification settings."
+  },
   "channelReminders": "Medication reminders",
+  "@channelReminders": {
+    "description": "Name of the Android notification channel for ordinary reminders; shown in the phone's notification settings for Nexpill."
+  },
   "channelRemindersDescription": "Heads-ups, doses due, and overdue doses.",
+  "@channelRemindersDescription": {
+    "description": "Description of the reminders channel in the phone's notification settings: heads-ups before a dose, doses due now, and overdue repeats."
+  },
   "channelUpkeep": "Keeping reminders going",
+  "@channelUpkeep": {
+    "description": "Name of the Android notification channel for the one notice that asks to open Nexpill so reminders can be set further ahead."
+  },
   "channelUpkeepDescription": "A note when Nexpill needs opening so reminders don't run out.",
+  "@channelUpkeepDescription": {
+    "description": "Description of the upkeep channel in the phone's notification settings."
+  },
   "actionMarkGiven": "Mark given",
+  "@actionMarkGiven": {
+    "description": "Button on a reminder notification: logs the dose as given now, without opening the app."
+  },
   "actionSkip": "Skip",
   "@actionSkip": {
     "description": "Button on a reminder notification: deliberately not giving this dose; the schedule carries on."
   },
   "actionSnooze": "Snooze {minutes} min",
   "@actionSnooze": {
+    "description": "Button on a reminder notification: shows it again in {minutes} minutes (currently 5).",
     "placeholders": {
       "minutes": {
         "type": "int"
@@ -540,9 +608,21 @@
     }
   },
   "upkeepTitle": "Open Nexpill to keep reminders coming",
+  "@upkeepTitle": {
+    "description": "Title of the notice shown when the reminders planned a week ahead are about to run out because Nexpill hasn't been opened."
+  },
   "upkeepBody": "Reminders are set a week ahead each time Nexpill is used. Open it to set the next ones.",
+  "@upkeepBody": {
+    "description": "Body of the notice that reminders are about to run out."
+  },
   "testReminderTitle": "Test reminder",
+  "@testReminderTitle": {
+    "description": "Title of the test notification sent from Settings → Send a test reminder."
+  },
   "testReminderBody": "Reminders are working. This is how they'll look.",
+  "@testReminderBody": {
+    "description": "Body of the test notification."
+  },
   "csvGivenAt": "Given at",
   "@csvGivenAt": {
     "description": "Column heading in the exported dose-history spreadsheet."
@@ -601,6 +681,7 @@
   },
   "summaryTitleFor": "Medication summary for {name}",
   "@summaryTitleFor": {
+    "description": "First line of the exported plain-text medication summary: {name} is the person's name typed by the user.",
     "placeholders": {
       "name": {
         "type": "String"
@@ -608,8 +689,12 @@
     }
   },
   "summaryTitle": "Medication summary",
+  "@summaryTitle": {
+    "description": "First line of the exported medication summary when the phone's owner has no name set. Same words as the Settings item medicationSummary."
+  },
   "summaryAsOf": "As of {dateTime}. Active medications only.",
   "@summaryAsOf": {
+    "description": "Second line of the exported medication summary: {dateTime} is when it was written.",
     "placeholders": {
       "dateTime": {
         "type": "String"
@@ -617,9 +702,16 @@
     }
   },
   "summaryNotAdvice": "From Nexpill, a timing tracker. Not medical advice.",
+  "@summaryNotAdvice": {
+    "description": "Third line of the exported medication summary, read by a doctor or another caregiver."
+  },
   "summaryNoActive": "No active medications.",
+  "@summaryNoActive": {
+    "description": "Exported medication summary: the person has no active medications."
+  },
   "summaryPurpose": "For: {value}",
   "@summaryPurpose": {
+    "description": "Line under a medication in the exported summary: {value} is what it's for, as typed by the user.",
     "placeholders": {
       "value": {
         "type": "String"
@@ -628,6 +720,7 @@
   },
   "summaryDose": "Dose: {value}",
   "@summaryDose": {
+    "description": "Line under a medication in the exported summary: {value} is the usual dose as typed by the user, e.g. '1 tablet'.",
     "placeholders": {
       "value": {
         "type": "String"
@@ -636,6 +729,7 @@
   },
   "summarySchedule": "Schedule: {value}",
   "@summarySchedule": {
+    "description": "Line under a medication in the exported summary: {value} is one of the schedule… messages, e.g. 'Every 8 hours'.",
     "placeholders": {
       "value": {
         "type": "String"
@@ -644,6 +738,7 @@
   },
   "summaryCourse": "Course: {value}",
   "@summaryCourse": {
+    "description": "Line under a medication in the exported summary: {value} is courseLastDay or courseDosesSoFar.",
     "placeholders": {
       "value": {
         "type": "String"
@@ -652,6 +747,7 @@
   },
   "summaryInstructions": "Instructions: {value}",
   "@summaryInstructions": {
+    "description": "Line under a medication in the exported summary: {value} is the instructions as typed by the user.",
     "placeholders": {
       "value": {
         "type": "String"
@@ -660,6 +756,7 @@
   },
   "summaryLastGiven": "Last given: {value}",
   "@summaryLastGiven": {
+    "description": "Line under a medication in the exported summary: {value} is a date and time, or summaryNotYet.",
     "placeholders": {
       "value": {
         "type": "String"
@@ -667,8 +764,12 @@
     }
   },
   "summaryNotYet": "Not yet",
+  "@summaryNotYet": {
+    "description": "Fills summaryLastGiven when no dose has been given yet: 'Last given: Not yet'."
+  },
   "summaryStatus": "Status: {value}",
   "@summaryStatus": {
+    "description": "Line under a medication in the exported summary: {value} is one of the status… messages ('Due now', 'Overdue by 1 hour') or a finished text.",
     "placeholders": {
       "value": {
         "type": "String"
@@ -677,6 +778,7 @@
   },
   "summaryReminders": "Reminders: {value}",
   "@summaryReminders": {
+    "description": "Line under a medication in the exported summary: {value} is the reminder summary, 'Off' or 'On, 10 minutes early, as an alarm'.",
     "placeholders": {
       "value": {
         "type": "String"
@@ -685,6 +787,7 @@
   },
   "summaryRemaining": "Remaining: {value}",
   "@summaryRemaining": {
+    "description": "Line under a medication in the exported summary: {value} is the supply left with its unit, e.g. '12 tablets', or summaryRunningLow / summaryNoneLeft.",
     "placeholders": {
       "value": {
         "type": "String"
@@ -693,6 +796,7 @@
   },
   "summaryRunningLow": "{amount} (running low)",
   "@summaryRunningLow": {
+    "description": "Supply in the exported summary at or below the warning level: {amount} is a quantity with its unit, e.g. '3 tablets'.",
     "placeholders": {
       "amount": {
         "type": "String"
@@ -701,6 +805,7 @@
   },
   "summaryNoneLeft": "{amount} (none left)",
   "@summaryNoneLeft": {
+    "description": "Supply in the exported summary when it has run out: {amount} is a quantity with its unit, e.g. '0 tablets'.",
     "placeholders": {
       "amount": {
         "type": "String"
@@ -708,10 +813,20 @@
     }
   },
   "backupNotNexpill": "This file isn't a Nexpill backup.",
+  "@backupNotNexpill": {
+    "description": "Shown in the 'Can't restore this file' dialog: the chosen file isn't JSON or has no nexpillBackup field. Nothing is restored."
+  },
   "backupTooNew": "This backup is from a newer version of Nexpill. Update the app, then try again.",
+  "@backupTooNew": {
+    "description": "Shown in the 'Can't restore this file' dialog: the file's format version is newer than this app knows."
+  },
   "backupTwoOfYou": "More than one person in this file is marked as you.",
+  "@backupTwoOfYou": {
+    "description": "Shown in the 'Can't restore this file' dialog: two people in the file are both marked as the phone's owner ('self')."
+  },
   "backupCorrectsMissing": "A dose of {medication} corrects one that isn't in its history.",
   "@backupCorrectsMissing": {
+    "description": "Shown in the 'Can't restore this file' dialog: a correction points at a dose that isn't in the file. {medication} is a medication name from the file.",
     "placeholders": {
       "medication": {
         "type": "String"
@@ -720,6 +835,7 @@
   },
   "backupCorrectionsCircle": "Corrections to {medication}'s doses go round in a circle.",
   "@backupCorrectionsCircle": {
+    "description": "Shown in the 'Can't restore this file' dialog: corrections point at each other in a loop. {medication} is a medication name from the file.",
     "placeholders": {
       "medication": {
         "type": "String"
@@ -728,6 +844,7 @@
   },
   "backupCourseBoth": "{where} needs either \"lastDay\" or \"doses\", not both.",
   "@backupCourseBoth": {
+    "description": "Shown in the 'Can't restore this file' dialog. {where} says where in the file (backupWhereFile, backupWhereItem, or a name in quotes). 'lastDay' and 'doses' are field names in the file; keep them in English.",
     "placeholders": {
       "where": {
         "type": "String"
@@ -736,6 +853,7 @@
   },
   "backupBadTime": "{where} has a time that isn't HH:mm: {time}.",
   "@backupBadTime": {
+    "description": "Shown in the 'Can't restore this file' dialog: a set time isn't in HH:mm form. {where} says where in the file; {time} is the bad value. Keep 'HH:mm'.",
     "placeholders": {
       "where": {
         "type": "String"
@@ -747,6 +865,7 @@
   },
   "backupUnknownSchedule": "{where} has an unknown schedule type \"{type}\".",
   "@backupUnknownSchedule": {
+    "description": "Shown in the 'Can't restore this file' dialog. {where} says where in the file; {type} is the unknown value found.",
     "placeholders": {
       "where": {
         "type": "String"
@@ -758,6 +877,7 @@
   },
   "backupWrongForm": "{where} isn't in the expected form.",
   "@backupWrongForm": {
+    "description": "Shown in the 'Can't restore this file' dialog: {where} (where in the file) isn't a JSON object.",
     "placeholders": {
       "where": {
         "type": "String"
@@ -766,6 +886,7 @@
   },
   "backupMissing": "{where} is missing \"{key}\" or it is the wrong kind of value.",
   "@backupMissing": {
+    "description": "Shown in the 'Can't restore this file' dialog: {where} says where in the file; {key} is a field name from the file, kept in English.",
     "placeholders": {
       "where": {
         "type": "String"
@@ -777,6 +898,7 @@
   },
   "backupEmpty": "{where} has an empty \"{key}\".",
   "@backupEmpty": {
+    "description": "Shown in the 'Can't restore this file' dialog: a required text field, {key}, is blank. {where} says where in the file.",
     "placeholders": {
       "where": {
         "type": "String"
@@ -788,6 +910,7 @@
   },
   "backupImpossible": "{where} has an impossible \"{key}\": {value}.",
   "@backupImpossible": {
+    "description": "Shown in the 'Can't restore this file' dialog: a number is out of range, e.g. a negative interval. {where} says where in the file, {key} is the field name, {value} the number found.",
     "placeholders": {
       "where": {
         "type": "String"
@@ -802,6 +925,7 @@
   },
   "backupBadDate": "{where} has a \"{key}\" that isn't a YYYY-MM-DD date.",
   "@backupBadDate": {
+    "description": "Shown in the 'Can't restore this file' dialog: a date isn't in YYYY-MM-DD form. {where} says where in the file, {key} is the field name. Keep 'YYYY-MM-DD'.",
     "placeholders": {
       "where": {
         "type": "String"
@@ -813,6 +937,7 @@
   },
   "backupBadInstant": "{where} has a \"{key}\" that isn't a date and time with a time zone.",
   "@backupBadInstant": {
+    "description": "Shown in the 'Can't restore this file' dialog: a timestamp lacks a time zone. {where} says where in the file, {key} is the field name.",
     "placeholders": {
       "where": {
         "type": "String"
@@ -824,6 +949,7 @@
   },
   "backupDuplicateId": "The id \"{id}\" appears more than once.",
   "@backupDuplicateId": {
+    "description": "Shown in the 'Can't restore this file' dialog: {id} is a record id that appears twice in the file.",
     "placeholders": {
       "id": {
         "type": "String"
@@ -832,6 +958,7 @@
   },
   "backupNone": "{where} has no \"{key}\".",
   "@backupNone": {
+    "description": "Shown in the 'Can't restore this file' dialog: a list in the file is empty. {where} says where; {key} is the list's field name ('times', 'steps'), kept in English.",
     "placeholders": {
       "where": {
         "type": "String"
@@ -842,8 +969,12 @@
     }
   },
   "backupWhereFile": "The file",
+  "@backupWhereFile": {
+    "description": "Fills {where} in the backup… messages when the problem is at the top level of the file: 'The file is missing \"patients\"…'. Capitalised, as it starts the sentence."
+  },
   "backupWhereItem": "{where}, {key} {number}",
   "@backupWhereItem": {
+    "description": "Fills {where} in the backup… messages for a list entry that has no name: entry {number} (counting from 1) of the list {key} inside {where}, e.g. 'The file, patients 2' or '\"Sam\", medications 1, doses 3'. {key} is a field name from the file, kept in English.",
     "placeholders": {
       "where": {
         "type": "String"
@@ -857,11 +988,24 @@
     }
   },
   "cancel": "Cancel",
+  "@cancel": {
+    "description": "Button that closes a dialog without doing anything; used in every confirmation dialog."
+  },
   "couldNotSave": "Couldn't save the file.",
+  "@couldNotSave": {
+    "description": "Message shown when saving a backup, dose history or summary file fails."
+  },
   "hours": "Hours",
+  "@hours": {
+    "description": "Label of the hours box in the editor's duration field (Every…, At least this long apart, a taper step's interval)."
+  },
   "minutes": "Minutes",
+  "@minutes": {
+    "description": "Label of the minutes box in the editor's duration field, next to Hours."
+  },
   "cardMoreFor": "More for {medication}",
   "@cardMoreFor": {
+    "description": "Accessibility label of the three-dot menu on a medication card. {medication} is a name typed by the user.",
     "placeholders": {
       "medication": {
         "type": "String"
@@ -869,7 +1013,13 @@
     }
   },
   "edit": "Edit",
+  "@edit": {
+    "description": "Item in the card's menu: opens the medication editor. Also named in remindersOffFor."
+  },
   "doseHistory": "Dose history",
+  "@doseHistory": {
+    "description": "Item in the card's menu (that medication's history) and the history button on the home screen (the person's whole history)."
+  },
   "skipTheDose": "Skip the {time} dose",
   "@skipTheDose": {
     "description": "Title of the question asked before a dose is skipped.",
@@ -880,8 +1030,12 @@
     }
   },
   "stopTaking": "Stop taking",
+  "@stopTaking": {
+    "description": "Item in the card's menu: the medication is no longer being taken. Its history is kept and it moves to the 'Stopped' list at the bottom, where it can be resumed."
+  },
   "lastGiven": "Last given {when}",
   "@lastGiven": {
+    "description": "Line on the medication card: when the last dose was given. {when} is one of the when… messages.",
     "placeholders": {
       "when": {
         "type": "String"
@@ -890,6 +1044,7 @@
   },
   "lastGivenBy": "Last given {when} by {name}",
   "@lastGivenBy": {
+    "description": "Line on the medication card: the last dose was given {when} (one of the when… messages) by {name}, as typed when logging it.",
     "placeholders": {
       "when": {
         "type": "String"
@@ -904,8 +1059,12 @@
     "description": "Button on the medication card: deliberately not giving this dose; the schedule carries on."
   },
   "give": "Give",
+  "@give": {
+    "description": "The main button on a medication card: opens the sheet to log a dose. Keep it short."
+  },
   "supplyLeft": "{amount} left",
   "@supplyLeft": {
+    "description": "Supply line on the medication card: {amount} is a quantity with its unit, e.g. '12 tablets'.",
     "placeholders": {
       "amount": {
         "type": "String"
@@ -913,8 +1072,12 @@
     }
   },
   "supplyNoneLeft": "None left: time to refill",
+  "@supplyNoneLeft": {
+    "description": "Supply line on the medication card when the tracked supply has run out."
+  },
   "supplyRunningLow": "{left}: running low",
   "@supplyRunningLow": {
+    "description": "Supply line on the medication card at or below the warning level: {left} is supplyLeft, e.g. '3 tablets left: running low'.",
     "placeholders": {
       "left": {
         "type": "String"
@@ -922,8 +1085,12 @@
     }
   },
   "earlyTitle": "This is early",
+  "@earlyTitle": {
+    "description": "Title of the dialog shown when Give is tapped before the dose is due."
+  },
   "earlyMessageDue": "{medication} is next due {when}, in {duration}. Log a dose now anyway?",
   "@earlyMessageDue": {
+    "description": "Body of the early-dose dialog for a scheduled medication: the dose isn't due yet. {medication} is a name typed by the user, {when} one of the when… messages, {duration} how long until then.",
     "placeholders": {
       "medication": {
         "type": "String"
@@ -938,6 +1105,7 @@
   },
   "earlyMessageAvailable": "{medication} can next be given {when}, in {duration}. Log a dose now anyway?",
   "@earlyMessageAvailable": {
+    "description": "Body of the early-dose dialog for an as-needed medication: a dose is allowed again {when} (one of the when… messages), in {duration}. {medication} is a name typed by the user.",
     "placeholders": {
       "medication": {
         "type": "String"
@@ -951,10 +1119,25 @@
     }
   },
   "notYet": "Not yet",
+  "@notYet": {
+    "description": "Button in the early-dose dialog: don't log a dose."
+  },
   "logItNow": "Log it now",
+  "@logItNow": {
+    "description": "Button in the early-dose dialog: log the dose now regardless."
+  },
   "dayGiven": "Day it was given",
+  "@dayGiven": {
+    "description": "Title of the date picker when logging a dose that was given earlier."
+  },
   "timeGiven": "Time it was given",
+  "@timeGiven": {
+    "description": "Title of the time picker when logging a dose that was given earlier."
+  },
   "timeInFuture": "That time hasn't happened yet.",
+  "@timeInFuture": {
+    "description": "Error in the give-dose sheet when the chosen time is later than now."
+  },
   "correctEntry": "Correct this {medication} entry",
   "@correctEntry": {
     "description": "Title of the screen for correcting a mistaken {medication} entry. The original stays in history, struck through.",
@@ -966,6 +1149,7 @@
   },
   "giveMedication": "Give {medication}",
   "@giveMedication": {
+    "description": "Title of the sheet for logging a dose: {medication} is a name typed by the user.",
     "placeholders": {
       "medication": {
         "type": "String"
@@ -973,10 +1157,20 @@
     }
   },
   "originalStays": "The original stays in history, marked as corrected.",
+  "@originalStays": {
+    "description": "Note under the title of the correction sheet: the entry being corrected stays in history."
+  },
   "now": "Now",
+  "@now": {
+    "description": "Segment in the give-dose sheet: the dose is given at this moment."
+  },
   "earlier": "Earlier",
+  "@earlier": {
+    "description": "Segment in the give-dose sheet: the dose was given at an earlier time, which is then picked."
+  },
   "givenWhen": "Given {when}",
   "@givenWhen": {
+    "description": "In the give-dose sheet after picking an earlier time: {when} is one of the when… messages.",
     "placeholders": {
       "when": {
         "type": "String"
@@ -984,6 +1178,9 @@
     }
   },
   "change": "Change",
+  "@change": {
+    "description": "Button beside the picked time in the give-dose sheet: pick a different one."
+  },
   "dose": "Dose",
   "@dose": {
     "description": "Field label when logging a dose: the amount given, as the user types it."
@@ -993,24 +1190,52 @@
     "description": "Field label when logging a dose: who gave it."
   },
   "optional": "Optional",
+  "@optional": {
+    "description": "Hint shown inside an empty optional text field: Given by, Notes, the owner's name, Warn at."
+  },
   "notes": "Notes",
   "@notes": {
     "description": "Field label when logging a dose: free-text notes."
   },
   "saveCorrection": "Save correction",
+  "@saveCorrection": {
+    "description": "Button that saves a correction of a logged dose."
+  },
   "logDose": "Log dose",
+  "@logDose": {
+    "description": "Button that saves a new dose."
+  },
   "doseHistorySaved": "Dose history saved",
+  "@doseHistorySaved": {
+    "description": "Confirmation after the dose history was saved as a CSV file."
+  },
   "correctTimeOrDetails": "Correct time or details",
   "@correctTimeOrDetails": {
     "description": "Menu item on a history entry: opens the correction screen."
   },
   "keepsOriginal": "Keeps the original, marked as corrected",
+  "@keepsOriginal": {
+    "description": "Subtitle under 'Correct time or details' in a history entry's menu."
+  },
   "deleteEntry": "Delete entry",
+  "@deleteEntry": {
+    "description": "Menu item on a history entry: removes it from history altogether. Only for an entry that should never have been logged."
+  },
   "deleteEntrySkippedHint": "The dose becomes due again",
+  "@deleteEntrySkippedHint": {
+    "description": "Subtitle under 'Delete entry' for a skipped dose: without the skip, the dose is due again."
+  },
   "deleteEntryHint": "Only for a dose that was never given",
+  "@deleteEntryHint": {
+    "description": "Subtitle under 'Delete entry' for a given dose."
+  },
   "deleteEntryTitle": "Delete this entry?",
+  "@deleteEntryTitle": {
+    "description": "Title of the confirmation before a history entry is deleted."
+  },
   "deleteSkippedMessage": "{medication}, {dateTime}, skipped. Delete it if the dose wasn't meant to be skipped.",
   "@deleteSkippedMessage": {
+    "description": "Body of the delete confirmation for a skipped dose. {medication} is a name typed by the user, {dateTime} when the dose was due.",
     "placeholders": {
       "medication": {
         "type": "String"
@@ -1022,6 +1247,7 @@
   },
   "deleteDoseMessage": "{medication}, {dateTime}. Use this only if the dose was never given; to fix its time, correct it instead. Any corrections of it go too.",
   "@deleteDoseMessage": {
+    "description": "Body of the delete confirmation for a given dose. {medication} is a name typed by the user, {dateTime} when it was given.",
     "placeholders": {
       "medication": {
         "type": "String"
@@ -1032,9 +1258,16 @@
     }
   },
   "delete": "Delete",
+  "@delete": {
+    "description": "Confirming button of the delete dialogs (history entry, medication, person) and the Delete item in a person's menu on the People screen."
+  },
   "yourDoses": "Your doses",
+  "@yourDoses": {
+    "description": "Title of the dose history screen for the phone's owner."
+  },
   "personsDoses": "{name}'s doses",
   "@personsDoses": {
+    "description": "Title of the dose history screen for someone else: {name} is their name typed by the user.",
     "placeholders": {
       "name": {
         "type": "String"
@@ -1042,9 +1275,16 @@
     }
   },
   "doses": "Doses",
+  "@doses": {
+    "description": "Fallback title of the dose history screen when it is filtered to a medication that has since been deleted."
+  },
   "saveAsCsv": "Save as a spreadsheet (CSV)",
+  "@saveAsCsv": {
+    "description": "Accessibility label of the download button on the dose history screen."
+  },
   "onlyMedication": "Only {medication}",
   "@onlyMedication": {
+    "description": "Filter chip at the top of the dose history when it shows one medication: {medication} is a name typed by the user. Removing the chip shows everything.",
     "placeholders": {
       "medication": {
         "type": "String"
@@ -1052,8 +1292,12 @@
     }
   },
   "nothingLogged": "Nothing logged yet.",
+  "@nothingLogged": {
+    "description": "Dose history screen with no entries yet."
+  },
   "historyBy": "by {name}",
   "@historyBy": {
+    "description": "In a history entry's detail line, after the dose amount: who gave it, e.g. '1 tablet · by Sam'. {name} is as typed when logging.",
     "placeholders": {
       "name": {
         "type": "String"
@@ -1061,25 +1305,80 @@
     }
   },
   "historyCorrection": "correction",
+  "@historyCorrection": {
+    "description": "Tag in a history entry's detail line: this entry is a correction of an earlier one."
+  },
   "historyCorrected": "corrected",
+  "@historyCorrected": {
+    "description": "Tag in a history entry's detail line: this entry was replaced by a correction and is shown struck through."
+  },
   "defaultDose": "1 tablet",
+  "@defaultDose": {
+    "description": "The usual dose prefilled when adding a medication; the user can change it."
+  },
   "errorName": "Give the medication a name.",
+  "@errorName": {
+    "description": "Validation error under the Name field of the medication editor."
+  },
   "errorDose": "Say what one dose is, like \"1 tablet\".",
+  "@errorDose": {
+    "description": "Validation error under the Usual dose field of the medication editor."
+  },
   "errorHowOften": "Choose how often.",
+  "@errorHowOften": {
+    "description": "Validation error in the editor's When section: the interval is zero."
+  },
   "errorShortestGap": "Choose the shortest gap between doses.",
+  "@errorShortestGap": {
+    "description": "Validation error in the editor's When section: the as-needed minimum gap is zero."
+  },
   "errorAddTime": "Add at least one time.",
+  "@errorAddTime": {
+    "description": "Validation error in the editor's When section: a set-times schedule has no times."
+  },
   "errorDosesStillToGive": "Enter how many doses are still to give.",
+  "@errorDosesStillToGive": {
+    "description": "Validation error under the 'Doses still to give' field of a course some of whose doses have been given."
+  },
   "errorCourseDoses": "Enter how many doses the course has.",
+  "@errorCourseDoses": {
+    "description": "Validation error under the 'Number of doses' field of a new course."
+  },
   "errorStartingSupply": "Enter how much there is to start with.",
+  "@errorStartingSupply": {
+    "description": "Validation error in the editor's Supply section: Starting amount is missing or negative."
+  },
   "errorPerDose": "Enter how much one dose uses.",
+  "@errorPerDose": {
+    "description": "Validation error in the editor's Supply section: Each dose uses is missing or zero."
+  },
   "errorLowAt": "Enter when to warn, or leave it empty.",
+  "@errorLowAt": {
+    "description": "Validation error in the editor's Supply section: Warn at isn't a number."
+  },
   "errorNoSteps": "Add at least one step.",
+  "@errorNoSteps": {
+    "description": "Validation error in the editor's When section: the taper has no steps."
+  },
   "errorStepInterval": "Every step needs an interval.",
+  "@errorStepInterval": {
+    "description": "Validation error in the taper editor: a step's interval is zero."
+  },
   "errorStepEnds": "A step has to end after it starts.",
+  "@errorStepEnds": {
+    "description": "Validation error in the taper editor: a step's end date is on or before its start."
+  },
   "errorOpenEnded": "Only the last step can be open-ended.",
+  "@errorOpenEnded": {
+    "description": "Validation error in the taper editor: a step other than the last has no end date."
+  },
   "errorStepsOverlap": "Two steps overlap.",
+  "@errorStepsOverlap": {
+    "description": "Validation error in the taper editor: one step ends after the next begins."
+  },
   "deleteMedicationTitle": "Delete {medication}?",
   "@deleteMedicationTitle": {
+    "description": "Title of the confirmation before a medication is deleted. {medication} is a name typed by the user.",
     "placeholders": {
       "medication": {
         "type": "String"
@@ -1087,9 +1386,16 @@
     }
   },
   "deleteMedicationMessage": "Its dose history goes with it. To stop it but keep the history, turn off \"Taking this now\" instead.",
+  "@deleteMedicationMessage": {
+    "description": "Body of the delete-medication confirmation. 'Taking this now' is the editor switch takingThisNow; use the same words."
+  },
   "newMedication": "New medication",
+  "@newMedication": {
+    "description": "Title of the medication editor when adding."
+  },
   "editMedication": "Edit {medication}",
   "@editMedication": {
+    "description": "Title of the medication editor when editing: {medication} is a name typed by the user.",
     "placeholders": {
       "medication": {
         "type": "String"
@@ -1097,6 +1403,9 @@
     }
   },
   "save": "Save",
+  "@save": {
+    "description": "Button in the editor's top bar, and the confirming button of the person dialog when renaming."
+  },
   "forPerson": "For {person}",
   "@forPerson": {
     "description": "Heading of the medication editor: whose medication this is. {person} is a name typed by the user.",
@@ -1107,47 +1416,156 @@
     }
   },
   "fieldName": "Name",
+  "@fieldName": {
+    "description": "Label of the medication's name field in the editor, and of the name field in the add-person dialog."
+  },
   "fieldNameHint": "e.g. Amoxicillin",
+  "@fieldNameHint": {
+    "description": "Hint inside the empty Name field of the medication editor; the example is a medication name."
+  },
   "fieldStrength": "Strength",
+  "@fieldStrength": {
+    "description": "Field label in the medication editor: the strength printed on the pack, e.g. '500 mg'. Shown after the name on the card."
+  },
   "fieldStrengthHint": "Optional, e.g. 500 mg",
+  "@fieldStrengthHint": {
+    "description": "Hint inside the empty Strength field."
+  },
   "fieldPurpose": "What it's for",
+  "@fieldPurpose": {
+    "description": "Field label in the medication editor: what the medication is for. Shown on the card and in reminders."
+  },
   "fieldPurposeHint": "Optional, e.g. blood pressure",
+  "@fieldPurposeHint": {
+    "description": "Hint inside the empty 'What it's for' field."
+  },
   "fieldUsualDose": "Usual dose",
+  "@fieldUsualDose": {
+    "description": "Field label in the medication editor: the amount usually given, prefilled when logging a dose."
+  },
   "fieldUsualDoseHint": "e.g. 1 tablet, 5 ml",
+  "@fieldUsualDoseHint": {
+    "description": "Hint inside the empty Usual dose field."
+  },
   "fieldInstructions": "Instructions",
+  "@fieldInstructions": {
+    "description": "Field label in the medication editor: free-text instructions, shown on the card."
+  },
   "fieldInstructionsHint": "Optional, e.g. with food",
+  "@fieldInstructionsHint": {
+    "description": "Hint inside the empty Instructions field."
+  },
   "sectionWhen": "When",
+  "@sectionWhen": {
+    "description": "Heading of the editor section that sets the schedule."
+  },
   "sectionHowLong": "How long",
+  "@sectionHowLong": {
+    "description": "Heading of the editor section that sets how long the course runs."
+  },
   "sectionReminders": "Reminders",
+  "@sectionReminders": {
+    "description": "Heading of the editor's reminder section, of the Reminders section in Settings, and title of the per-person reminder switch on the People screen."
+  },
   "sectionSupply": "Supply",
+  "@sectionSupply": {
+    "description": "Heading of the editor section that tracks how much is left."
+  },
   "takingThisNow": "Taking this now",
+  "@takingThisNow": {
+    "description": "Switch in the editor of an existing medication: on while it's being taken; turning it off stops it but keeps its history. Named in deleteMedicationMessage and courseOngoingHint."
+  },
   "takingThisNowHint": "Turn off when it's stopped. It keeps its history but stops reminding.",
+  "@takingThisNowHint": {
+    "description": "Subtitle of the 'Taking this now' switch."
+  },
   "deleteMedication": "Delete medication",
+  "@deleteMedication": {
+    "description": "Item at the bottom of the medication editor: deletes the medication and its history after confirming."
+  },
   "addMedication": "Add medication",
+  "@addMedication": {
+    "description": "Label of the add button on the home screen, and of the editor's save button when adding."
+  },
   "saveChanges": "Save changes",
+  "@saveChanges": {
+    "description": "Save button at the bottom of the medication editor when editing."
+  },
   "kindInterval": "Every few hours",
+  "@kindInterval": {
+    "description": "Schedule-kind chip in the editor: a dose every so many hours, counted from the last dose given."
+  },
   "kindFixedTimes": "At set times",
+  "@kindFixedTimes": {
+    "description": "Schedule-kind chip in the editor: at set clock times every day."
+  },
   "kindAsNeeded": "As needed",
   "@kindAsNeeded": {
     "description": "Kind of schedule, chosen when editing a medication: given only when needed, with a minimum gap between doses."
   },
   "kindTaper": "Taper",
+  "@kindTaper": {
+    "description": "Schedule-kind chip in the editor: a taper, steps with dates and a different interval each."
+  },
   "kindOnce": "Once",
+  "@kindOnce": {
+    "description": "Schedule-kind chip in the editor: a single dose at one date and time."
+  },
   "every": "Every",
+  "@every": {
+    "description": "Heading over the duration field for an interval schedule: 'Every', then hours and minutes boxes."
+  },
   "intervalHint": "Counted from the last dose given.",
+  "@intervalHint": {
+    "description": "Hint under the interval duration field."
+  },
   "atLeastApart": "At least this long apart",
+  "@atLeastApart": {
+    "description": "Heading over the duration field for an as-needed schedule: the minimum gap between doses."
+  },
   "asNeededHint": "Never \"due\" — Nexpill shows when it can be given again.",
+  "@asNeededHint": {
+    "description": "Hint under the as-needed gap. 'due' is the status word: an as-needed dose is allowed, never required, so the app never calls it due."
+  },
   "addTime": "Add time",
+  "@addTime": {
+    "description": "Chip in the set-times schedule that opens the time picker to add a time."
+  },
   "fixedTimesHint": "Every day, on this phone's clock.",
+  "@fixedTimesHint": {
+    "description": "Hint under the set times."
+  },
   "timeOfDose": "Time of dose",
+  "@timeOfDose": {
+    "description": "Title of the time picker for a set time, or for a single dose."
+  },
   "onceHint": "A single dose. Once it's given or skipped it's finished, and stays in history.",
+  "@onceHint": {
+    "description": "Hint under the single dose's date and time."
+  },
   "dayOfDose": "Day of the dose",
+  "@dayOfDose": {
+    "description": "Title of the date picker for a single dose."
+  },
   "courseUntilStopped": "Until stopped",
+  "@courseUntilStopped": {
+    "description": "How-long chip in the editor: the medication carries on until stopped."
+  },
   "courseUntilDate": "Until a date",
+  "@courseUntilDate": {
+    "description": "How-long chip in the editor: the medication runs through a last day."
+  },
   "courseNumberOfDoses": "A number of doses",
+  "@courseNumberOfDoses": {
+    "description": "How-long chip in the editor: the medication runs for a set number of doses."
+  },
   "courseOngoingHint": "Reminders carry on until you turn off \"Taking this now\".",
+  "@courseOngoingHint": {
+    "description": "Hint under 'Until stopped'. 'Taking this now' is the editor switch takingThisNow; use the same words."
+  },
   "courseLastDayChip": "Last day: {date}",
   "@courseLastDayChip": {
+    "description": "Chip showing the course's last day, {date}; tapping it picks a date.",
     "placeholders": {
       "date": {
         "type": "String"
@@ -1155,12 +1573,28 @@
     }
   },
   "courseLastDayHint": "Doses carry on through that day; reminders stop at midnight at the end of it.",
+  "@courseLastDayHint": {
+    "description": "Hint under the last-day chip."
+  },
   "dosesStillToGive": "Doses still to give",
+  "@dosesStillToGive": {
+    "description": "Label of the number field for a course of doses when some have already been given."
+  },
   "numberOfDoses": "Number of doses",
+  "@numberOfDoses": {
+    "description": "Label of the number field for a new course of doses."
+  },
   "dosesHint": "e.g. 10",
+  "@dosesHint": {
+    "description": "Hint inside the empty number-of-doses field."
+  },
   "courseDosesHint": "Reminders stop once the last one is given.",
+  "@courseDosesHint": {
+    "description": "Hint under the number of doses of a new course."
+  },
   "courseDosesGivenHint": "{count, plural, =1{1 dose given so far. Reminders stop once the last one is given.} other{{count} doses given so far. Reminders stop once the last one is given.}}",
   "@courseDosesGivenHint": {
+    "description": "Hint under 'Doses still to give' when {count} doses of the course have already been given.",
     "placeholders": {
       "count": {
         "type": "int"
@@ -1168,8 +1602,12 @@
     }
   },
   "lastDayOfCourse": "Last day of the course",
+  "@lastDayOfCourse": {
+    "description": "Title of the date picker for the course's last day."
+  },
   "taperStepNumber": "Step {number}",
   "@taperStepNumber": {
+    "description": "Heading of each step in the taper editor: {number} counts from 1.",
     "placeholders": {
       "number": {
         "type": "int"
@@ -1177,6 +1615,9 @@
     }
   },
   "removeStep": "Remove step",
+  "@removeStep": {
+    "description": "Accessibility label of the X button on a taper step."
+  },
   "stepFrom": "From {date}",
   "@stepFrom": {
     "description": "Taper editor: button showing a step's first day; tapping it picks the date.",
@@ -1187,6 +1628,9 @@
     }
   },
   "noEndDate": "No end date",
+  "@noEndDate": {
+    "description": "Chip on a taper step that has no end date; tapping it picks one."
+  },
   "stepUntil": "Until {date}",
   "@stepUntil": {
     "description": "Taper editor: button showing a step's last day; tapping it picks the date.",
@@ -1197,13 +1641,37 @@
     }
   },
   "clearEnd": "Clear end",
+  "@clearEnd": {
+    "description": "Chip on a taper step: removes its end date, making it open-ended."
+  },
   "addStep": "Add a step",
+  "@addStep": {
+    "description": "Button in the taper editor that adds a step."
+  },
   "taperHint": "Each step runs from midnight on its first day until midnight on its end day. The last step can be open-ended.",
+  "@taperHint": {
+    "description": "Hint under the taper steps."
+  },
   "remindMe": "Remind me",
+  "@remindMe": {
+    "description": "Switch in the editor's Reminders section: reminders on or off for this medication."
+  },
   "remindAsNeededHint": "When it can be given again.",
+  "@remindAsNeededHint": {
+    "description": "Subtitle of the Remind me switch for an as-needed medication: it reminds when a dose is allowed again."
+  },
   "remindHint": "When a dose is due, and again while it's overdue.",
+  "@remindHint": {
+    "description": "Subtitle of the Remind me switch for a scheduled medication."
+  },
   "headsUp": "Heads-up before it's due",
+  "@headsUp": {
+    "description": "Reminder setting: a reminder some minutes before the dose is due. Choices: None, 10 min, 15 min."
+  },
   "none": "None",
+  "@none": {
+    "description": "Choice in the heads-up setting: no early reminder."
+  },
   "minutesShort": "{count} min",
   "@minutesShort": {
     "description": "Choice in the editor's reminder-timing dropdown, e.g. '10 min'.",
@@ -1214,8 +1682,12 @@
     }
   },
   "repeatWhileOverdue": "Repeat while overdue",
+  "@repeatWhileOverdue": {
+    "description": "Reminder setting: how often the reminder repeats while the dose is overdue; the dropdown lists everyDuration choices."
+  },
   "everyDuration": "every {duration}",
   "@everyDuration": {
+    "description": "Choice in the repeat-while-overdue dropdown: {duration} is a short duration, e.g. 'every 30 min', 'every 1 hr'.",
     "placeholders": {
       "duration": {
         "type": "String"
@@ -1223,22 +1695,68 @@
     }
   },
   "ringLikeAlarm": "Ring like an alarm",
+  "@ringLikeAlarm": {
+    "description": "Switch in the editor's Reminders section: the reminder rings as an alarm rather than a normal notification."
+  },
   "ringLikeAlarmHint": "The alarm sound, repeating until you mark it given or snooze it.",
+  "@ringLikeAlarmHint": {
+    "description": "Subtitle of the Ring like an alarm switch."
+  },
   "trackSupply": "Track how much is left",
+  "@trackSupply": {
+    "description": "Switch in the editor's Supply section: count down how much is left with each dose."
+  },
   "trackSupplyHint": "Counts down with each dose logged.",
+  "@trackSupplyHint": {
+    "description": "Subtitle of the Track how much is left switch."
+  },
   "startingAmount": "Starting amount",
+  "@startingAmount": {
+    "description": "Field label in the Supply section: how much there is when tracking starts."
+  },
   "unit": "Unit",
+  "@unit": {
+    "description": "Field label in the Supply section: what the supply is counted in, e.g. tablets, ml."
+  },
   "unitHint": "tablets",
+  "@unitHint": {
+    "description": "Hint inside the empty Unit field."
+  },
   "eachDoseUses": "Each dose uses",
+  "@eachDoseUses": {
+    "description": "Field label in the Supply section: how much of the supply one dose uses."
+  },
   "warnAt": "Warn at",
+  "@warnAt": {
+    "description": "Field label in the Supply section: the amount left at which the card and summary say 'running low'. Optional."
+  },
   "everyone": "Everyone",
+  "@everyone": {
+    "description": "Title of the home screen when caring for more than one person: each of them with what's next."
+  },
   "managePeople": "Manage people",
+  "@managePeople": {
+    "description": "Accessibility label of the people button on the Everyone screen, and an item in the person switcher: opens the People screen."
+  },
   "settings": "Settings",
+  "@settings": {
+    "description": "Title of the Settings screen and accessibility label of the settings button."
+  },
   "addSomeone": "Add someone",
+  "@addSomeone": {
+    "description": "Button that adds a person: on the Everyone screen, the People screen and in the person switcher."
+  },
   "noMedicationsYet": "No medications yet",
+  "@noMedicationsYet": {
+    "description": "Heading on a person's empty home screen, and under their name on the Everyone screen: nothing added for them yet."
+  },
   "nothingToGiveNow": "Nothing to give now",
+  "@nothingToGiveNow": {
+    "description": "Heading on a person's home screen, and under their name on the Everyone screen, when every medication has finished or been stopped."
+  },
   "moreDueNow": "+ {count} more due now",
   "@moreDueNow": {
+    "description": "On the Everyone screen under the person's first medication: {count} more of their medications are also due or overdue now.",
     "placeholders": {
       "count": {
         "type": "int"
@@ -1246,18 +1764,52 @@
     }
   },
   "remindersOffShort": "Reminders off",
+  "@remindersOffShort": {
+    "description": "Under a person on the Everyone screen whose reminders are all off, and the button in the skip message that turns a medication's reminders off."
+  },
   "errorEnterName": "Enter a name.",
+  "@errorEnterName": {
+    "description": "Error in the add-person dialog when the name is empty."
+  },
   "errorNameTaken": "Someone already has that name.",
+  "@errorNameTaken": {
+    "description": "Error in the add-person dialog when another person already has that name."
+  },
   "whoAreYouCaringFor": "Who are you caring for?",
+  "@whoAreYouCaringFor": {
+    "description": "Title of the dialog that adds a person."
+  },
   "rename": "Rename",
+  "@rename": {
+    "description": "Title of the person dialog when renaming, and the item in a person's menu on the People screen."
+  },
   "yourName": "Your name",
+  "@yourName": {
+    "description": "Title of the person dialog when the phone's owner adds their name; also the label of the name field while 'This is me' is ticked, and in the summary-name dialog."
+  },
   "nameHint": "A first name or nickname is fine",
+  "@nameHint": {
+    "description": "Hint inside the empty name field when adding someone else."
+  },
   "thisIsMe": "This is me",
+  "@thisIsMe": {
+    "description": "Checkbox in the add-person dialog: this person is the phone's owner."
+  },
   "forYourOwnMedications": "For your own medications",
+  "@forYourOwnMedications": {
+    "description": "Subtitle under the 'This is me' checkbox."
+  },
   "add": "Add",
+  "@add": {
+    "description": "Confirming button of the add-person dialog."
+  },
   "deleteYourMedicationsTitle": "Delete your medications?",
+  "@deleteYourMedicationsTitle": {
+    "description": "Title of the confirmation before the phone's owner is removed on the People screen."
+  },
   "deletePersonTitle": "Delete {name}?",
   "@deletePersonTitle": {
+    "description": "Title of the confirmation before someone else is removed on the People screen: {name} is their name typed by the user.",
     "placeholders": {
       "name": {
         "type": "String"
@@ -1266,6 +1818,7 @@
   },
   "deleteYourMedicationsMessage": "{count, plural, =1{Your medication and all dose history go too, and can't be brought back unless you have a backup file.} other{Your {count} medications and all dose history go too, and can't be brought back unless you have a backup file.}}",
   "@deleteYourMedicationsMessage": {
+    "description": "Body of the confirmation before the phone's owner is removed: {count} is how many medications they have.",
     "placeholders": {
       "count": {
         "type": "int"
@@ -1274,6 +1827,7 @@
   },
   "deletePersonMessage": "{count, plural, =1{Their medication and all dose history go too, and can't be brought back unless you have a backup file.} other{Their {count} medications and all dose history go too, and can't be brought back unless you have a backup file.}}",
   "@deletePersonMessage": {
+    "description": "Body of the confirmation before someone else is removed: {count} is how many medications they have.",
     "placeholders": {
       "count": {
         "type": "int"
@@ -1281,8 +1835,12 @@
     }
   },
   "people": "People",
+  "@people": {
+    "description": "Title of the People screen and heading of the People section in Settings."
+  },
   "tapToSeeThem": "{count} · tap to see them",
   "@tapToSeeThem": {
+    "description": "Subtitle under a person on the People screen: {count} is medicationCount, e.g. '2 medications · tap to see them'.",
     "placeholders": {
       "count": {
         "type": "String"
@@ -1290,9 +1848,16 @@
     }
   },
   "addYourName": "Add your name",
+  "@addYourName": {
+    "description": "Item in the phone's owner's menu on the People screen when they have no name yet."
+  },
   "asSetForEach": "As set for each medication",
+  "@asSetForEach": {
+    "description": "Subtitle of a person's Reminders switch on the People screen when on: each medication's own setting applies."
+  },
   "allOffFor": "All off for {person}",
   "@allOffFor": {
+    "description": "Subtitle of a person's Reminders switch on the People screen when off: {person} is their name typed by the user, or personYouAfterFor.",
     "placeholders": {
       "person": {
         "type": "String"
@@ -1301,6 +1866,7 @@
   },
   "medicationCount": "{count, plural, =1{1 medication} other{{count} medications}}",
   "@medicationCount": {
+    "description": "How many active medications a person has: under their name on the People screen, and in the restore confirmation.",
     "placeholders": {
       "count": {
         "type": "int"
@@ -1320,8 +1886,12 @@
     }
   },
   "undo": "Undo",
+  "@undo": {
+    "description": "Button on the message after a dose is logged or skipped, a medication is stopped or its reminders turned off: reverses it."
+  },
   "skippedInARow": "{medication}: skipped {count} times in a row",
   "@skippedInARow": {
+    "description": "Message after the third skip in a row, offering to turn the reminders off: {medication} is a name typed by the user, {count} is 3 or more.",
     "placeholders": {
       "medication": {
         "type": "String"
@@ -1333,6 +1903,7 @@
   },
   "medicationSkipped": "{medication}: {skipped}",
   "@medicationSkipped": {
+    "description": "Message after a dose is skipped: {medication} is a name typed by the user, {skipped} is skippedDose.",
     "placeholders": {
       "medication": {
         "type": "String"
@@ -1344,6 +1915,7 @@
   },
   "remindersOffFor": "Reminders off for {medication}. Turn them on again in Edit.",
   "@remindersOffFor": {
+    "description": "Message after reminders were turned off from the skip message. 'Edit' is the card menu item edit; use the same word.",
     "placeholders": {
       "medication": {
         "type": "String"
@@ -1352,6 +1924,7 @@
   },
   "medicationStopped": "{medication} stopped. Its history is kept.",
   "@medicationStopped": {
+    "description": "Message after Stop taking: {medication} is a name typed by the user.",
     "placeholders": {
       "medication": {
         "type": "String"
@@ -1359,10 +1932,20 @@
     }
   },
   "remindersAreOff": "Reminders are off",
+  "@remindersAreOff": {
+    "description": "Title of the banner on the home screen when Android's notification permission is missing."
+  },
   "allowNotificationsHint": "Allow notifications so they can reach you.",
+  "@allowNotificationsHint": {
+    "description": "Subtitle of the reminders-off banner on the home screen."
+  },
   "allow": "Allow",
+  "@allow": {
+    "description": "Button on the reminders-off banner and in Settings: asks Android for notification permission."
+  },
   "remindersAreOffFor": "Reminders are off for {person}.",
   "@remindersAreOffFor": {
+    "description": "Note at the top of a person's home screen when their Reminders switch is off: {person} is their name typed by the user, or personYouAfterFor.",
     "placeholders": {
       "person": {
         "type": "String"
@@ -1370,8 +1953,12 @@
     }
   },
   "addYourFirst": "Add your first one, and Nexpill will keep track of when each dose can be given.",
+  "@addYourFirst": {
+    "description": "Text under 'No medications yet' on the phone's owner's own screen."
+  },
   "addPersonsFirst": "Add {name}'s first one, and Nexpill will keep track of when each dose can be given.",
   "@addPersonsFirst": {
+    "description": "Text under 'No medications yet' on someone else's screen: {name} is their name typed by the user.",
     "placeholders": {
       "name": {
         "type": "String"
@@ -1379,8 +1966,12 @@
     }
   },
   "allEndedForYou": "Everything for you has finished or been stopped. It's all below, with its history.",
+  "@allEndedForYou": {
+    "description": "Text under 'Nothing to give now' on the phone's owner's screen."
+  },
   "allEndedForPerson": "Everything for {name} has finished or been stopped. It's all below, with its history.",
   "@allEndedForPerson": {
+    "description": "Text under 'Nothing to give now' on someone else's screen: {name} is their name typed by the user.",
     "placeholders": {
       "name": {
         "type": "String"
@@ -1388,9 +1979,16 @@
     }
   },
   "addAMedication": "Add a medication",
+  "@addAMedication": {
+    "description": "Button under the empty-screen text on the home screen."
+  },
   "addAnotherMedication": "Add another medication",
+  "@addAnotherMedication": {
+    "description": "Button below the medication cards on the phone's owner's screen."
+  },
   "addMedicationFor": "Add a medication for {name}",
   "@addMedicationFor": {
+    "description": "Button below the medication cards on someone else's screen: {name} is their name typed by the user.",
     "placeholders": {
       "name": {
         "type": "String"
@@ -1399,6 +1997,7 @@
   },
   "endedStopped": "Stopped ({count})",
   "@endedStopped": {
+    "description": "Heading of the collapsed list at the bottom of the home screen: {count} medications have been stopped.",
     "placeholders": {
       "count": {
         "type": "int"
@@ -1407,6 +2006,7 @@
   },
   "endedFinished": "Finished ({count})",
   "@endedFinished": {
+    "description": "Heading of the collapsed list at the bottom of the home screen: {count} courses have finished.",
     "placeholders": {
       "count": {
         "type": "int"
@@ -1415,6 +2015,7 @@
   },
   "endedBoth": "Finished and stopped ({count})",
   "@endedBoth": {
+    "description": "Heading of the collapsed list at the bottom of the home screen: {count} medications, some finished and some stopped.",
     "placeholders": {
       "count": {
         "type": "int"
@@ -1422,15 +2023,40 @@
     }
   },
   "resume": "Resume",
+  "@resume": {
+    "description": "Button on a stopped medication in that list: start taking it again."
+  },
   "logoLabel": "Nexpill logo",
+  "@logoLabel": {
+    "description": "Accessibility label of the logo on the welcome screen."
+  },
   "welcomeWhat": "Keeps track of when each dose was given and when the next one can be, and reminds you on time.",
+  "@welcomeWhat": {
+    "description": "Welcome screen on first run: what Nexpill does."
+  },
   "welcomePrivate": "Everything stays on this phone. No account, no internet.",
+  "@welcomePrivate": {
+    "description": "Welcome screen: the privacy reassurance under what Nexpill does."
+  },
   "whoAreTheMedicationsFor": "Who are the medications for?",
+  "@whoAreTheMedicationsFor": {
+    "description": "Question on the welcome screen, above the two buttons."
+  },
   "me": "Me",
+  "@me": {
+    "description": "Welcome screen button: the medications are the phone's owner's."
+  },
   "someoneICareFor": "Someone I care for",
+  "@someoneICareFor": {
+    "description": "Welcome screen button: adds someone else."
+  },
   "addMoreLater": "You can add more people later.",
+  "@addMoreLater": {
+    "description": "Note under the welcome screen buttons."
+  },
   "noBrowser": "No browser to open it with. Visit {website} instead.",
   "@noBrowser": {
+    "description": "Message when the Website or Send feedback link can't be opened: {website} is the site's address.",
     "placeholders": {
       "website": {
         "type": "String"
@@ -1438,12 +2064,28 @@
     }
   },
   "backupSaved": "Backup saved",
+  "@backupSaved": {
+    "description": "Confirmation after the backup file was saved."
+  },
   "couldNotOpen": "Couldn't open that file.",
+  "@couldNotOpen": {
+    "description": "Message when the chosen backup file can't be read at all."
+  },
   "cantRestore": "Can't restore this file",
+  "@cantRestore": {
+    "description": "Title of the dialog saying why a backup file was refused; its body is one of the backup… messages."
+  },
   "ok": "OK",
+  "@ok": {
+    "description": "Button closing the 'Can't restore this file' dialog."
+  },
   "restoreTitle": "Replace everything with this backup?",
+  "@restoreTitle": {
+    "description": "Title of the confirmation before a backup replaces everything on the phone."
+  },
   "peopleCount": "{count, plural, =1{1 person} other{{count} people}}",
   "@peopleCount": {
+    "description": "Fills {people} in restoreMessage.",
     "placeholders": {
       "count": {
         "type": "int"
@@ -1452,6 +2094,7 @@
   },
   "dosesLoggedCount": "{count, plural, =1{1 dose logged} other{{count} doses logged}}",
   "@dosesLoggedCount": {
+    "description": "Fills {doses} in restoreMessage.",
     "placeholders": {
       "count": {
         "type": "int"
@@ -1460,6 +2103,7 @@
   },
   "restoreMessage": "It has {people}, {medications} and {doses}. Everything now on this phone will be replaced by it.",
   "@restoreMessage": {
+    "description": "Body of the restore confirmation: {people} is peopleCount, {medications} is medicationCount, {doses} is dosesLoggedCount.",
     "placeholders": {
       "people": {
         "type": "String"
@@ -1473,26 +2117,84 @@
     }
   },
   "replace": "Replace",
+  "@replace": {
+    "description": "Confirming button of the restore confirmation."
+  },
   "restored": "Restored",
+  "@restored": {
+    "description": "Message after a backup was restored."
+  },
   "summaryFor": "Summary for",
+  "@summaryFor": {
+    "description": "Title of the dialog choosing whose medication summary to save, when there is more than one person."
+  },
   "summarySaved": "Summary saved",
+  "@summarySaved": {
+    "description": "Confirmation after the medication summary file was saved."
+  },
   "yourNameOnSummary": "Your name on the summary",
+  "@yourNameOnSummary": {
+    "description": "Title of the dialog asking the phone's owner, who has no name set, for a name to put on the summary."
+  },
   "continueAction": "Continue",
+  "@continueAction": {
+    "description": "Confirming button of the summary-name dialog; an empty name is fine."
+  },
   "deleteAllTitle": "Delete all data?",
+  "@deleteAllTitle": {
+    "description": "Title of the confirmation in Settings before all data is deleted."
+  },
   "deleteAllMessage": "Every person, medication and dose on this phone, and every reminder. This can't be undone; if you might want it back, save a backup first.",
+  "@deleteAllMessage": {
+    "description": "Body of the delete-all confirmation."
+  },
   "deleteEverything": "Delete everything",
+  "@deleteEverything": {
+    "description": "Confirming button of the delete-all confirmation."
+  },
   "notificationsOff": "Notifications are off",
+  "@notificationsOff": {
+    "description": "Settings → Reminders: Android's notification permission is missing."
+  },
   "notificationsOn": "Notifications are on",
+  "@notificationsOn": {
+    "description": "Settings → Reminders: notifications are allowed."
+  },
   "notificationsOffHint": "Reminders can't be shown until they're allowed.",
+  "@notificationsOffHint": {
+    "description": "Subtitle under 'Notifications are off' in Settings."
+  },
   "notificationsOnHint": "Reminders will show on this phone.",
+  "@notificationsOnHint": {
+    "description": "Subtitle under 'Notifications are on' in Settings."
+  },
   "mayBeLate": "Reminders may be late",
+  "@mayBeLate": {
+    "description": "Warning in Settings → Reminders when Android has taken away exact alarms."
+  },
   "mayBeLateHint": "Android has turned off exact alarms for Nexpill. Turn \"Alarms & reminders\" back on in the phone's settings for the app.",
+  "@mayBeLateHint": {
+    "description": "Subtitle of that warning. 'Alarms & reminders' is the Android setting's name; use the phone's own wording in your language."
+  },
   "sendTest": "Send a test reminder",
+  "@sendTest": {
+    "description": "Settings → Reminders item: sends a test notification."
+  },
   "sendTestHint": "Arrives in a few seconds.",
+  "@sendTestHint": {
+    "description": "Subtitle of Send a test reminder."
+  },
   "testOnItsWay": "Test reminder on its way",
+  "@testOnItsWay": {
+    "description": "Message after tapping Send a test reminder."
+  },
   "peopleYouCareFor": "People you care for",
+  "@peopleYouCareFor": {
+    "description": "Settings → People item: opens the People screen."
+  },
   "onThisPhone": "{count} on this phone",
   "@onThisPhone": {
+    "description": "Subtitle of People you care for: {count} is how many people.",
     "placeholders": {
       "count": {
         "type": "int"
@@ -1500,24 +2202,76 @@
     }
   },
   "yourData": "Your data",
+  "@yourData": {
+    "description": "Heading of the Settings section with back up, restore, summary and delete all."
+  },
   "backUp": "Back up to a file",
+  "@backUp": {
+    "description": "Settings item: saves a backup file wherever the user chooses."
+  },
   "backUpHint": "Everything, saved wherever you choose.",
+  "@backUpHint": {
+    "description": "Subtitle of Back up to a file."
+  },
   "restore": "Restore from a backup",
+  "@restore": {
+    "description": "Settings item: restores a backup file, replacing everything on the phone."
+  },
   "restoreHint": "Replaces what's on this phone.",
+  "@restoreHint": {
+    "description": "Subtitle of Restore from a backup."
+  },
   "medicationSummary": "Medication summary",
+  "@medicationSummary": {
+    "description": "Settings item: saves the plain-text medication summary. Same words as summaryTitle."
+  },
   "medicationSummaryHint": "Plain text, for a doctor or a handover.",
+  "@medicationSummaryHint": {
+    "description": "Subtitle of Medication summary."
+  },
   "deleteAllData": "Delete all data",
+  "@deleteAllData": {
+    "description": "Settings item: deletes everything after confirming."
+  },
   "about": "About",
+  "@about": {
+    "description": "Heading of the About section in Settings."
+  },
   "aboutNexpill": "About Nexpill",
+  "@aboutNexpill": {
+    "description": "Settings item that opens the About screen, and that screen's title."
+  },
   "aboutNexpillHint": "Where your data lives, and why it's free",
+  "@aboutNexpillHint": {
+    "description": "Subtitle of About Nexpill in Settings."
+  },
   "website": "Website",
+  "@website": {
+    "description": "Settings item: opens the Nexpill website in the browser."
+  },
   "sendFeedback": "Send feedback",
+  "@sendFeedback": {
+    "description": "Settings item: opens the feedback form on the website in the browser."
+  },
   "sendFeedbackHint": "A form on the website, in your browser.",
+  "@sendFeedbackHint": {
+    "description": "Subtitle of Send feedback."
+  },
   "version": "Version",
+  "@version": {
+    "description": "Settings item label; the version number is its subtitle."
+  },
   "language": "Language",
+  "@language": {
+    "description": "Heading of the Language section in Settings, its item, and the title of the language dialog."
+  },
   "sameAsPhone": "Same as the phone",
+  "@sameAsPhone": {
+    "description": "Choice in the language dialog: follow the phone's language."
+  },
   "sameAsPhoneNow": "Same as the phone: {language}",
   "@sameAsPhoneNow": {
+    "description": "Subtitle of the Language item when following the phone: {language} is the language in use, by its own name.",
     "placeholders": {
       "language": {
         "type": "String"
@@ -1525,22 +2279,68 @@
     }
   },
   "aboutStaysTitle": "It stays on your phone",
+  "@aboutStaysTitle": {
+    "description": "Heading of the first point on the About screen: the data stays on the phone."
+  },
   "aboutStaysBody": "Everything you log is written to a database on this device. There is no account and no server. It only goes anywhere else if you move it yourself, as a backup file or an export.",
+  "@aboutStaysBody": {
+    "description": "Body of the About screen's first point."
+  },
   "aboutCannotSeeTitle": "We cannot see it",
+  "@aboutCannotSeeTitle": {
+    "description": "Heading of the About screen's second point: Nexpill has no internet permission."
+  },
   "aboutCannotSeeBody": "Nexpill is built without permission to use the internet at all. Android enforces that, and you can check it in the app's permission list.",
+  "@aboutCannotSeeBody": {
+    "description": "Body of the About screen's second point."
+  },
   "aboutRemindersTitle": "Reminders come from the phone itself",
+  "@aboutRemindersTitle": {
+    "description": "Heading of the About screen's third point: reminders are local alarms."
+  },
   "aboutRemindersBody": "Each reminder is an alarm this phone holds, so it arrives on time with no signal, in airplane mode, and after a restart.",
+  "@aboutRemindersBody": {
+    "description": "Body of the About screen's third point."
+  },
   "aboutPermissionsTitle": "What the permissions are for",
+  "@aboutPermissionsTitle": {
+    "description": "Heading of the About screen's fourth point: what each permission is for."
+  },
   "aboutPermissionsBody": "Notifications, for reminders. Exact alarms, so they arrive on the minute. Starting after a restart, to set them again. Vibration. That is the whole list.",
+  "@aboutPermissionsBody": {
+    "description": "Body of the About screen's fourth point; name the permissions as Android does in your language."
+  },
   "aboutFreeTitle": "Free, for good",
+  "@aboutFreeTitle": {
+    "description": "Heading of the About screen's fifth point: free and open source for good."
+  },
   "aboutFreeBody": "Nexpill was written by a caregiver, for caregivers. It will always be free and open source: no price, no premium tier, no ads.",
+  "@aboutFreeBody": {
+    "description": "Body of the About screen's fifth point."
+  },
   "aboutCheckTitle": "You can check our work",
+  "@aboutCheckTitle": {
+    "description": "Heading of the About screen's sixth point: the source is open."
+  },
   "aboutCheckBody": "Nexpill is open source under the GNU General Public License. Anyone can read exactly what it does.",
+  "@aboutCheckBody": {
+    "description": "Body of the About screen's sixth point. 'GNU General Public License' is the licence's name."
+  },
   "aboutHeadline": "Your records stay with you.",
+  "@aboutHeadline": {
+    "description": "Headline at the top of the About screen."
+  },
   "aboutIntro": "Nexpill keeps track of when each dose was given and when the next one can be, and reminds you on time. It doesn't give medical advice.",
+  "@aboutIntro": {
+    "description": "Introduction under the About screen's headline."
+  },
   "aboutTradeOff": "One trade-off worth knowing: there is no cloud copy, so a lost or wiped phone means lost history. Save a backup file from Settings now and then, and keep it somewhere other than this phone.",
+  "@aboutTradeOff": {
+    "description": "Small print at the bottom of the About screen: no cloud copy, so save backups."
+  },
   "versionNumber": "Version {version}",
   "@versionNumber": {
+    "description": "Last line of the About screen: {version} is the app version, e.g. '1.2.0'.",
     "placeholders": {
       "version": {
         "type": "String"
