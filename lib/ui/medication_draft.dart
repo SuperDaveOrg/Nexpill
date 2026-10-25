@@ -94,7 +94,7 @@ class MedicationDraft {
   String name = '';
   String strength = '';
   String purpose = '';
-  String dose = '1 tablet';
+  String dose = strings.defaultDose;
   String instructions = '';
   bool active = true;
 
@@ -152,15 +152,15 @@ class MedicationDraft {
   /// What's wrong, field by field; empty when it can be saved.
   Map<String, String> validate() {
     final errors = <String, String>{};
-    if (name.trim().isEmpty) errors['name'] = 'Give the medication a name.';
-    if (dose.trim().isEmpty) errors['dose'] = 'Say what one dose is, like "1 tablet".';
+    if (name.trim().isEmpty) errors['name'] = strings.errorName;
+    if (dose.trim().isEmpty) errors['dose'] = strings.errorDose;
     switch (kind) {
       case ScheduleKind.interval when everyMinutes < 1:
-        errors['schedule'] = 'Choose how often.';
+        errors['schedule'] = strings.errorHowOften;
       case ScheduleKind.prn when prnMinutes < 1:
-        errors['schedule'] = 'Choose the shortest gap between doses.';
+        errors['schedule'] = strings.errorShortestGap;
       case ScheduleKind.fixedTimes when times.isEmpty:
-        errors['schedule'] = 'Add at least one time.';
+        errors['schedule'] = strings.errorAddTime;
       case ScheduleKind.taper:
         final e = _taperError();
         if (e != null) errors['schedule'] = e;
@@ -172,35 +172,35 @@ class MedicationDraft {
       // Once doses have been given, 0 left means the course is complete.
       if (left == null || left < (givenSoFar > 0 ? 0 : 1)) {
         errors['course'] = givenSoFar > 0
-            ? 'Enter how many doses are still to give.'
-            : 'Enter how many doses the course has.';
+            ? strings.errorDosesStillToGive
+            : strings.errorCourseDoses;
       }
     }
     if (trackSupply) {
       final start = _parse(startingQuantity);
       final each = _parse(perDose);
       if (start == null || start < 0) {
-        errors['supply'] = 'Enter how much there is to start with.';
+        errors['supply'] = strings.errorStartingSupply;
       } else if (each == null || each <= 0) {
-        errors['supply'] = 'Enter how much one dose uses.';
+        errors['supply'] = strings.errorPerDose;
       } else if (lowAt != null && lowAt!.trim().isNotEmpty && (_parse(lowAt) ?? -1) < 0) {
-        errors['supply'] = 'Enter when to warn, or leave it empty.';
+        errors['supply'] = strings.errorLowAt;
       }
     }
     return errors;
   }
 
   String? _taperError() {
-    if (taperSteps.isEmpty) return 'Add at least one step.';
+    if (taperSteps.isEmpty) return strings.errorNoSteps;
     final steps = [...taperSteps]..sort((a, b) => a.start.compareTo(b.start));
     for (final (i, s) in steps.indexed) {
-      if (s.minutes < 1) return 'Every step needs an interval.';
+      if (s.minutes < 1) return strings.errorStepInterval;
       if (s.end != null && !s.end!.isAfter(s.start)) {
-        return 'A step has to end after it starts.';
+        return strings.errorStepEnds;
       }
       if (i < steps.length - 1) {
-        if (s.end == null) return 'Only the last step can be open-ended.';
-        if (s.end!.isAfter(steps[i + 1].start)) return 'Two steps overlap.';
+        if (s.end == null) return strings.errorOpenEnded;
+        if (s.end!.isAfter(steps[i + 1].start)) return strings.errorStepsOverlap;
       }
     }
     return null;

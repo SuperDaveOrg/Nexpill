@@ -11,6 +11,7 @@ import 'package:nexpill/ui/care_store.dart';
 import 'package:nexpill/ui/everyone_screen.dart';
 import 'package:nexpill/ui/give_dose_sheet.dart';
 import 'package:nexpill/ui/history_screen.dart';
+import 'package:nexpill/ui/language.dart';
 import 'package:nexpill/ui/layout.dart';
 import 'package:nexpill/ui/medication_card.dart';
 import 'package:nexpill/ui/medication_editor.dart';
@@ -90,10 +91,11 @@ class _CareScreenState extends State<CareScreen> with WidgetsBindingObserver {
         ));
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text('${m.name} logged, ${whenText(dose.givenAt, DateTime.now())}'),
+      content: Text(context.l
+          .doseLogged(m.name, whenText(dose.givenAt, DateTime.now()))),
       persist: false,
       action: SnackBarAction(
-        label: 'Undo',
+        label: context.l.undo,
         onPressed: () => _store.change((repo) => repo.deleteDose(dose.id)),
       ),
     ));
@@ -112,15 +114,16 @@ class _CareScreenState extends State<CareScreen> with WidgetsBindingObserver {
     final offerQuiet = m.reminders.enabled && inARow >= _skipsBeforeOfferingQuiet;
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text(offerQuiet
-          ? '${m.name}: skipped $inARow times in a row'
-          : '${m.name}: ${skippedText(dueAt)}'),
+          ? context.l.skippedInARow(m.name, inARow)
+          : context.l.medicationSkipped(m.name, skippedText(dueAt))),
       // Long enough to read and decide, for the offer.
       duration: offerQuiet ? const Duration(seconds: 10) : const Duration(seconds: 4),
       persist: false,
       action: offerQuiet
-          ? SnackBarAction(label: 'Reminders off', onPressed: () => _quiet(m))
+          ? SnackBarAction(
+              label: context.l.remindersOffShort, onPressed: () => _quiet(m))
           : SnackBarAction(
-              label: 'Undo',
+              label: context.l.undo,
               onPressed: () => _store.change((repo) => repo.deleteDose(skip.id)),
             ),
     ));
@@ -132,10 +135,10 @@ class _CareScreenState extends State<CareScreen> with WidgetsBindingObserver {
         m.copyWith(reminders: m.reminders.copyWith(enabled: false))));
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text('Reminders off for ${m.name}. Turn them on again in Edit.'),
+      content: Text(context.l.remindersOffFor(m.name)),
       persist: false,
       action: SnackBarAction(
-        label: 'Undo',
+        label: context.l.undo,
         onPressed: () => _store.change((repo) => repo.saveMedication(m)),
       ),
     ));
@@ -151,10 +154,10 @@ class _CareScreenState extends State<CareScreen> with WidgetsBindingObserver {
         await _store.change((repo) => repo.setMedicationActive(m.id, false));
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('${m.name} stopped. Its history is kept.'),
+          content: Text(context.l.medicationStopped(m.name)),
           persist: false,
           action: SnackBarAction(
-            label: 'Undo',
+            label: context.l.undo,
             onPressed: () =>
                 _store.change((repo) => repo.setMedicationActive(m.id, true)),
           ),
@@ -180,12 +183,12 @@ class _CareScreenState extends State<CareScreen> with WidgetsBindingObserver {
           const Divider(),
           ListTile(
             leading: const Icon(Icons.person_add_alt),
-            title: const Text('Add someone'),
+            title: Text(context.l.addSomeone),
             onTap: () => Navigator.pop(context, 'add'),
           ),
           ListTile(
             leading: const Icon(Icons.people_outline),
-            title: const Text('Manage people'),
+            title: Text(context.l.managePeople),
             onTap: () => Navigator.pop(context, 'manage'),
           ),
         ]),
@@ -273,12 +276,12 @@ class _CareScreenState extends State<CareScreen> with WidgetsBindingObserver {
         ),
         actions: [
           IconButton(
-            tooltip: 'Dose history',
+            tooltip: context.l.doseHistory,
             icon: const Icon(Icons.history),
             onPressed: () => _push(HistoryScreen(store: _store, patient: patient)),
           ),
           IconButton(
-            tooltip: 'Settings',
+            tooltip: context.l.settings,
             icon: const Icon(Icons.settings_outlined),
             onPressed: () => _push(SettingsScreen(
                 store: _store, onSelectPatient: widget.onSelectPatient)),
@@ -288,7 +291,7 @@ class _CareScreenState extends State<CareScreen> with WidgetsBindingObserver {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _push(MedicationEditor(store: _store, patient: patient)),
         icon: const Icon(Icons.add),
-        label: const Text('Add medication'),
+        label: Text(context.l.addMedication),
       ),
       body: RefreshIndicator(
         onRefresh: _store.refresh,
@@ -303,14 +306,14 @@ class _CareScreenState extends State<CareScreen> with WidgetsBindingObserver {
                   child: ListTile(
                     leading: Icon(Icons.notifications_off_outlined,
                         color: theme.colorScheme.error),
-                    title: const Text('Reminders are off'),
-                    subtitle: const Text('Allow notifications so they can reach you.'),
+                    title: Text(context.l.remindersAreOff),
+                    subtitle: Text(context.l.allowNotificationsHint),
                     trailing: FilledButton(
                       onPressed: () async {
                         await _store.notifications.requestPermission();
                         await _checkNotifications();
                       },
-                      child: const Text('Allow'),
+                      child: Text(context.l.allow),
                     ),
                   ),
                 ),
@@ -318,7 +321,7 @@ class _CareScreenState extends State<CareScreen> with WidgetsBindingObserver {
             if (!patient.notificationsEnabled && active.isNotEmpty)
               Padding(
                 padding: const EdgeInsets.only(bottom: 12, left: 8),
-                child: Text('Reminders are off for ${personInSentence(patient)}.',
+                child: Text(context.l.remindersAreOffFor(personInSentence(patient)),
                     style: theme.textTheme.bodySmall),
               ),
             if (active.isEmpty)
@@ -328,24 +331,27 @@ class _CareScreenState extends State<CareScreen> with WidgetsBindingObserver {
                   Icon(Icons.medication_outlined,
                       size: 48, color: theme.colorScheme.onSurfaceVariant),
                   const SizedBox(height: 12),
-                  Text(meds.isEmpty ? 'No medications yet' : 'Nothing to give now',
+                  Text(
+                      meds.isEmpty
+                          ? context.l.noMedicationsYet
+                          : context.l.nothingToGiveNow,
                       style: theme.textTheme.titleLarge),
                   const SizedBox(height: 6),
                   Text(
-                    meds.isEmpty
-                        ? 'Add ${patient.isSelf ? 'your' : '${patient.displayName}\'s'} '
-                            'first one, and Nexpill will keep track of when each '
-                            'dose can be given.'
-                        : 'Everything for ${personInSentence(patient)} has '
-                            'finished or been stopped. It\'s all below, with its '
-                            'history.',
+                    switch ((meds.isEmpty, patient.isSelf)) {
+                      (true, true) => context.l.addYourFirst,
+                      (true, false) => context.l.addPersonsFirst(patient.displayName),
+                      (false, true) => context.l.allEndedForYou,
+                      (false, false) =>
+                        context.l.allEndedForPerson(patient.displayName),
+                    },
                     textAlign: TextAlign.center,
                     style: theme.textTheme.bodyMedium,
                   ),
                   const SizedBox(height: 20),
                   FilledButton.icon(
                     icon: const Icon(Icons.add),
-                    label: const Text('Add a medication'),
+                    label: Text(context.l.addAMedication),
                     onPressed: () =>
                         _push(MedicationEditor(store: _store, patient: patient)),
                   ),
@@ -374,8 +380,8 @@ class _CareScreenState extends State<CareScreen> with WidgetsBindingObserver {
                 child: OutlinedButton.icon(
                   icon: const Icon(Icons.add),
                   label: Text(patient.isSelf
-                      ? 'Add another medication'
-                      : 'Add a medication for ${patient.displayName}'),
+                      ? context.l.addAnotherMedication
+                      : context.l.addMedicationFor(patient.displayName)),
                   onPressed: () =>
                       _push(MedicationEditor(store: _store, patient: patient)),
                 ),
@@ -385,8 +391,11 @@ class _CareScreenState extends State<CareScreen> with WidgetsBindingObserver {
                 data: theme.copyWith(dividerColor: Colors.transparent),
                 child: ExpansionTile(
                   title: Text(
-                      '${finished.isEmpty ? 'Stopped' : stopped.isEmpty ? 'Finished' : 'Finished and stopped'} '
-                      '($ended)',
+                      finished.isEmpty
+                          ? context.l.endedStopped(ended)
+                          : stopped.isEmpty
+                              ? context.l.endedFinished(ended)
+                              : context.l.endedBoth(ended),
                       style: theme.textTheme.titleSmall),
                   children: [
                     // Tapping one opens it, to set a longer course.
@@ -405,7 +414,7 @@ class _CareScreenState extends State<CareScreen> with WidgetsBindingObserver {
                             store: _store, patient: patient, existing: m)),
                         trailing: TextButton(
                           onPressed: () => _action(patient, m, CardAction.resume),
-                          child: const Text('Resume'),
+                          child: Text(context.l.resume),
                         ),
                       ),
                   ],
@@ -431,7 +440,7 @@ class _Welcome extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(actions: [
         IconButton(
-          tooltip: 'Settings',
+          tooltip: context.l.settings,
           icon: const Icon(Icons.settings_outlined),
           onPressed: () => Navigator.push(context,
               MaterialPageRoute(
@@ -446,35 +455,34 @@ class _Welcome extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Image.asset('assets/brand/nexpill_logo_512.png',
-                  width: 112, height: 112, semanticLabel: 'Nexpill logo'),
+                  width: 112, height: 112, semanticLabel: context.l.logoLabel),
               const SizedBox(height: 20),
               Text('Nexpill',
                   textAlign: TextAlign.center, style: theme.textTheme.displaySmall),
               const SizedBox(height: 12),
               Text(
-                'Keeps track of when each dose was given and when the next one '
-                'can be, and reminds you on time.',
+                context.l.welcomeWhat,
                 style: theme.textTheme.bodyLarge,
               ),
               const SizedBox(height: 8),
               Text(
-                'Everything stays on this phone. No account, no internet.',
+                context.l.welcomePrivate,
                 style: theme.textTheme.bodyMedium
                     ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
               ),
               const SizedBox(height: 32),
-              Text('Who are the medications for?',
+              Text(context.l.whoAreTheMedicationsFor,
                   textAlign: TextAlign.center, style: theme.textTheme.titleMedium),
               const SizedBox(height: 12),
               FilledButton.icon(
                 icon: const Icon(Icons.person_outline),
-                label: const Text('Me'),
+                label: Text(context.l.me),
                 onPressed: () async => onAdded((await addSelf(store)).id),
               ),
               const SizedBox(height: 8),
               FilledButton.icon(
                 icon: const Icon(Icons.person_add_alt),
-                label: const Text('Someone I care for'),
+                label: Text(context.l.someoneICareFor),
                 onPressed: () async {
                   final p = await addPatient(context, store, offerSelf: false);
                   if (p != null) onAdded(p.id);
@@ -482,7 +490,7 @@ class _Welcome extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               Text(
-                'You can add more people later.',
+                context.l.addMoreLater,
                 textAlign: TextAlign.center,
                 style: theme.textTheme.bodySmall,
               ),

@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:nexpill/models/care_snapshot.dart';
 import 'package:nexpill/domain/dates.dart';
+import 'package:nexpill/domain/wording.dart';
 import 'package:nexpill/models/dose_event.dart';
 import 'package:nexpill/models/medication.dart';
 import 'package:nexpill/models/patient.dart';
@@ -148,17 +149,15 @@ CareSnapshot decodeBackup(String text) {
   try {
     json = jsonDecode(text);
   } on FormatException {
-    throw const BackupFormatException("This file isn't a Nexpill backup.");
+    throw BackupFormatException(strings.backupNotNexpill);
   }
-  final root = _Reader(json, 'The file');
+  final root = _Reader(json, strings.backupWhereFile);
   final version = root.value<Object?>('nexpillBackup');
   if (version == null) {
-    throw const BackupFormatException("This file isn't a Nexpill backup.");
+    throw BackupFormatException(strings.backupNotNexpill);
   }
   if (version is! int || version > backupFormatVersion || version < 1) {
-    throw const BackupFormatException(
-        'This backup is from a newer version of Nexpill. Update the app, '
-        'then try again.');
+    throw BackupFormatException(strings.backupTooNew);
   }
 
   final ids = <String>{};
@@ -170,8 +169,7 @@ CareSnapshot decodeBackup(String text) {
     final patientId = p.id(ids);
     final isSelf = p.optionalBool('self') ?? false;
     if (isSelf && patients.any((other) => other.isSelf)) {
-      throw const BackupFormatException(
-          'More than one person in this file is marked as you.');
+      throw BackupFormatException(strings.backupTwoOfYou);
     }
     // Only the phone's owner may have no name.
     final name =
@@ -244,12 +242,12 @@ void _checkCorrections(Iterable<DoseEvent> doses, String medicationName) {
     for (var c = d; c.supersedesId != null;) {
       final target = byId[c.supersedesId];
       if (target == null) {
-        throw BackupFormatException('A dose of $medicationName corrects one '
-            'that isn\'t in its history.');
+        throw BackupFormatException(
+            strings.backupCorrectsMissing(medicationName));
       }
       if (!seen.add(target.id)) {
         throw BackupFormatException(
-            'Corrections to $medicationName\'s doses go round in a circle.');
+            strings.backupCorrectionsCircle(medicationName));
       }
       c = target;
     }
@@ -262,8 +260,7 @@ CourseEnd? _decodeCourse(_Reader m) {
   return switch ((c.optionalDate('lastDay'), c.optionalCount('doses'))) {
     (final day?, null) => EndsAfterDay(day),
     (null, final doses?) => EndsAfterDoses(doses),
-    _ => throw BackupFormatException(
-        '${c.where} needs either "lastDay" or "doses", not both.'),
+    _ => throw BackupFormatException(strings.backupCourseBoth(c.where)),
   };
 }
 
@@ -276,8 +273,7 @@ MedicationSchedule _decodeSchedule(_Reader s) {
           if (t is String && ClockTime.tryParse(t) != null)
             ClockTime.tryParse(t)!
           else
-            throw BackupFormatException('${s.where} has a time that isn\'t '
-                'HH:mm: $t.'),
+            throw BackupFormatException(strings.backupBadTime(s.where, '$t')),
       ]),
     'taper' => TaperSchedule([
         for (final step in s.nonEmpty(s.list('steps'), 'steps'))
@@ -289,7 +285,7 @@ MedicationSchedule _decodeSchedule(_Reader s) {
       ]),
     'once' => OnceSchedule(s.instant('at')),
     final type => throw BackupFormatException(
-        '${s.where} has an unknown schedule type "$type".'),
+        strings.backupUnknownSchedule(s.where, type)),
   };
 }
 
@@ -298,7 +294,7 @@ MedicationSchedule _decodeSchedule(_Reader s) {
 class _Reader {
   _Reader(Object? json, this.where) {
     if (json is! Map<String, Object?>) {
-      throw BackupFormatException('$where isn\'t in the expected form.');
+      throw BackupFormatException(strings.backupWrongForm(where));
     }
     _json = json;
   }
@@ -309,8 +305,7 @@ class _Reader {
   T value<T>(String key) {
     final v = _json[key];
     if (v is! T) {
-      throw BackupFormatException('$where is missing "$key" or it is the '
-          'wrong kind of value.');
+      throw BackupFormatException(strings.backupMissing(where, key));
     }
     return v;
   }
@@ -318,7 +313,7 @@ class _Reader {
   String string(String key) {
     final v = value<String>(key);
     if (v.trim().isEmpty) {
-      throw BackupFormatException('$where has an empty "$key".');
+      throw BackupFormatException(strings.backupEmpty(where, key));
     }
     return v;
   }
@@ -337,7 +332,7 @@ class _Reader {
   int minutes(String key, {bool allowZero = false}) {
     final v = value<int>(key);
     if (v < (allowZero ? 0 : 1) || v > 60 * 24 * 365) {
-      throw BackupFormatException('$where has an impossible "$key": $v.');
+      throw BackupFormatException(strings.backupImpossible(where, key, '$v'));
     }
     return v;
   }
@@ -347,15 +342,14 @@ class _Reader {
     if (_json[key] == null) return null;
     final v = value<int>(key);
     if (v < 1 || v > 100000) {
-      throw BackupFormatException('$where has an impossible "$key": $v.');
+      throw BackupFormatException(strings.backupImpossible(where, key, '$v'));
     }
     return v;
   }
 
   DateTime date(String key) =>
       tryParseIsoDate(value<String>(key)) ??
-      (throw BackupFormatException(
-          '$where has a "$key" that isn\'t a YYYY-MM-DD date.'));
+      (throw BackupFormatException(strings.backupBadDate(where, key)));
 
   DateTime? optionalDate(String key) => _json[key] == null ? null : date(key);
 
@@ -366,8 +360,7 @@ class _Reader {
     final parsed = DateTime.tryParse(s);
     final hasOffset = RegExp(r'(Z|[+-]\d{2}:?\d{2})$').hasMatch(s);
     if (parsed == null || !hasOffset) {
-      throw BackupFormatException('$where has a "$key" that isn\'t a date '
-          'and time with a time zone.');
+      throw BackupFormatException(strings.backupBadInstant(where, key));
     }
     return parsed.toUtc();
   }
@@ -376,13 +369,13 @@ class _Reader {
   String id(Set<String> seen) {
     final id = string('id');
     if (!seen.add(id)) {
-      throw BackupFormatException('The id "$id" appears more than once.');
+      throw BackupFormatException(strings.backupDuplicateId(id));
     }
     return id;
   }
 
   List<T> nonEmpty<T>(List<T> items, String key) => items.isEmpty
-      ? throw BackupFormatException('$where has no "$key".')
+      ? throw BackupFormatException(strings.backupNone(where, key))
       : items;
 
   _Reader object(String key) => _Reader(_json[key], '$where, "$key"');
@@ -399,6 +392,6 @@ class _Reader {
 
   String _describe(String key, int i, Object? item) {
     final name = item is Map ? item['name'] : null;
-    return name is String ? '"$name"' : '$where, $key ${i + 1}';
+    return name is String ? '"$name"' : strings.backupWhereItem(where, key, i + 1);
   }
 }

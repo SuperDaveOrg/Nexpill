@@ -6,6 +6,7 @@ import 'package:nexpill/models/dose_event.dart';
 import 'package:nexpill/models/medication.dart';
 import 'package:nexpill/services/preferences.dart';
 import 'package:nexpill/ui/dialogs.dart';
+import 'package:nexpill/ui/language.dart';
 
 /// What was entered in [GiveDoseSheet].
 class DoseEntry {
@@ -33,14 +34,16 @@ Future<bool> confirmEarlyDose(
   if (status.schedule.eligibleNow) return true;
   final minutes = status.minutesUntilEligible;
   final prn = medication.schedule is PrnSchedule;
+  final when = whenText(status.schedule.nextEligibleAt, now);
+  final l = context.l;
   return confirmAction(
     context,
-    title: 'This is early',
-    message: '${medication.name} ${prn ? 'can next be given' : 'is next due'} '
-        '${whenText(status.schedule.nextEligibleAt, now)}, in '
-        '${durationText(minutes)}. Log a dose now anyway?',
-    cancel: 'Not yet',
-    action: 'Log it now',
+    title: l.earlyTitle,
+    message: prn
+        ? l.earlyMessageAvailable(medication.name, when, durationText(minutes))
+        : l.earlyMessageDue(medication.name, when, durationText(minutes)),
+    cancel: l.notYet,
+    action: l.logItNow,
   );
 }
 
@@ -109,13 +112,13 @@ class _GiveDoseSheetState extends State<_GiveDoseSheet> {
       initialDate: start,
       firstDate: now.subtract(const Duration(days: 60)),
       lastDate: now,
-      helpText: 'Day it was given',
+      helpText: context.l.dayGiven,
     );
     if (day == null || !mounted) return;
     final time = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.fromDateTime(start),
-      helpText: 'Time it was given',
+      helpText: context.l.timeGiven,
     );
     if (time == null) return;
     setState(() {
@@ -127,7 +130,7 @@ class _GiveDoseSheetState extends State<_GiveDoseSheet> {
   void _save() {
     final at = _at ?? DateTime.now();
     if (at.isAfter(DateTime.now().add(const Duration(minutes: 1)))) {
-      setState(() => _error = 'That time hasn\'t happened yet.');
+      setState(() => _error = context.l.timeInFuture);
       return;
     }
     String? text(TextEditingController c) =>
@@ -147,6 +150,7 @@ class _GiveDoseSheetState extends State<_GiveDoseSheet> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l = context.l;
     final correcting = widget.correcting != null;
     final at = _at;
     // SafeArea keeps "Log dose" above a 3-button navigation bar; its bottom
@@ -162,24 +166,24 @@ class _GiveDoseSheetState extends State<_GiveDoseSheet> {
             children: [
               Text(
                 correcting
-                    ? 'Correct this ${widget.medication.name} entry'
-                    : 'Give ${widget.medication.name}',
+                    ? l.correctEntry(widget.medication.name)
+                    : l.giveMedication(widget.medication.name),
                 style: theme.textTheme.titleLarge,
               ),
               if (correcting)
                 Padding(
                   padding: const EdgeInsets.only(top: 6),
                   child: Text(
-                    'The original stays in history, marked as corrected.',
+                    l.originalStays,
                     style: theme.textTheme.bodySmall,
                   ),
                 ),
               const SizedBox(height: 16),
               if (!correcting)
                 SegmentedButton<bool>(
-                  segments: const [
-                    ButtonSegment(value: true, label: Text('Now')),
-                    ButtonSegment(value: false, label: Text('Earlier')),
+                  segments: [
+                    ButtonSegment(value: true, label: Text(l.now)),
+                    ButtonSegment(value: false, label: Text(l.earlier)),
                   ],
                   selected: {at == null},
                   onSelectionChanged: (s) {
@@ -194,9 +198,9 @@ class _GiveDoseSheetState extends State<_GiveDoseSheet> {
                 ListTile(
                   contentPadding: EdgeInsets.zero,
                   leading: const Icon(Icons.schedule),
-                  title: Text('Given ${whenText(at, DateTime.now())}'),
-                  trailing: TextButton(
-                      onPressed: _pickTime, child: const Text('Change')),
+                  title: Text(l.givenWhen(whenText(at, DateTime.now()))),
+                  trailing:
+                      TextButton(onPressed: _pickTime, child: Text(l.change)),
                 ),
               if (_error != null)
                 Text(_error!,
@@ -205,21 +209,21 @@ class _GiveDoseSheetState extends State<_GiveDoseSheet> {
               const SizedBox(height: 12),
               TextField(
                 controller: _dose,
-                decoration: const InputDecoration(labelText: 'Dose'),
+                decoration: InputDecoration(labelText: l.dose),
                 textCapitalization: TextCapitalization.sentences,
               ),
               const SizedBox(height: 12),
               TextField(
                 controller: _givenBy,
-                decoration: const InputDecoration(
-                    labelText: 'Given by', hintText: 'Optional'),
+                decoration:
+                    InputDecoration(labelText: l.givenBy, hintText: l.optional),
                 textCapitalization: TextCapitalization.words,
               ),
               const SizedBox(height: 12),
               TextField(
                 controller: _notes,
                 decoration:
-                    const InputDecoration(labelText: 'Notes', hintText: 'Optional'),
+                    InputDecoration(labelText: l.notes, hintText: l.optional),
                 textCapitalization: TextCapitalization.sentences,
                 maxLines: 2,
                 minLines: 1,
@@ -227,7 +231,7 @@ class _GiveDoseSheetState extends State<_GiveDoseSheet> {
               const SizedBox(height: 20),
               FilledButton(
                 onPressed: _save,
-                child: Text(correcting ? 'Save correction' : 'Log dose'),
+                child: Text(correcting ? l.saveCorrection : l.logDose),
               ),
             ],
           ),

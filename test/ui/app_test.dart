@@ -2,14 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nexpill/data/sample_data.dart';
 import 'package:nexpill/domain/wording.dart';
+import 'package:nexpill/l10n/app_localizations.dart';
 import 'package:nexpill/models/care_snapshot.dart';
 import 'package:nexpill/models/dose_event.dart';
 import 'package:nexpill/models/medication.dart';
 import 'package:nexpill/models/patient.dart';
 import 'package:nexpill/services/notification_service.dart';
+import 'package:nexpill/services/preferences.dart';
 import 'package:nexpill/ui/app.dart';
 import 'package:nexpill/ui/care_store.dart';
 import 'package:nexpill/ui/give_dose_sheet.dart';
+import 'package:nexpill/ui/language.dart';
 import 'package:nexpill/ui/settings_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -118,6 +121,51 @@ void main() {
     await tester.tap(find.text('Add'));
     await tester.pumpAndSettle();
     expect([for (final p in await repo.patients()) personName(p)], ['You', 'Alex']);
+  });
+
+  testWidgets('in Spanish, and back to English from Settings', (tester) async {
+    chosenLanguage.value = 'es';
+    addTearDown(() async {
+      chosenLanguage.value = null;
+      await useLanguage(const Locale('en'));
+    });
+    await start(tester);
+
+    await tester.tap(find.text('Para mí'));
+    await tester.pumpAndSettle();
+    expect(find.text('Tú'), findsOneWidget, reason: 'the title');
+    await tester.tap(find.text('Añadir medicamento'));
+    await tester.pumpAndSettle();
+    expect(find.text('Para ti'), findsOneWidget);
+    await tester.enterText(
+        find.widgetWithText(TextFormField, 'Nombre'), 'Amoxicilina');
+    await tester.tap(find.text('Guardar'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Dar'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Registrar dosis'));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('Próxima dosis'), findsOneWidget);
+    expect(notifications.lastPlan!.notifications.first.title,
+        'Amoxicilina: toca ahora');
+
+    // Reminders say things, so changing language replans them.
+    await tester.tap(find.byTooltip('Ajustes'));
+    await tester.pumpAndSettle();
+    final language = find.widgetWithIcon(ListTile, Icons.translate);
+    await tester.scrollUntilVisible(language, 200,
+        scrollable: find.byType(Scrollable).first);
+    await tester.ensureVisible(language);
+    await tester.pumpAndSettle();
+    expect(find.text('Español'), findsOneWidget, reason: 'the one picked');
+    await tester.tap(language);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('English'));
+    await tester.pumpAndSettle();
+    expect(find.text('Settings'), findsOneWidget);
+    expect(notifications.lastPlan!.notifications.first.title,
+        'Amoxicilina due now');
+    expect(await Preferences.language(), 'en');
   });
 
   testWidgets('someone already added can become you', (tester) async {
@@ -262,6 +310,7 @@ void main() {
     final m = sampleCare(DateTime.now()).medications.first;
     DoseEvent? correcting;
     await tester.pumpWidget(MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
       home: Builder(
         builder: (context) => TextButton(
           onPressed: () =>
@@ -291,7 +340,9 @@ void main() {
 
   testWidgets('Settings shows restored people without reopening', (tester) async {
     await store.load();
-    await tester.pumpWidget(MaterialApp(home: SettingsScreen(store: store)));
+    await tester.pumpWidget(MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        home: SettingsScreen(store: store)));
     await tester.pumpAndSettle();
     expect(find.text('0 on this phone'), findsOneWidget);
 

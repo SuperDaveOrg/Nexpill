@@ -9,6 +9,7 @@ import 'package:nexpill/services/preferences.dart';
 import 'package:nexpill/services/reminder_sync.dart';
 import 'package:nexpill/ui/app.dart';
 import 'package:nexpill/ui/care_store.dart';
+import 'package:nexpill/ui/language.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,6 +26,11 @@ Future<void> main() async {
   // keeps both in step with MediaQuery once it's on screen.
   use24HourClock = PlatformDispatcher.instance.alwaysUse24HourFormat;
   await Preferences.setUse24HourClock(use24HourClock);
+  chosenLanguage.value = await Preferences.language();
+  final language =
+      resolveLanguage(chosenLanguage.value, PlatformDispatcher.instance.locales);
+  await useLanguage(language);
+  await Preferences.setLanguageInUse(language.languageCode);
 
   final store = CareStore(repository: CareRepository(), notifications: notifications);
   // Every start replans the week's reminders, so they never run out while

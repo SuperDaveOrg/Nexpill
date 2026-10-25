@@ -6,6 +6,7 @@ import 'package:nexpill/models/patient.dart';
 import 'package:nexpill/ui/care_store.dart';
 import 'package:nexpill/ui/dialogs.dart';
 import 'package:nexpill/ui/layout.dart';
+import 'package:nexpill/ui/language.dart';
 
 /// Who someone is: their name, and whether they're the phone's owner.
 typedef PersonDetails = ({String name, bool isSelf});
@@ -31,12 +32,12 @@ Future<PersonDetails?> showPersonDialog(
         void submit() {
           final name = controller.text.trim();
           if (name.isEmpty && !isSelf) {
-            setState(() => error = 'Enter a name.');
+            setState(() => error = context.l.errorEnterName);
           } else if (name.isNotEmpty &&
               others.any((p) =>
                   p.id != existing?.id &&
                   p.displayName.toLowerCase() == name.toLowerCase())) {
-            setState(() => error = 'Someone already has that name.');
+            setState(() => error = context.l.errorNameTaken);
           } else {
             Navigator.pop(context, (name: name, isSelf: isSelf));
           }
@@ -44,18 +45,18 @@ Future<PersonDetails?> showPersonDialog(
 
         return AlertDialog(
           title: Text(existing == null
-              ? 'Who are you caring for?'
+              ? context.l.whoAreYouCaringFor
               : existing.hasName
-                  ? 'Rename'
-                  : 'Your name'),
+                  ? context.l.rename
+                  : context.l.yourName),
           content: Column(mainAxisSize: MainAxisSize.min, children: [
             TextField(
               controller: controller,
               autofocus: true,
               textCapitalization: TextCapitalization.words,
               decoration: InputDecoration(
-                labelText: isSelf ? 'Your name' : 'Name',
-                hintText: isSelf ? 'Optional' : 'A first name or nickname is fine',
+                labelText: isSelf ? context.l.yourName : context.l.fieldName,
+                hintText: isSelf ? context.l.optional : context.l.nameHint,
                 errorText: error,
               ),
               onSubmitted: (_) => submit(),
@@ -64,8 +65,8 @@ Future<PersonDetails?> showPersonDialog(
               CheckboxListTile(
                 contentPadding: EdgeInsets.zero,
                 controlAffinity: ListTileControlAffinity.leading,
-                title: const Text('This is me'),
-                subtitle: const Text('For your own medications'),
+                title: Text(context.l.thisIsMe),
+                subtitle: Text(context.l.forYourOwnMedications),
                 value: isSelf,
                 onChanged: (v) => setState(() {
                   isSelf = v ?? false;
@@ -76,10 +77,10 @@ Future<PersonDetails?> showPersonDialog(
           actions: [
             TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text('Cancel')),
+                child: Text(context.l.cancel)),
             TextButton(
                 onPressed: submit,
-                child: Text(existing == null ? 'Add' : 'Save')),
+                child: Text(existing == null ? context.l.add : context.l.save)),
           ],
         );
       },
@@ -128,12 +129,13 @@ class PatientsScreen extends StatelessWidget {
     final count = store.care.medicationsFor(p.id).length;
     final ok = await confirmAction(
       context,
-      title: p.isSelf ? 'Delete your medications?' : 'Delete ${p.displayName}?',
-      message: '${p.isSelf ? 'Your' : 'Their'} '
-          '${count == 1 ? 'medication' : '$count medications'} and all '
-          'dose history go too, and can\'t be brought back unless you have a '
-          'backup file.',
-      action: 'Delete',
+      title: p.isSelf
+          ? context.l.deleteYourMedicationsTitle
+          : context.l.deletePersonTitle(p.displayName),
+      message: p.isSelf
+          ? context.l.deleteYourMedicationsMessage(count)
+          : context.l.deletePersonMessage(count),
+      action: context.l.delete,
     );
     if (ok) await store.change((repo) => repo.deletePatient(p.id));
   }
@@ -146,11 +148,11 @@ class PatientsScreen extends StatelessWidget {
         final theme = Theme.of(context);
         final patients = store.care.patients;
         return Scaffold(
-          appBar: AppBar(title: const Text('People')),
+          appBar: AppBar(title: Text(context.l.people)),
           floatingActionButton: FloatingActionButton.extended(
             onPressed: () => addPatient(context, store),
             icon: const Icon(Icons.person_add_alt),
-            label: const Text('Add someone'),
+            label: Text(context.l.addSomeone),
           ),
           body: ListView(
             padding: readablePadding(context,
@@ -162,8 +164,8 @@ class PatientsScreen extends StatelessWidget {
                     ListTile(
                       title: Text(personName(p), style: theme.textTheme.titleMedium),
                       subtitle: Text(onOpen == null
-                          ? _medCount(p)
-                          : '${_medCount(p)} · tap to see them'),
+                          ? _medCount(context, p)
+                          : context.l.tapToSeeThem(_medCount(context, p))),
                       onTap: onOpen == null
                           ? null
                           : () {
@@ -177,16 +179,19 @@ class PatientsScreen extends StatelessWidget {
                         itemBuilder: (_) => [
                           PopupMenuItem(
                               value: 'rename',
-                              child: Text(p.hasName ? 'Rename' : 'Add your name')),
-                          const PopupMenuItem(value: 'delete', child: Text('Delete')),
+                              child: Text(p.hasName
+                                  ? context.l.rename
+                                  : context.l.addYourName)),
+                          PopupMenuItem(
+                              value: 'delete', child: Text(context.l.delete)),
                         ],
                       ),
                     ),
                     SwitchListTile(
-                      title: const Text('Reminders'),
+                      title: Text(context.l.sectionReminders),
                       subtitle: Text(p.notificationsEnabled
-                          ? 'As set for each medication'
-                          : 'All off for ${personInSentence(p)}'),
+                          ? context.l.asSetForEach
+                          : context.l.allOffFor(personInSentence(p))),
                       value: p.notificationsEnabled,
                       onChanged: (v) => store.change((repo) =>
                           repo.savePatient(p.copyWith(notificationsEnabled: v))),
@@ -202,8 +207,8 @@ class PatientsScreen extends StatelessWidget {
     );
   }
 
-  String _medCount(Patient p) {
+  String _medCount(BuildContext context, Patient p) {
     final n = store.care.medicationsFor(p.id).where((m) => m.active).length;
-    return n == 1 ? '1 medication' : '$n medications';
+    return context.l.medicationCount(n);
   }
 }

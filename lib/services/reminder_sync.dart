@@ -34,6 +34,7 @@ Future<void> onReminderAction(NotificationResponse response) async {
   if (tag == null) return;
 
   use24HourClock = await Preferences.use24HourClock() ?? false;
+  await useLanguage(Locale(await Preferences.languageInUse() ?? 'en'));
   final repository = CareRepository();
   final notifications = NotificationService();
   await notifications.init(onAction: onReminderAction);

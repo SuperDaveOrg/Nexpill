@@ -233,6 +233,19 @@ section.alt .card { background: var(--cream); }
 .steps li { margin-bottom: 10px; }
 .note { color: var(--muted); font-size: 0.95rem; }
 
+/* Only while there's a beta: deploy_site.sh drops it otherwise. */
+.beta-callout {
+  margin-top: 26px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-left: 6px solid var(--teal);
+  border-radius: var(--radius);
+  padding: 22px 24px;
+}
+.beta-callout .eyebrow { margin-bottom: 8px; }
+.beta-callout h3 { margin-bottom: 0.4em; }
+.beta-callout p:not(.eyebrow) { color: var(--muted); margin: 0 0 16px; }
+
 /* Why Nexpill exists */
 
 section.story { padding: 0 0 56px; }

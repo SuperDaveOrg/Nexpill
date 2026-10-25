@@ -5,13 +5,15 @@ publish_to: 'none'
 # NAME+CODE, and the only place the version lives. CODE is derived from NAME
 # (major*10000 + minor*100 + patch). Change it with tool/bump_version.sh, not
 # by hand. See docs/RELEASING.md.
-version: 0.7.0+700
+version: 0.8.0+800
 
 environment:
   sdk: ^3.13.4
 
 dependencies:
   flutter:
+    sdk: flutter
+  flutter_localizations:
     sdk: flutter
   flutter_local_notifications: ^22.3.1
   intl: ^0.20.3
@@ -29,6 +31,8 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  # The app's words, from lib/l10n/*.arb. See docs/translating.md.
+  generate: true
 
   assets:
     - assets/brand/nexpill_logo_512.png

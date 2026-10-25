@@ -246,11 +246,14 @@ class ReminderItem {
           medication.schedule is FixedTimesSchedule ||
           medication.schedule is OnceSchedule);
 
-  String get phrase => switch (kind) {
-        ReminderKind.dueSoon => 'due at ${clockText(dueAt)}',
-        ReminderKind.dueNow => 'due now',
-        ReminderKind.overdue => 'overdue since ${clockText(dueAt)}',
-        ReminderKind.available => 'can be given again',
+  /// "Amoxicillin due now".
+  String get text => switch (kind) {
+        ReminderKind.dueSoon =>
+          strings.reminderDueAt(medication.name, clockText(dueAt)),
+        ReminderKind.dueNow => strings.reminderDueNow(medication.name),
+        ReminderKind.overdue =>
+          strings.reminderOverdueSince(medication.name, clockText(dueAt)),
+        ReminderKind.available => strings.reminderAvailable(medication.name),
       };
 }
 
@@ -274,16 +277,16 @@ class PlannedNotification {
   List<String> get medicationIds => [for (final i in items) i.medication.id];
 
   String get title => items.length == 1
-      ? '${items.single.medication.name} ${items.single.phrase}'
-      : '${items.length} medications for ${personInSentence(patient)}';
+      ? items.single.text
+      : strings.reminderManyFor(items.length, personInSentence(patient));
 
   String get body => items.length == 1
       ? [
-          'For ${personInSentence(patient)}',
+          strings.reminderFor(personInSentence(patient)),
           items.single.medication.defaultDoseText,
           ?items.single.medication.purpose,
         ].join(' · ')
-      : [for (final i in items) '${i.medication.name} ${i.phrase}'].join('\n');
+      : [for (final i in items) i.text].join('\n');
 }
 
 /// The notification to show again for [medicationIds] after a snooze,

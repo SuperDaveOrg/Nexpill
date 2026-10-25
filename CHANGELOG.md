@@ -9,6 +9,14 @@ turns that section into the release's own when it's cut.
 
 ## [Unreleased]
 
+### Added
+- Nexpill in German, Spanish, French, Italian, Portuguese (Portugal) and
+  Russian, as well as English. It follows the phone's language, or pick one
+  in Settings → Language (or, on Android 13 and later, in the phone's
+  settings for the app). Reminders, the printable summary and the
+  dose-history spreadsheet are in the same language. Times still follow the
+  phone's 12- or 24-hour setting.
+
 ## [0.7.0] - 2026-10-25
 
 ### Added

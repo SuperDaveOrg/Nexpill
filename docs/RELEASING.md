@@ -173,6 +173,30 @@ tool/deploy_site.sh                # deploy
 The page promotes LedgerSprout, which pays for Nexpill staying free; keep
 that section when editing.
 
+### Previews
+
+`nexpill.superdavelab.com/beta/` (`site/beta/`) offers a **preview** of the
+next version to testers, above all native speakers checking translations.
+"Preview" on the pages, so it isn't confused with the release's "Public
+beta"; the URL stays `/beta/`, which the README links to. It offers the
+newest **snapshot**: a build of an untagged commit, signed with the release
+key, built after the current release. The main page asks for testers and
+links to it only while there's one; once the release is newer, the page
+says there's no preview and the main page's call for testers goes.
+
+```bash
+tool/bump_version.sh minor          # on the branch, so the preview is labelled 0.7.0-<commit>
+git push origin <branch>            # the page links to the commit on GitHub
+tool/build_release.sh --ref <branch>
+tool/deploy_site.sh
+```
+
+A preview has the same version code as the release it leads up to, so
+testers update from the current release to the preview, and from the preview
+to that release, keeping their records. Reports from the preview page's form
+arrive as Nexpill website feedback, starting `[Preview <version>, language:
+…]`.
+
 
 ## Reproducible builds
 

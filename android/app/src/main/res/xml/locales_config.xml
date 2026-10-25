@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The languages Nexpill speaks, so Android 13+ offers them in its per-app
+     language setting. Keep in step with lib/l10n/app_*.arb. -->
+<locale-config xmlns:android="http://schemas.android.com/apk/res/android">
+    <locale android:name="de"/>
+    <locale android:name="en"/>
+    <locale android:name="es"/>
+    <locale android:name="fr"/>
+    <locale android:name="it"/>
+    <locale android:name="pt-PT"/>
+    <locale android:name="ru"/>
+</locale-config>
