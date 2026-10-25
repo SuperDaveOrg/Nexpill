@@ -126,7 +126,7 @@ abstract class AppLocalizations {
   /// **'{hours} {minutes}'**
   String durationHoursMinutes(String hours, String minutes);
 
-  /// No description provided for @skippedDose.
+  /// Confirmation shown after a dose was skipped.
   ///
   /// In en, this message translates to:
   /// **'Skipped the {time} dose'**
@@ -168,7 +168,7 @@ abstract class AppLocalizations {
   /// **'Taper with no steps'**
   String get taperNoSteps;
 
-  /// No description provided for @taperStepFrom.
+  /// In a taper summary: a step that starts on {date} and has no end date.
   ///
   /// In en, this message translates to:
   /// **'From {date}'**
@@ -234,97 +234,97 @@ abstract class AppLocalizations {
   /// **'{text}, then every {duration}'**
   String taperShortThen(String text, String duration);
 
-  /// No description provided for @statusNotGiven.
+  /// Card status: no dose of this medication has been logged yet.
   ///
   /// In en, this message translates to:
   /// **'Not given yet'**
   String get statusNotGiven;
 
-  /// No description provided for @statusCanGiveNow.
+  /// Card status for an as-needed medication: the minimum gap has passed, so a dose is allowed now. Allowed, never required.
   ///
   /// In en, this message translates to:
   /// **'Can be given now'**
   String get statusCanGiveNow;
 
-  /// No description provided for @statusDueNow.
+  /// Card status, also used in reminders: the dose should be given now.
   ///
   /// In en, this message translates to:
   /// **'Due now'**
   String get statusDueNow;
 
-  /// No description provided for @statusNextAt.
+  /// Card status: the next dose is at {time}; giving it before then would be too early.
   ///
   /// In en, this message translates to:
   /// **'Next at {time}'**
   String statusNextAt(String time);
 
-  /// No description provided for @statusOverdueBy.
+  /// Card status: the dose was due {duration} ago and hasn't been given.
   ///
   /// In en, this message translates to:
   /// **'Overdue by {duration}'**
   String statusOverdueBy(String duration);
 
-  /// No description provided for @statusMissed.
+  /// Card status: so late that the next dose is nearly due. Keep it distinct from overdue.
   ///
   /// In en, this message translates to:
   /// **'Missed: was due {duration} ago'**
   String statusMissed(String duration);
 
-  /// No description provided for @statusFinished.
+  /// Card status: the course or single dose is complete; nothing more to give.
   ///
   /// In en, this message translates to:
   /// **'Finished'**
   String get statusFinished;
 
-  /// No description provided for @remindersOff.
+  /// Reminder summary in the editor: reminders are off for this medication.
   ///
   /// In en, this message translates to:
   /// **'Off'**
   String get remindersOff;
 
-  /// No description provided for @remindersOn.
+  /// Reminder summary in the editor: reminders are on for this medication.
   ///
   /// In en, this message translates to:
   /// **'On'**
   String get remindersOn;
 
-  /// No description provided for @remindersEarly.
+  /// Reminder summary in the editor: reminders fire {duration} before the dose is due.
   ///
   /// In en, this message translates to:
   /// **'{duration} early'**
   String remindersEarly(String duration);
 
-  /// No description provided for @remindersAlarm.
+  /// Reminder summary in the editor, listed after 'On': the reminder rings as an alarm.
   ///
   /// In en, this message translates to:
   /// **'as an alarm'**
   String get remindersAlarm;
 
-  /// No description provided for @whenToday.
+  /// A time today, inside bigger sentences: 'since {when}', 'was due {when}', 'Next dose {when}'. Spanish says 'hoy a las 4:28' so each of those reads well; check yours do.
   ///
   /// In en, this message translates to:
   /// **'{time}'**
   String whenToday(String time);
 
-  /// No description provided for @whenTomorrow.
+  /// Inside bigger sentences: 'since {when}', 'was due {when}', 'Next dose {when}'.
   ///
   /// In en, this message translates to:
   /// **'tomorrow at {time}'**
   String whenTomorrow(String time);
 
-  /// No description provided for @whenYesterday.
+  /// Inside bigger sentences: 'since {when}', 'was due {when}'.
   ///
   /// In en, this message translates to:
   /// **'yesterday at {time}'**
   String whenYesterday(String time);
 
-  /// No description provided for @whenOnDay.
+  /// Inside bigger sentences: 'since {when}', 'was due {when}', 'Next dose {when}'.
   ///
   /// In en, this message translates to:
   /// **'{date} at {time}'**
   String whenOnDay(String date, String time);
 
-  /// No description provided for @shortMinutes.
+  /// Short duration on a card or in a reminder, e.g. '45 min'.
   ///
   /// In en, this message translates to:
   /// **'{count} min'**
@@ -348,7 +348,7 @@ abstract class AppLocalizations {
   /// **'{count, plural, =1{1 day} other{{count} days}}'**
   String shortDays(int count);
 
-  /// No description provided for @today.
+  /// Heading of today's entries in the dose history.
   ///
   /// In en, this message translates to:
   /// **'Today'**
@@ -396,73 +396,73 @@ abstract class AppLocalizations {
   /// **'{count, plural, =1{1 dose left} other{{count} doses left}}'**
   String courseDosesLeft(int count);
 
-  /// No description provided for @cardFirstDue.
+  /// Card detail line under 'Not given yet': when the first dose is due. {when} is one of the when… messages.
   ///
   /// In en, this message translates to:
   /// **'First due {when}'**
   String cardFirstDue(String when);
 
-  /// No description provided for @cardAsNeeded.
+  /// Card detail line under 'Can be given now', for an as-needed medication.
   ///
   /// In en, this message translates to:
   /// **'As needed'**
   String get cardAsNeeded;
 
-  /// No description provided for @cardAvailableFrom.
+  /// Card headline for an as-needed medication still inside its minimum gap: a dose is allowed again from {when}.
   ///
   /// In en, this message translates to:
   /// **'Next dose from {when}'**
   String cardAvailableFrom(String when);
 
-  /// No description provided for @cardNextDose.
+  /// Card headline: the next dose is due {when}; giving it now would be too early.
   ///
   /// In en, this message translates to:
   /// **'Next dose {when}'**
   String cardNextDose(String when);
 
-  /// No description provided for @cardIn.
+  /// Card detail line under 'Next dose…': how long until then.
   ///
   /// In en, this message translates to:
   /// **'in {duration}'**
   String cardIn(String duration);
 
-  /// No description provided for @cardDueIn.
+  /// Card headline: not yet; the dose becomes due in {duration}.
   ///
   /// In en, this message translates to:
   /// **'Due in {duration}'**
   String cardDueIn(String duration);
 
-  /// No description provided for @cardAt.
+  /// Card detail line under 'Due in…': the time it becomes due.
   ///
   /// In en, this message translates to:
   /// **'at {when}'**
   String cardAt(String when);
 
-  /// No description provided for @cardSince.
+  /// Card detail line under 'Due now': since when.
   ///
   /// In en, this message translates to:
   /// **'since {when}'**
   String cardSince(String when);
 
-  /// No description provided for @cardOverdue.
+  /// Card headline: the dose was due {duration} ago and hasn't been given.
   ///
   /// In en, this message translates to:
   /// **'Overdue {duration}'**
   String cardOverdue(String duration);
 
-  /// No description provided for @cardWasDue.
+  /// Card detail line under 'Overdue…'.
   ///
   /// In en, this message translates to:
   /// **'was due {when}'**
   String cardWasDue(String when);
 
-  /// No description provided for @cardMissed.
+  /// Card headline: so late that the next dose is nearly due. Keep it distinct from overdue.
   ///
   /// In en, this message translates to:
   /// **'Missed'**
   String get cardMissed;
 
-  /// No description provided for @cardMissedWasDue.
+  /// Card detail line under 'Missed'.
   ///
   /// In en, this message translates to:
   /// **'was due {when}, {duration} ago'**
@@ -480,25 +480,25 @@ abstract class AppLocalizations {
   /// **'you'**
   String get personYouAfterFor;
 
-  /// No description provided for @reminderDueAt.
+  /// Reminder notification title, read half-asleep: keep it short. {medication} is a name typed by the user.
   ///
   /// In en, this message translates to:
   /// **'{medication} due at {time}'**
   String reminderDueAt(String medication, String time);
 
-  /// No description provided for @reminderDueNow.
+  /// Reminder notification title: the dose should be given now.
   ///
   /// In en, this message translates to:
   /// **'{medication} due now'**
   String reminderDueNow(String medication);
 
-  /// No description provided for @reminderOverdueSince.
+  /// Reminder notification title: the dose was due at {time} and hasn't been given.
   ///
   /// In en, this message translates to:
   /// **'{medication} overdue since {time}'**
   String reminderOverdueSince(String medication, String time);
 
-  /// No description provided for @reminderAvailable.
+  /// Reminder notification title for an as-needed medication: a dose is allowed again. Allowed, never required.
   ///
   /// In en, this message translates to:
   /// **'{medication} can be given again'**
@@ -510,7 +510,7 @@ abstract class AppLocalizations {
   /// **'{count} medications for {person}'**
   String reminderManyFor(int count, String person);
 
-  /// No description provided for @reminderFor.
+  /// Reminder notification body: who the medication is for. {person} is a name typed by the user.
   ///
   /// In en, this message translates to:
   /// **'For {person}'**
@@ -558,7 +558,7 @@ abstract class AppLocalizations {
   /// **'Mark given'**
   String get actionMarkGiven;
 
-  /// No description provided for @actionSkip.
+  /// Button on a reminder notification: deliberately not giving this dose; the schedule carries on.
   ///
   /// In en, this message translates to:
   /// **'Skip'**
@@ -594,85 +594,85 @@ abstract class AppLocalizations {
   /// **'Reminders are working. This is how they\'ll look.'**
   String get testReminderBody;
 
-  /// No description provided for @csvGivenAt.
+  /// Column heading in the exported dose-history spreadsheet.
   ///
   /// In en, this message translates to:
   /// **'Given at'**
   String get csvGivenAt;
 
-  /// No description provided for @csvGivenAtUtc.
+  /// Column heading in the exported dose-history spreadsheet.
   ///
   /// In en, this message translates to:
   /// **'Given at (UTC)'**
   String get csvGivenAtUtc;
 
-  /// No description provided for @csvPatient.
+  /// Column heading in the exported dose-history spreadsheet.
   ///
   /// In en, this message translates to:
   /// **'Patient'**
   String get csvPatient;
 
-  /// No description provided for @csvMedication.
+  /// Column heading in the exported dose-history spreadsheet.
   ///
   /// In en, this message translates to:
   /// **'Medication'**
   String get csvMedication;
 
-  /// No description provided for @csvDose.
+  /// Column heading in the exported dose-history spreadsheet: the amount given.
   ///
   /// In en, this message translates to:
   /// **'Dose'**
   String get csvDose;
 
-  /// No description provided for @csvGivenBy.
+  /// Column heading in the exported dose-history spreadsheet: who gave it.
   ///
   /// In en, this message translates to:
   /// **'Given by'**
   String get csvGivenBy;
 
-  /// No description provided for @csvNotes.
+  /// Column heading in the exported dose-history spreadsheet.
   ///
   /// In en, this message translates to:
   /// **'Notes'**
   String get csvNotes;
 
-  /// No description provided for @csvStatus.
+  /// Column heading in the exported dose-history spreadsheet.
   ///
   /// In en, this message translates to:
   /// **'Status'**
   String get csvStatus;
 
-  /// No description provided for @csvCorrects.
+  /// Column heading in the exported spreadsheet: the number of the entry this row corrects.
   ///
   /// In en, this message translates to:
   /// **'Corrects entry'**
   String get csvCorrects;
 
-  /// No description provided for @csvEntry.
+  /// Column heading in the exported spreadsheet: the entry's number.
   ///
   /// In en, this message translates to:
   /// **'Entry'**
   String get csvEntry;
 
-  /// No description provided for @csvReplaced.
+  /// Status cell in the exported spreadsheet: this entry was replaced by a correction and no longer counts.
   ///
   /// In en, this message translates to:
   /// **'Replaced by a correction'**
   String get csvReplaced;
 
-  /// No description provided for @csvSkipped.
+  /// Status cell in the exported spreadsheet: the dose was deliberately skipped.
   ///
   /// In en, this message translates to:
   /// **'Skipped'**
   String get csvSkipped;
 
-  /// No description provided for @csvCorrection.
+  /// Status cell in the exported spreadsheet: this entry corrects an earlier one.
   ///
   /// In en, this message translates to:
   /// **'Correction'**
   String get csvCorrection;
 
-  /// No description provided for @csvGiven.
+  /// Status cell in the exported spreadsheet: the dose was given.
   ///
   /// In en, this message translates to:
   /// **'Given'**
@@ -930,7 +930,7 @@ abstract class AppLocalizations {
   /// **'Dose history'**
   String get doseHistory;
 
-  /// No description provided for @skipTheDose.
+  /// Title of the question asked before a dose is skipped.
   ///
   /// In en, this message translates to:
   /// **'Skip the {time} dose'**
@@ -954,7 +954,7 @@ abstract class AppLocalizations {
   /// **'Last given {when} by {name}'**
   String lastGivenBy(String when, String name);
 
-  /// No description provided for @skip.
+  /// Button on the medication card: deliberately not giving this dose; the schedule carries on.
   ///
   /// In en, this message translates to:
   /// **'Skip'**
@@ -1032,7 +1032,7 @@ abstract class AppLocalizations {
   /// **'That time hasn\'t happened yet.'**
   String get timeInFuture;
 
-  /// No description provided for @correctEntry.
+  /// Title of the screen for correcting a mistaken {medication} entry. The original stays in history, struck through.
   ///
   /// In en, this message translates to:
   /// **'Correct this {medication} entry'**
@@ -1074,13 +1074,13 @@ abstract class AppLocalizations {
   /// **'Change'**
   String get change;
 
-  /// No description provided for @dose.
+  /// Field label when logging a dose: the amount given, as the user types it.
   ///
   /// In en, this message translates to:
   /// **'Dose'**
   String get dose;
 
-  /// No description provided for @givenBy.
+  /// Field label when logging a dose: who gave it.
   ///
   /// In en, this message translates to:
   /// **'Given by'**
@@ -1092,7 +1092,7 @@ abstract class AppLocalizations {
   /// **'Optional'**
   String get optional;
 
-  /// No description provided for @notes.
+  /// Field label when logging a dose: free-text notes.
   ///
   /// In en, this message translates to:
   /// **'Notes'**
@@ -1116,7 +1116,7 @@ abstract class AppLocalizations {
   /// **'Dose history saved'**
   String get doseHistorySaved;
 
-  /// No description provided for @correctTimeOrDetails.
+  /// Menu item on a history entry: opens the correction screen.
   ///
   /// In en, this message translates to:
   /// **'Correct time or details'**
@@ -1350,7 +1350,7 @@ abstract class AppLocalizations {
   /// **'Save'**
   String get save;
 
-  /// No description provided for @forPerson.
+  /// Heading of the medication editor: whose medication this is. {person} is a name typed by the user.
   ///
   /// In en, this message translates to:
   /// **'For {person}'**
@@ -1482,7 +1482,7 @@ abstract class AppLocalizations {
   /// **'At set times'**
   String get kindFixedTimes;
 
-  /// No description provided for @kindAsNeeded.
+  /// Kind of schedule, chosen when editing a medication: given only when needed, with a minimum gap between doses.
   ///
   /// In en, this message translates to:
   /// **'As needed'**
@@ -1638,7 +1638,7 @@ abstract class AppLocalizations {
   /// **'Remove step'**
   String get removeStep;
 
-  /// No description provided for @stepFrom.
+  /// Taper editor: button showing a step's first day; tapping it picks the date.
   ///
   /// In en, this message translates to:
   /// **'From {date}'**
@@ -1650,7 +1650,7 @@ abstract class AppLocalizations {
   /// **'No end date'**
   String get noEndDate;
 
-  /// No description provided for @stepUntil.
+  /// Taper editor: button showing a step's last day; tapping it picks the date.
   ///
   /// In en, this message translates to:
   /// **'Until {date}'**
@@ -1704,7 +1704,7 @@ abstract class AppLocalizations {
   /// **'None'**
   String get none;
 
-  /// No description provided for @minutesShort.
+  /// Choice in the editor's reminder-timing dropdown, e.g. '10 min'.
   ///
   /// In en, this message translates to:
   /// **'{count} min'**
@@ -1938,7 +1938,7 @@ abstract class AppLocalizations {
   /// **'{count, plural, =1{1 medication} other{{count} medications}}'**
   String medicationCount(int count);
 
-  /// No description provided for @doseLogged.
+  /// Confirmation shown after a dose is logged.
   ///
   /// In en, this message translates to:
   /// **'{medication} logged, {when}'**

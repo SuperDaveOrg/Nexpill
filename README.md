@@ -27,9 +27,12 @@ permission.
 an earlier web version whose reminders couldn't be relied on; see
 [docs/port-from-pwa.md](docs/port-from-pwa.md) for how the port went.
 
-**Testers wanted:**
+**Help translate Nexpill:**
 <p align="center">
-Nexpill in your language. A beta of the next version speaks German, Spanish, French, Italian, Portuguese (Portugal) and Russian, and each translation needs a native speaker to check it before release. If you'd like to help, the beta and what to look for are at [nexpill.superdavelab.com/beta](https://nexpill.superdavelab.com/beta/).
+The next version speaks German, Spanish, French, Italian, Portuguese (Portugal) and Russian, each a first draft that needs a native speaker before release. Fix the words yourself on <a href="https://hosted.weblate.org/engage/nexpill/">Hosted Weblate</a>, in the browser with no Git needed, or check them in the running app: the beta and what to look for are at <a href="https://nexpill.superdavelab.com/beta/">nexpill.superdavelab.com/beta</a>. A language Nexpill doesn't speak yet is welcome too; see <a href="docs/translating.md">docs/translating.md</a>.
+</p>
+<p align="center">
+<a href="https://hosted.weblate.org/engage/nexpill/"><img src="https://hosted.weblate.org/widget/nexpill/svg-badge.svg" alt="Translation status"></a>
 </p>
 
 ## Why Nexpill exists

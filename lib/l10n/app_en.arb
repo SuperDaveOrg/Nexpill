@@ -29,6 +29,7 @@
   },
   "skippedDose": "Skipped the {time} dose",
   "@skippedDose": {
+    "description": "Confirmation shown after a dose was skipped.",
     "placeholders": {
       "time": {
         "type": "String"
@@ -74,6 +75,7 @@
   "taperNoSteps": "Taper with no steps",
   "taperStepFrom": "From {date}",
   "@taperStepFrom": {
+    "description": "In a taper summary: a step that starts on {date} and has no end date.",
     "placeholders": {
       "date": {
         "type": "String"
@@ -162,10 +164,20 @@
     }
   },
   "statusNotGiven": "Not given yet",
+  "@statusNotGiven": {
+    "description": "Card status: no dose of this medication has been logged yet."
+  },
   "statusCanGiveNow": "Can be given now",
+  "@statusCanGiveNow": {
+    "description": "Card status for an as-needed medication: the minimum gap has passed, so a dose is allowed now. Allowed, never required."
+  },
   "statusDueNow": "Due now",
+  "@statusDueNow": {
+    "description": "Card status, also used in reminders: the dose should be given now."
+  },
   "statusNextAt": "Next at {time}",
   "@statusNextAt": {
+    "description": "Card status: the next dose is at {time}; giving it before then would be too early.",
     "placeholders": {
       "time": {
         "type": "String"
@@ -174,6 +186,7 @@
   },
   "statusOverdueBy": "Overdue by {duration}",
   "@statusOverdueBy": {
+    "description": "Card status: the dose was due {duration} ago and hasn't been given.",
     "placeholders": {
       "duration": {
         "type": "String"
@@ -182,6 +195,7 @@
   },
   "statusMissed": "Missed: was due {duration} ago",
   "@statusMissed": {
+    "description": "Card status: so late that the next dose is nearly due. Keep it distinct from overdue.",
     "placeholders": {
       "duration": {
         "type": "String"
@@ -189,10 +203,20 @@
     }
   },
   "statusFinished": "Finished",
+  "@statusFinished": {
+    "description": "Card status: the course or single dose is complete; nothing more to give."
+  },
   "remindersOff": "Off",
+  "@remindersOff": {
+    "description": "Reminder summary in the editor: reminders are off for this medication."
+  },
   "remindersOn": "On",
+  "@remindersOn": {
+    "description": "Reminder summary in the editor: reminders are on for this medication."
+  },
   "remindersEarly": "{duration} early",
   "@remindersEarly": {
+    "description": "Reminder summary in the editor: reminders fire {duration} before the dose is due.",
     "placeholders": {
       "duration": {
         "type": "String"
@@ -200,8 +224,12 @@
     }
   },
   "remindersAlarm": "as an alarm",
+  "@remindersAlarm": {
+    "description": "Reminder summary in the editor, listed after 'On': the reminder rings as an alarm."
+  },
   "whenToday": "{time}",
   "@whenToday": {
+    "description": "A time today, inside bigger sentences: 'since {when}', 'was due {when}', 'Next dose {when}'. Spanish says 'hoy a las 4:28' so each of those reads well; check yours do.",
     "placeholders": {
       "time": {
         "type": "String"
@@ -210,6 +238,7 @@
   },
   "whenTomorrow": "tomorrow at {time}",
   "@whenTomorrow": {
+    "description": "Inside bigger sentences: 'since {when}', 'was due {when}', 'Next dose {when}'.",
     "placeholders": {
       "time": {
         "type": "String"
@@ -218,6 +247,7 @@
   },
   "whenYesterday": "yesterday at {time}",
   "@whenYesterday": {
+    "description": "Inside bigger sentences: 'since {when}', 'was due {when}'.",
     "placeholders": {
       "time": {
         "type": "String"
@@ -226,6 +256,7 @@
   },
   "whenOnDay": "{date} at {time}",
   "@whenOnDay": {
+    "description": "Inside bigger sentences: 'since {when}', 'was due {when}', 'Next dose {when}'.",
     "placeholders": {
       "date": {
         "type": "String"
@@ -237,6 +268,7 @@
   },
   "shortMinutes": "{count} min",
   "@shortMinutes": {
+    "description": "Short duration on a card or in a reminder, e.g. '45 min'.",
     "placeholders": {
       "count": {
         "type": "int"
@@ -271,6 +303,9 @@
     }
   },
   "today": "Today",
+  "@today": {
+    "description": "Heading of today's entries in the dose history."
+  },
   "yesterday": "Yesterday",
   "courseFinishedLastDay": "Course finished: last day was {date}",
   "@courseFinishedLastDay": {
@@ -322,6 +357,7 @@
   },
   "cardFirstDue": "First due {when}",
   "@cardFirstDue": {
+    "description": "Card detail line under 'Not given yet': when the first dose is due. {when} is one of the when… messages.",
     "placeholders": {
       "when": {
         "type": "String"
@@ -329,8 +365,12 @@
     }
   },
   "cardAsNeeded": "As needed",
+  "@cardAsNeeded": {
+    "description": "Card detail line under 'Can be given now', for an as-needed medication."
+  },
   "cardAvailableFrom": "Next dose from {when}",
   "@cardAvailableFrom": {
+    "description": "Card headline for an as-needed medication still inside its minimum gap: a dose is allowed again from {when}.",
     "placeholders": {
       "when": {
         "type": "String"
@@ -339,6 +379,7 @@
   },
   "cardNextDose": "Next dose {when}",
   "@cardNextDose": {
+    "description": "Card headline: the next dose is due {when}; giving it now would be too early.",
     "placeholders": {
       "when": {
         "type": "String"
@@ -347,6 +388,7 @@
   },
   "cardIn": "in {duration}",
   "@cardIn": {
+    "description": "Card detail line under 'Next dose…': how long until then.",
     "placeholders": {
       "duration": {
         "type": "String"
@@ -355,6 +397,7 @@
   },
   "cardDueIn": "Due in {duration}",
   "@cardDueIn": {
+    "description": "Card headline: not yet; the dose becomes due in {duration}.",
     "placeholders": {
       "duration": {
         "type": "String"
@@ -363,6 +406,7 @@
   },
   "cardAt": "at {when}",
   "@cardAt": {
+    "description": "Card detail line under 'Due in…': the time it becomes due.",
     "placeholders": {
       "when": {
         "type": "String"
@@ -371,6 +415,7 @@
   },
   "cardSince": "since {when}",
   "@cardSince": {
+    "description": "Card detail line under 'Due now': since when.",
     "placeholders": {
       "when": {
         "type": "String"
@@ -379,6 +424,7 @@
   },
   "cardOverdue": "Overdue {duration}",
   "@cardOverdue": {
+    "description": "Card headline: the dose was due {duration} ago and hasn't been given.",
     "placeholders": {
       "duration": {
         "type": "String"
@@ -387,6 +433,7 @@
   },
   "cardWasDue": "was due {when}",
   "@cardWasDue": {
+    "description": "Card detail line under 'Overdue…'.",
     "placeholders": {
       "when": {
         "type": "String"
@@ -394,8 +441,12 @@
     }
   },
   "cardMissed": "Missed",
+  "@cardMissed": {
+    "description": "Card headline: so late that the next dose is nearly due. Keep it distinct from overdue."
+  },
   "cardMissedWasDue": "was due {when}, {duration} ago",
   "@cardMissedWasDue": {
+    "description": "Card detail line under 'Missed'.",
     "placeholders": {
       "when": {
         "type": "String"
@@ -409,6 +460,7 @@
   "personYouAfterFor": "you",
   "reminderDueAt": "{medication} due at {time}",
   "@reminderDueAt": {
+    "description": "Reminder notification title, read half-asleep: keep it short. {medication} is a name typed by the user.",
     "placeholders": {
       "medication": {
         "type": "String"
@@ -420,6 +472,7 @@
   },
   "reminderDueNow": "{medication} due now",
   "@reminderDueNow": {
+    "description": "Reminder notification title: the dose should be given now.",
     "placeholders": {
       "medication": {
         "type": "String"
@@ -428,6 +481,7 @@
   },
   "reminderOverdueSince": "{medication} overdue since {time}",
   "@reminderOverdueSince": {
+    "description": "Reminder notification title: the dose was due at {time} and hasn't been given.",
     "placeholders": {
       "medication": {
         "type": "String"
@@ -439,6 +493,7 @@
   },
   "reminderAvailable": "{medication} can be given again",
   "@reminderAvailable": {
+    "description": "Reminder notification title for an as-needed medication: a dose is allowed again. Allowed, never required.",
     "placeholders": {
       "medication": {
         "type": "String"
@@ -458,6 +513,7 @@
   },
   "reminderFor": "For {person}",
   "@reminderFor": {
+    "description": "Reminder notification body: who the medication is for. {person} is a name typed by the user.",
     "placeholders": {
       "person": {
         "type": "String"
@@ -472,6 +528,9 @@
   "channelUpkeepDescription": "A note when Nexpill needs opening so reminders don't run out.",
   "actionMarkGiven": "Mark given",
   "actionSkip": "Skip",
+  "@actionSkip": {
+    "description": "Button on a reminder notification: deliberately not giving this dose; the schedule carries on."
+  },
   "actionSnooze": "Snooze {minutes} min",
   "@actionSnooze": {
     "placeholders": {
@@ -485,19 +544,61 @@
   "testReminderTitle": "Test reminder",
   "testReminderBody": "Reminders are working. This is how they'll look.",
   "csvGivenAt": "Given at",
+  "@csvGivenAt": {
+    "description": "Column heading in the exported dose-history spreadsheet."
+  },
   "csvGivenAtUtc": "Given at (UTC)",
+  "@csvGivenAtUtc": {
+    "description": "Column heading in the exported dose-history spreadsheet."
+  },
   "csvPatient": "Patient",
+  "@csvPatient": {
+    "description": "Column heading in the exported dose-history spreadsheet."
+  },
   "csvMedication": "Medication",
+  "@csvMedication": {
+    "description": "Column heading in the exported dose-history spreadsheet."
+  },
   "csvDose": "Dose",
+  "@csvDose": {
+    "description": "Column heading in the exported dose-history spreadsheet: the amount given."
+  },
   "csvGivenBy": "Given by",
+  "@csvGivenBy": {
+    "description": "Column heading in the exported dose-history spreadsheet: who gave it."
+  },
   "csvNotes": "Notes",
+  "@csvNotes": {
+    "description": "Column heading in the exported dose-history spreadsheet."
+  },
   "csvStatus": "Status",
+  "@csvStatus": {
+    "description": "Column heading in the exported dose-history spreadsheet."
+  },
   "csvCorrects": "Corrects entry",
+  "@csvCorrects": {
+    "description": "Column heading in the exported spreadsheet: the number of the entry this row corrects."
+  },
   "csvEntry": "Entry",
+  "@csvEntry": {
+    "description": "Column heading in the exported spreadsheet: the entry's number."
+  },
   "csvReplaced": "Replaced by a correction",
+  "@csvReplaced": {
+    "description": "Status cell in the exported spreadsheet: this entry was replaced by a correction and no longer counts."
+  },
   "csvSkipped": "Skipped",
+  "@csvSkipped": {
+    "description": "Status cell in the exported spreadsheet: the dose was deliberately skipped."
+  },
   "csvCorrection": "Correction",
+  "@csvCorrection": {
+    "description": "Status cell in the exported spreadsheet: this entry corrects an earlier one."
+  },
   "csvGiven": "Given",
+  "@csvGiven": {
+    "description": "Status cell in the exported spreadsheet: the dose was given."
+  },
   "summaryTitleFor": "Medication summary for {name}",
   "@summaryTitleFor": {
     "placeholders": {
@@ -771,6 +872,7 @@
   "doseHistory": "Dose history",
   "skipTheDose": "Skip the {time} dose",
   "@skipTheDose": {
+    "description": "Title of the question asked before a dose is skipped.",
     "placeholders": {
       "time": {
         "type": "String"
@@ -798,6 +900,9 @@
     }
   },
   "skip": "Skip",
+  "@skip": {
+    "description": "Button on the medication card: deliberately not giving this dose; the schedule carries on."
+  },
   "give": "Give",
   "supplyLeft": "{amount} left",
   "@supplyLeft": {
@@ -852,6 +957,7 @@
   "timeInFuture": "That time hasn't happened yet.",
   "correctEntry": "Correct this {medication} entry",
   "@correctEntry": {
+    "description": "Title of the screen for correcting a mistaken {medication} entry. The original stays in history, struck through.",
     "placeholders": {
       "medication": {
         "type": "String"
@@ -879,13 +985,25 @@
   },
   "change": "Change",
   "dose": "Dose",
+  "@dose": {
+    "description": "Field label when logging a dose: the amount given, as the user types it."
+  },
   "givenBy": "Given by",
+  "@givenBy": {
+    "description": "Field label when logging a dose: who gave it."
+  },
   "optional": "Optional",
   "notes": "Notes",
+  "@notes": {
+    "description": "Field label when logging a dose: free-text notes."
+  },
   "saveCorrection": "Save correction",
   "logDose": "Log dose",
   "doseHistorySaved": "Dose history saved",
   "correctTimeOrDetails": "Correct time or details",
+  "@correctTimeOrDetails": {
+    "description": "Menu item on a history entry: opens the correction screen."
+  },
   "keepsOriginal": "Keeps the original, marked as corrected",
   "deleteEntry": "Delete entry",
   "deleteEntrySkippedHint": "The dose becomes due again",
@@ -981,6 +1099,7 @@
   "save": "Save",
   "forPerson": "For {person}",
   "@forPerson": {
+    "description": "Heading of the medication editor: whose medication this is. {person} is a name typed by the user.",
     "placeholders": {
       "person": {
         "type": "String"
@@ -1009,6 +1128,9 @@
   "kindInterval": "Every few hours",
   "kindFixedTimes": "At set times",
   "kindAsNeeded": "As needed",
+  "@kindAsNeeded": {
+    "description": "Kind of schedule, chosen when editing a medication: given only when needed, with a minimum gap between doses."
+  },
   "kindTaper": "Taper",
   "kindOnce": "Once",
   "every": "Every",
@@ -1057,6 +1179,7 @@
   "removeStep": "Remove step",
   "stepFrom": "From {date}",
   "@stepFrom": {
+    "description": "Taper editor: button showing a step's first day; tapping it picks the date.",
     "placeholders": {
       "date": {
         "type": "String"
@@ -1066,6 +1189,7 @@
   "noEndDate": "No end date",
   "stepUntil": "Until {date}",
   "@stepUntil": {
+    "description": "Taper editor: button showing a step's last day; tapping it picks the date.",
     "placeholders": {
       "date": {
         "type": "String"
@@ -1082,6 +1206,7 @@
   "none": "None",
   "minutesShort": "{count} min",
   "@minutesShort": {
+    "description": "Choice in the editor's reminder-timing dropdown, e.g. '10 min'.",
     "placeholders": {
       "count": {
         "type": "int"
@@ -1184,6 +1309,7 @@
   },
   "doseLogged": "{medication} logged, {when}",
   "@doseLogged": {
+    "description": "Confirmation shown after a dose is logged.",
     "placeholders": {
       "medication": {
         "type": "String"
