@@ -107,6 +107,10 @@ class Medication {
           FixedTimesSchedule(:final times) => times.join(','),
           _ => null,
         },
+        'once_at': switch (schedule) {
+          OnceSchedule(:final at) => at.toUtc().millisecondsSinceEpoch,
+          _ => null,
+        },
         'reminders_enabled': reminders.enabled ? 1 : 0,
         'early_reminder_minutes': reminders.earlyMinutes,
         'overdue_repeat_minutes': reminders.overdueRepeatMinutes,
@@ -149,6 +153,9 @@ class Medication {
               if (t.isNotEmpty) ClockTime.tryParse(t)!,
           ]),
         TaperSchedule.name => TaperSchedule(taperRules),
+        OnceSchedule.name => OnceSchedule(DateTime.fromMillisecondsSinceEpoch(
+            row['once_at'] as int,
+            isUtc: true)),
         _ => throw StateError('unknown schedule type $type'),
       },
       reminders: ReminderSettings(
@@ -283,6 +290,17 @@ class TaperSchedule extends MedicationSchedule {
   final List<TaperRule> rules;
 
   static const name = 'taper';
+  @override
+  String get typeName => name;
+}
+
+/// A single dose at [at], an instant, and then nothing more: finished once
+/// it's given or skipped.
+class OnceSchedule extends MedicationSchedule {
+  const OnceSchedule(this.at);
+  final DateTime at;
+
+  static const name = 'once';
   @override
   String get typeName => name;
 }

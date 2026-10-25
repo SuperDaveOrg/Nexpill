@@ -41,8 +41,8 @@ class ScheduleResult {
   /// or the due time itself without one — or null when reminders are off.
   final DateTime? reminderAt;
 
-  /// A course that has ended, or a taper whose last step has: nothing more
-  /// is due, so nothing is overdue and there's no reminder. [nextEligibleAt]
+  /// A course that has ended, a taper whose last step has, or a single dose
+  /// that's been given or skipped: nothing more is due, so nothing is overdue and there's no reminder. [nextEligibleAt]
   /// is when it finished. See [finishesAt].
   final bool finished;
 }
@@ -57,7 +57,11 @@ ScheduleResult calculateSchedule(
 ) {
   final latest = latestDose(medication.id, doseEvents);
   final end = finishesAt(medication, doseEvents);
-  if (end != null && !now.isBefore(end)) {
+  // A single dose is done as soon as it's logged, even one skipped ahead of
+  // its time.
+  final onceDone = medication.schedule is OnceSchedule &&
+      latestEntry(medication.id, doseEvents) != null;
+  if (end != null && (onceDone || !now.isBefore(end))) {
     return ScheduleResult(
       lastGivenAt: latest?.givenAt,
       nextEligibleAt: end,
@@ -85,17 +89,24 @@ ScheduleResult calculateSchedule(
 }
 
 /// When [medication] finishes by itself: at the end of its course's last
-/// day, at the dose that completes its course, or when a taper's last step
-/// ends — whichever comes first. Null if none of those applies, or the
+/// day, at the dose that completes its course, when a taper's last step
+/// ends, or at a single dose's first entry, given or skipped — whichever
+/// comes first. Null if none of those applies, or the
 /// doses that would complete the course haven't all been given.
 ///
 /// [doseEvents] may hold any medication's doses; only this one's count.
 DateTime? finishesAt(Medication medication, Iterable<DoseEvent> doseEvents) {
   final ends = [
     if (medication.schedule case TaperSchedule(:final rules)) ?taperEndsAt(rules),
+    if (medication.schedule is OnceSchedule) ?_firstEntryAt(medication.id, doseEvents),
     if (medication.course case final course?) ?_courseEndsAt(course, medication.id, doseEvents),
   ];
   return ends.isEmpty ? null : ends.reduce((a, b) => a.isBefore(b) ? a : b);
+}
+
+DateTime? _firstEntryAt(String medicationId, Iterable<DoseEvent> doseEvents) {
+  final times = [for (final e in effectiveEntries(medicationId, doseEvents)) e.givenAt];
+  return times.isEmpty ? null : times.reduce((a, b) => a.isBefore(b) ? a : b);
 }
 
 DateTime? _courseEndsAt(
@@ -139,6 +150,7 @@ DateTime _nextEligibleAt(
       latest?.givenAt.add(Duration(minutes: minimumIntervalMinutes)) ?? now,
     FixedTimesSchedule(:final times) => _fixedDue(times, latest, now),
     TaperSchedule(:final rules) => _taperDue(rules, latest, now),
+    OnceSchedule(:final at) => at,
   };
 }
 

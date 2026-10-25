@@ -115,6 +115,24 @@ void main() {
     });
   });
 
+  group('a single dose', () {
+    test('says when it is', () {
+      expect(plain(scheduleText(OnceSchedule(DateTime(2026, 6, 11, 15)))),
+          'Once, Jun 11, 2026 3:00 PM');
+      expect(plain(scheduleShortText(OnceSchedule(DateTime(2026, 6, 10, 17)), now)),
+          'Once, today at 5:00 PM');
+      expect(plain(scheduleShortText(OnceSchedule(DateTime(2026, 6, 11, 15)), now)),
+          'Once, tomorrow at 3:00 PM');
+    });
+
+    test('is due like any other dose, and then finished', () {
+      final s = OnceSchedule(DateTime(2026, 6, 10, 13));
+      expect(card(s, []), ('Overdue 1 hr', 'was due 1:00 PM'));
+      expect(card(s, [at(DateTime(2026, 6, 10, 13, 30))]),
+          ('Finished', 'Single dose logged'));
+    });
+  });
+
   test('relative days', () {
     expect(plain(whenText(DateTime(2026, 6, 10, 9), now)), '9:00 AM');
     expect(plain(whenText(DateTime(2026, 6, 9, 21), now)), 'yesterday at 9:00 PM');

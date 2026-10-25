@@ -185,6 +185,7 @@ class _MedicationEditorState extends State<MedicationEditor> {
                 (ScheduleKind.fixedTimes, 'At set times'),
                 (ScheduleKind.prn, 'As needed'),
                 (ScheduleKind.taper, 'Taper'),
+                (ScheduleKind.once, 'Once'),
               ])
                 ChoiceChip(
                   label: Text(label),
@@ -234,6 +235,26 @@ class _MedicationEditorState extends State<MedicationEditor> {
                 _hint(theme, 'Every day, on this phone\'s clock.'),
               ],
             ScheduleKind.taper => _taper(theme),
+            ScheduleKind.once => [
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    ActionChip(
+                      avatar: const Icon(Icons.event_outlined),
+                      label: Text(dateText(_d.onceAt)),
+                      onPressed: _pickOnceDay,
+                    ),
+                    ActionChip(
+                      avatar: const Icon(Icons.schedule),
+                      label: Text(clockText(_d.onceAt)),
+                      onPressed: _pickOnceTime,
+                    ),
+                  ],
+                ),
+                _hint(theme, 'A single dose. Once it\'s given or skipped it\'s '
+                    'finished, and stays in history.'),
+              ],
           },
           if (_errors['schedule'] != null)
             Padding(
@@ -262,6 +283,34 @@ class _MedicationEditorState extends State<MedicationEditor> {
       final t = ClockTime(picked.hour, picked.minute);
       if (!_d.times.contains(t)) _d.times.add(t);
     });
+  }
+
+  Future<void> _pickOnceDay() async {
+    final today = dateOnly(DateTime.now());
+    final at = _d.onceAt;
+    final day = dateOnly(at);
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: day,
+      firstDate: day.isBefore(today) ? day : today,
+      lastDate: DateTime(today.year + 2, today.month, today.day),
+      helpText: 'Day of the dose',
+    );
+    if (picked == null) return;
+    _update(() => _d.onceAt =
+        DateTime(picked.year, picked.month, picked.day, at.hour, at.minute));
+  }
+
+  Future<void> _pickOnceTime() async {
+    final at = _d.onceAt;
+    final picked = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.fromDateTime(at),
+      helpText: 'Time of dose',
+    );
+    if (picked == null) return;
+    _update(() => _d.onceAt =
+        DateTime(at.year, at.month, at.day, picked.hour, picked.minute));
   }
 
   Widget _course(ThemeData theme) {

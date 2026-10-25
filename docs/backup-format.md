@@ -11,7 +11,7 @@ in one step: a file with a problem anywhere is refused whole.
 
 ## Versioning
 
-`nexpillBackup` is the format version, currently **4**. Adding an optional
+`nexpillBackup` is the format version, currently **5**. Adding an optional
 field doesn't change it. Changing what a field means, or adding a required
 one, needs a new version, a section here, and a reader that still accepts the
 old versions. Nexpill refuses a file whose version it doesn't know.
@@ -28,6 +28,7 @@ older app refuses the file instead of half-restoring it.
 | 2 | Adds the medication's optional `course`. Without the version change, an older Nexpill would drop a course and keep reminding after it ended. A version 1 file is read as version 2 with no courses. |
 | 3 | Adds the dose's optional `skipped`. Without the version change, an older Nexpill would read a skip as a dose given, using up supply and counting towards a course. A version 2 file is read as version 3 with no skips. |
 | 4 | Adds the patient's optional `self`, for the phone's owner, whose `name` may then be absent. Without the version change, an older Nexpill would refuse a file with a nameless patient for the wrong reason, or forget who the owner is. A version 3 file is read as version 4 with no owner. |
+| 5 | Adds the `once` schedule type, a single dose at a set time. Without the version change, an older Nexpill would refuse the file as having an unknown schedule type, rather than saying it needs updating. A version 4 file is read as version 5 unchanged. |
 
 ## Example
 
@@ -118,6 +119,7 @@ the whole file; Nexpill writes random UUIDs.
 | `fixedTimes` | `times`: array of `"HH:mm"` | Due at those times on the phone's clock every day. |
 | `asNeeded` | `minimumMinutes` | Can be given once that long has passed since the last dose; never due or overdue. |
 | `taper` | `steps`: array of `{from, until?, everyMinutes}` | An interval that changes by date. `from` and `until` are `YYYY-MM-DD` calendar days; a step applies from local midnight on `from` until local midnight on `until` (so not on `until` itself). The last step may be open-ended. |
+| `once` | `at`: instant | A single dose, due at that moment. Finished once a dose of it is given or skipped, whenever that was logged for; nothing more is due after that. |
 
 All minute values are positive integers.
 
@@ -154,7 +156,8 @@ Exactly one of:
 
 Once finished, nothing more is due and nothing is reminded; the medication
 and its history stay. A taper's own steps end it, so Nexpill doesn't write
-a course for a taper; if one is there, whichever ends first applies.
+a course for a taper, nor for a `once` schedule, which its one dose ends; if
+one is there, whichever ends first applies.
 
 ### Dose
 

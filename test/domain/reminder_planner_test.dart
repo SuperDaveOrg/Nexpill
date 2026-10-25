@@ -276,6 +276,32 @@ void main() {
     });
   });
 
+  group('a single dose', () {
+    final m = med('flu', OnceSchedule(DateTime(2026, 6, 11, 15)),
+        reminders: const ReminderSettings(
+            enabled: true, earlyMinutes: 10, overdueRepeatMinutes: 60, alarm: true));
+
+    test('reminds before, at and after its time, ringing when due', () {
+      final plan = const ReminderPlanner(maxOverdueRepeats: 2)
+          .plan(care([m], []), from: from);
+      expect(summary(plan), [
+        '11/14:50 dueSoon:flu',
+        '11/15:00 dueNow:flu',
+        '11/16:00 overdue:flu',
+        '11/17:00 overdue:flu',
+      ]);
+      expect([for (final n in plan.notifications) n.rings], [false, true, true, true]);
+    });
+
+    test('stops once given or skipped', () {
+      expect(planner.plan(care([m], [given('flu', from)]), from: from).notifications,
+          isEmpty);
+      final skip = DoseEvent(id: 's', medicationId: 'flu',
+          givenAt: DateTime(2026, 6, 11, 15).toUtc(), skipped: true);
+      expect(planner.plan(care([m], [skip]), from: from).notifications, isEmpty);
+    });
+  });
+
   group('notifications', () {
     test('one per patient per minute, listing everything due', () {
       final a = med('amox', const IntervalSchedule(480));

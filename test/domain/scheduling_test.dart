@@ -408,6 +408,48 @@ void main() {
     });
   });
 
+  group('a single dose', () {
+    final at = utc('2026-03-28T15:00:00Z');
+    final m = med(OnceSchedule(at));
+
+    test('is due at its time, then late, never missed', () {
+      final early = computeMedicationStatus(m, [], now);
+      expect(early.label, MedicationStatusLabel.tooEarly);
+      expect(early.schedule.nextEligibleAt, at);
+      expect(early.schedule.reminderAt, at);
+
+      expect(computeMedicationStatus(m, [], utc('2026-03-28T14:50:00Z')).label,
+          MedicationStatusLabel.dueSoon);
+      final late = computeMedicationStatus(m, [], utc('2026-03-29T15:00:00Z'));
+      expect(late.label, MedicationStatusLabel.overdue);
+      expect(late.schedule.overdueByMinutes, 24 * 60);
+    });
+
+    test('is finished by a dose, even one given early', () {
+      final r = calculateSchedule(m, [dose('2026-03-28T09:30:00Z')], now);
+      expect(r.finished, isTrue);
+      expect(r.nextEligibleAt, utc('2026-03-28T09:30:00Z'));
+      expect(r.reminderAt, isNull);
+      expect(computeMedicationStatus(m, [dose('2026-03-28T09:30:00Z')], now).label,
+          MedicationStatusLabel.finished);
+    });
+
+    test('is finished straight away by a skip ahead of its time', () {
+      final skip = DoseEvent(
+          id: 'skip-1', medicationId: 'med-1', givenAt: at, skipped: true);
+      final r = calculateSchedule(m, [skip], now);
+      expect(r.finished, isTrue);
+      expect(finishesAt(m, [skip]), at);
+    });
+
+    test('a corrected dose still finishes it', () {
+      final first = dose('2026-03-28T09:00:00Z', id: 'a');
+      final fixed = dose('2026-03-28T09:10:00Z', id: 'b', corrects: 'a');
+      expect(finishesAt(m, [first, fixed]), utc('2026-03-28T09:10:00Z'));
+      expect(calculateSchedule(m, [first, fixed], now).finished, isTrue);
+    });
+  });
+
   group('reminders', () {
     test('have a time only when enabled', () {
       final on = med(const IntervalSchedule(60),
