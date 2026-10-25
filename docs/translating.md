@@ -32,11 +32,68 @@ Not translated, on purpose: the brand name, the backup file's field names
 (they're the public format), file names, the debug-only Development section,
 and anything the user typed — medication names, doses, notes.
 
+## Translating on Weblate
+
+The easiest way to help is [Hosted Weblate](https://hosted.weblate.org/projects/nexpill/),
+a web editor that needs no Git or Flutter. Sign in, pick a language, and
+fix what reads wrongly. Where a string is ambiguous, a note under it says
+which screen it's on and what it must mean; the `description` entries in
+`app_en.arb` are those notes, so add one whenever a new string could be
+misread. Weblate checks placeholders and plural forms as you type (ICU
+MessageFormat), and translators can comment on a string, or on the English.
+
+| Component | Files | What it is |
+|---|---|---|
+| App | `lib/l10n/app_*.arb` | Every word in the app. |
+| Store listing | `fastlane/metadata/android/*/` | The title and descriptions F-Droid shows. |
+
+**How changes come back.** Weblate commits each translator's work under
+their own name and opens a pull request against `main` (one per
+component, updated until it's merged). To merge one:
+
+1. CI runs the usual checks; `flutter test test/l10n` is the one that
+   matters here.
+2. If it adds a language, do steps 2 and 3 below first; the test fails
+   until the language is in both lists. Merge a new language once it's
+   complete: `gen-l10n` quietly fills gaps with English, which is exactly
+   what the test is there to refuse.
+3. Merge with a merge commit, not a squash. Weblate matches its commits
+   against `main`, and a squash leaves it to rebase.
+4. Run `flutter gen-l10n`, which rewrites the generated `.dart` files in
+   `lib/l10n/`, and commit them.
+
+Don't edit a translated `.arb` on `main` while Weblate has unmerged
+changes; lock the component on Weblate first (Manage → Repository
+maintenance), or the two conflict. The English still changes here, in
+`app_en.arb`: Weblate picks it up on the next push to `main` and marks the
+affected translations for attention.
+
+**Weblate settings**, should they ever need recreating. Project
+`nexpill`, licence GPL-3.0-or-later, source language English, source
+repository `https://github.com/SuperDaveOrg/Nexpill.git` on branch `main`,
+pushed through the Hosted Weblate GitHub app (or the *GitHub pull request*
+VCS with an empty push URL, which uses a fork).
+
+| | App | Store listing |
+|---|---|---|
+| File format | ARB file | App store metadata files |
+| File mask | `lib/l10n/app_*.arb` | `fastlane/metadata/android/*` |
+| Monolingual base language file | `lib/l10n/app_en.arb` | `fastlane/metadata/android/en-US` |
+| Template for new translations | empty | `fastlane/metadata/android/en-US` |
+| Language code style | default (`pt_BR`, as Flutter names files) | BCP with hyphen (`pt-PT`, as F-Droid names directories) |
+| Key filter | none | `^(?!changelogs/)`, so release notes stay English |
+| Edit base file, Manage strings | off | off |
+
+The ARB format turns on Weblate's ICU MessageFormat check by itself, which
+covers placeholders and plural forms; no extra translation flags are
+needed.
+
 ## Adding a language
 
-1. Copy `lib/l10n/app_en.arb` to `app_<code>.arb`, set `"@@locale"`, delete
-   the `@` entries (only the template needs them), and translate every
-   message.
+1. On Weblate, open the App component and choose *Start new translation*.
+   It creates `lib/l10n/app_<code>.arb` and the usual pull request. (By
+   hand instead: copy `app_en.arb` to `app_<code>.arb`, set `"@@locale"`,
+   delete the `@` entries, and translate every message.)
 2. Add the language, by its own name, to `languageNames` in
    `lib/ui/language.dart`.
 3. Add it to `android/app/src/main/res/xml/locales_config.xml`.
@@ -89,7 +146,7 @@ Other rules:
 | Language | State |
 |---|---|
 | English | The source. |
-| German | First draft, written with an AI assistant. **Needs review by a native speaker before release**, like every language below. |
+| German | First draft, written with an AI assistant. **Needs review by a native speaker before release**, like every language below; the place to do it is [Weblate](https://hosted.weblate.org/projects/nexpill/). |
 | Spanish | First draft, written with an AI assistant. **Needs review by a native speaker before release**, above all the statuses in the table above. |
 | French | The same. |
 | Italian | The same. |
