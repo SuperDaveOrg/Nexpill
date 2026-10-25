@@ -192,6 +192,24 @@ abstract class AppLocalizations {
   /// **'Taper finished'**
   String get taperFinished;
 
+  /// No description provided for @scheduleOnce.
+  ///
+  /// In en, this message translates to:
+  /// **'Once, {when}'**
+  String scheduleOnce(String when);
+
+  /// No description provided for @scheduleOnceToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Once, today at {time}'**
+  String scheduleOnceToday(String time);
+
+  /// No description provided for @singleDoseFinished.
+  ///
+  /// In en, this message translates to:
+  /// **'Single dose logged'**
+  String get singleDoseFinished;
+
   /// No description provided for @taperShortEvery.
   ///
   /// In en, this message translates to:
@@ -1476,6 +1494,12 @@ abstract class AppLocalizations {
   /// **'Taper'**
   String get kindTaper;
 
+  /// No description provided for @kindOnce.
+  ///
+  /// In en, this message translates to:
+  /// **'Once'**
+  String get kindOnce;
+
   /// No description provided for @every.
   ///
   /// In en, this message translates to:
@@ -1517,6 +1541,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Time of dose'**
   String get timeOfDose;
+
+  /// No description provided for @onceHint.
+  ///
+  /// In en, this message translates to:
+  /// **'A single dose. Once it\'s given or skipped it\'s finished, and stays in history.'**
+  String get onceHint;
+
+  /// No description provided for @dayOfDose.
+  ///
+  /// In en, this message translates to:
+  /// **'Day of the dose'**
+  String get dayOfDose;
 
   /// No description provided for @courseUntilStopped.
   ///

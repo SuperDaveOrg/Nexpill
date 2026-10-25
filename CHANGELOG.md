@@ -17,6 +17,18 @@ turns that section into the release's own when it's cut.
   dose-history spreadsheet are in the same language. Times still follow the
   phone's 12- or 24-hour setting.
 
+## [0.7.0] - 2026-10-25
+
+### Added
+- A single dose at a set date and time: choose "Once" under When, then the
+  day and time. It's due and reminded like any other dose, can ring as an
+  alarm, and is finished once it's given or skipped, staying in history.
+
+### Changed
+- Backups are format version 5, which can hold a single dose. Older
+  versions of Nexpill can't restore them; this version restores every
+  earlier file.
+
 ## [0.6.0] - 2026-10-20
 
 ### Added

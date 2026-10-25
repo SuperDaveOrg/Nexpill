@@ -23,8 +23,8 @@ import 'package:nexpill/models/patient.dart';
 /// - Overdue reminders repeat every `overdueRepeatMinutes` — at most
 ///   [maxOverdueRepeats] times, and only until the next dose is due.
 /// - As-needed medications get only "can be given again", once per dose.
-/// - A course stops reminding when it ends, and a taper when its last step
-///   does.
+/// - A course stops reminding when it ends, a taper when its last step
+///   does, and a single dose once it's given or skipped.
 /// - An interval or as-needed medication never given has no reminders:
 ///   there's nothing to count from.
 /// - Everything due for one patient at the same minute is one notification.
@@ -189,7 +189,7 @@ class ReminderPlanner {
             }
           }
         }
-      case IntervalSchedule() || PrnSchedule():
+      case IntervalSchedule() || PrnSchedule() || OnceSchedule():
         break;
     }
     // A course running out on its last day. (One that ends on a dose ends
@@ -238,12 +238,13 @@ class ReminderItem {
   final DateTime firesAt;
 
   /// Alarm mode rings for doses due or overdue on interval and fixed-time
-  /// schedules, as in the PWA.
+  /// schedules, as in the PWA, and for a single dose.
   bool get rings =>
       medication.reminders.alarm &&
       (kind == ReminderKind.dueNow || kind == ReminderKind.overdue) &&
       (medication.schedule is IntervalSchedule ||
-          medication.schedule is FixedTimesSchedule);
+          medication.schedule is FixedTimesSchedule ||
+          medication.schedule is OnceSchedule);
 
   /// "Amoxicillin due now".
   String get text => switch (kind) {

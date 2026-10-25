@@ -90,6 +90,19 @@ class AppLocalizationsRu extends AppLocalizations {
   String get taperFinished => 'Постепенное снижение завершено';
 
   @override
+  String scheduleOnce(String when) {
+    return 'Однократно, $when';
+  }
+
+  @override
+  String scheduleOnceToday(String time) {
+    return 'Однократно, сегодня в $time';
+  }
+
+  @override
+  String get singleDoseFinished => 'Разовая доза отмечена';
+
+  @override
   String taperShortEvery(String duration) {
     return 'Снижение: раз в $duration';
   }
@@ -965,6 +978,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get kindTaper => 'Постепенное снижение';
 
   @override
+  String get kindOnce => 'Однократно';
+
+  @override
   String get every => 'Раз в';
 
   @override
@@ -985,6 +1001,13 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get timeOfDose => 'Время дозы';
+
+  @override
+  String get onceHint =>
+      'Одна доза. Как только её дали или пропустили, она завершена и остаётся в истории.';
+
+  @override
+  String get dayOfDose => 'День дозы';
 
   @override
   String get courseUntilStopped => 'Пока не прекратите';

@@ -86,6 +86,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get taperFinished => 'Taper finished';
 
   @override
+  String scheduleOnce(String when) {
+    return 'Once, $when';
+  }
+
+  @override
+  String scheduleOnceToday(String time) {
+    return 'Once, today at $time';
+  }
+
+  @override
+  String get singleDoseFinished => 'Single dose logged';
+
+  @override
   String taperShortEvery(String duration) {
     return 'Taper: every $duration';
   }
@@ -937,6 +950,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get kindTaper => 'Taper';
 
   @override
+  String get kindOnce => 'Once';
+
+  @override
   String get every => 'Every';
 
   @override
@@ -957,6 +973,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get timeOfDose => 'Time of dose';
+
+  @override
+  String get onceHint =>
+      'A single dose. Once it\'s given or skipped it\'s finished, and stays in history.';
+
+  @override
+  String get dayOfDose => 'Day of the dose';
 
   @override
   String get courseUntilStopped => 'Until stopped';

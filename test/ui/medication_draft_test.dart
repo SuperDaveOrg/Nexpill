@@ -147,6 +147,24 @@ void main() {
     });
   });
 
+  test('a single dose starts at the next hour, can ring, and has no course', () {
+    final d = MedicationDraft.blank('p', DateTime(2026, 6, 10, 14, 20))
+      ..name = 'Flu shot'
+      ..alarm = true
+      ..courseKind = CourseKind.doses
+      ..setKind(ScheduleKind.once);
+    expect(d.onceAt, DateTime(2026, 6, 10, 15));
+    expect(d.courseAvailable, isFalse);
+    expect(d.validate(), isEmpty);
+    final m = d.build(() => 'x');
+    expect((m.schedule as OnceSchedule).at, DateTime(2026, 6, 10, 15));
+    expect(m.reminders.alarm, isTrue);
+    expect(m.course, isNull);
+    final again = MedicationDraft.of(m);
+    expect(again.kind, ScheduleKind.once);
+    expect(again.onceAt, DateTime(2026, 6, 10, 15));
+  });
+
   test('editing keeps everything, and round-trips', () {
     final original = named()
       ..setKind(ScheduleKind.fixedTimes)

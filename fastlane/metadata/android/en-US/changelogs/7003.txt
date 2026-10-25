@@ -1,0 +1,2 @@
+• New: a single dose at a set date and time. Choose "Once" under When, then pick the day and time. It's reminded like any other dose, can ring as an alarm, and is finished once it's given or skipped, staying in history.
+• Backups made with this version need Nexpill 0.7.0 or later to restore. Older backups still restore as before.

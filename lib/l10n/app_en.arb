@@ -103,6 +103,23 @@
     }
   },
   "taperFinished": "Taper finished",
+  "scheduleOnce": "Once, {when}",
+  "@scheduleOnce": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "scheduleOnceToday": "Once, today at {time}",
+  "@scheduleOnceToday": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "singleDoseFinished": "Single dose logged",
   "taperShortEvery": "Taper: every {duration}",
   "@taperShortEvery": {
     "placeholders": {
@@ -993,6 +1010,7 @@
   "kindFixedTimes": "At set times",
   "kindAsNeeded": "As needed",
   "kindTaper": "Taper",
+  "kindOnce": "Once",
   "every": "Every",
   "intervalHint": "Counted from the last dose given.",
   "atLeastApart": "At least this long apart",
@@ -1000,6 +1018,8 @@
   "addTime": "Add time",
   "fixedTimesHint": "Every day, on this phone's clock.",
   "timeOfDose": "Time of dose",
+  "onceHint": "A single dose. Once it's given or skipped it's finished, and stays in history.",
+  "dayOfDose": "Day of the dose",
   "courseUntilStopped": "Until stopped",
   "courseUntilDate": "Until a date",
   "courseNumberOfDoses": "A number of doses",

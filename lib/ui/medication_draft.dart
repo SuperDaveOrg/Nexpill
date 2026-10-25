@@ -2,7 +2,7 @@ import 'package:nexpill/domain/dates.dart';
 import 'package:nexpill/domain/wording.dart';
 import 'package:nexpill/models/medication.dart';
 
-enum ScheduleKind { interval, fixedTimes, prn, taper }
+enum ScheduleKind { interval, fixedTimes, prn, taper, once }
 
 /// How long a medication runs: until stopped, through a last day, or for a
 /// number of doses.
@@ -25,6 +25,7 @@ class MedicationDraft {
       : id = null,
         givenSoFar = 0,
         courseLastDay = _aWeekFrom(today),
+        onceAt = _nextHour(today),
         taperSteps = [TaperStepDraft(start: dateOnly(today))];
 
   /// [givenSoFar] is how many of [m]'s doses count, so a course can be set
@@ -52,6 +53,10 @@ class MedicationDraft {
           EndsAfterDay(:final lastDay) => lastDay,
           _ => _aWeekFrom(DateTime.now()),
         },
+        onceAt = switch (m.schedule) {
+          OnceSchedule(:final at) => at.toLocal(),
+          _ => _nextHour(DateTime.now()),
+        },
         taperSteps = [] {
     switch (m.course) {
       case EndsAfterDay():
@@ -78,6 +83,8 @@ class MedicationDraft {
           for (final r in rules)
             TaperStepDraft(start: r.startDate, end: r.endDate, minutes: r.intervalMinutes),
         ]);
+      case OnceSchedule():
+        kind = ScheduleKind.once;
     }
   }
 
@@ -96,6 +103,9 @@ class MedicationDraft {
   List<ClockTime> times = [const ClockTime(8, 0)];
   int prnMinutes = 4 * 60;
   final List<TaperStepDraft> taperSteps;
+
+  /// When a single dose is due, on the phone's clock.
+  DateTime onceAt;
 
   bool remindersOn = true;
   int earlyMinutes = 0;
@@ -123,12 +133,16 @@ class MedicationDraft {
 
   bool get isNew => id == null;
 
-  /// A taper's steps say when it ends, so it has no separate course.
-  bool get courseAvailable => kind != ScheduleKind.taper;
+  /// A taper's steps say when it ends, and a single dose ends with itself,
+  /// so neither has a separate course.
+  bool get courseAvailable =>
+      kind != ScheduleKind.taper && kind != ScheduleKind.once;
 
   /// Alarm mode rings for scheduled doses only.
   bool get alarmAvailable =>
-      kind == ScheduleKind.interval || kind == ScheduleKind.fixedTimes;
+      kind == ScheduleKind.interval ||
+      kind == ScheduleKind.fixedTimes ||
+      kind == ScheduleKind.once;
 
   void setKind(ScheduleKind k) {
     kind = k;
@@ -217,6 +231,7 @@ class MedicationDraft {
                   endDate: s.end == null ? null : dateOnly(s.end!),
                   intervalMinutes: s.minutes),
           ]),
+        ScheduleKind.once => OnceSchedule(onceAt),
       },
       reminders: ReminderSettings(
         enabled: remindersOn,
@@ -244,6 +259,11 @@ class MedicationDraft {
   /// so a daylight-saving change can't shift it.
   static DateTime _aWeekFrom(DateTime today) =>
       DateTime(today.year, today.month, today.day + 6);
+
+  /// The start of the hour after [now]: a sensible first guess for a single
+  /// dose.
+  static DateTime _nextHour(DateTime now) =>
+      DateTime(now.year, now.month, now.day, now.hour + 1);
 
   static double? _parse(String? s) =>
       s == null ? null : double.tryParse(s.trim().replaceAll(',', '.'));

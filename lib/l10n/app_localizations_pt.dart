@@ -88,6 +88,19 @@ class AppLocalizationsPt extends AppLocalizations {
   String get taperFinished => 'Redução gradual terminada';
 
   @override
+  String scheduleOnce(String when) {
+    return 'Uma vez, $when';
+  }
+
+  @override
+  String scheduleOnceToday(String time) {
+    return 'Uma vez, hoje às $time';
+  }
+
+  @override
+  String get singleDoseFinished => 'Dose única registada';
+
+  @override
   String taperShortEvery(String duration) {
     return 'Redução: a cada $duration';
   }
@@ -945,6 +958,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get kindTaper => 'Redução gradual';
 
   @override
+  String get kindOnce => 'Uma vez';
+
+  @override
   String get every => 'A cada';
 
   @override
@@ -965,6 +981,13 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get timeOfDose => 'Hora da dose';
+
+  @override
+  String get onceHint =>
+      'Uma única dose. Assim que for dada ou saltada, fica terminada e continua no histórico.';
+
+  @override
+  String get dayOfDose => 'Dia da dose';
 
   @override
   String get courseUntilStopped => 'Até ser interrompido';

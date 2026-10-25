@@ -86,6 +86,19 @@ class AppLocalizationsDe extends AppLocalizations {
   String get taperFinished => 'Ausschleichen beendet';
 
   @override
+  String scheduleOnce(String when) {
+    return 'Einmalig, $when';
+  }
+
+  @override
+  String scheduleOnceToday(String time) {
+    return 'Einmalig, heute um $time';
+  }
+
+  @override
+  String get singleDoseFinished => 'Einzeldosis erfasst';
+
+  @override
   String taperShortEvery(String duration) {
     return 'Ausschleichen: alle $duration';
   }
@@ -941,6 +954,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get kindTaper => 'Ausschleichen';
 
   @override
+  String get kindOnce => 'Einmalig';
+
+  @override
   String get every => 'Alle';
 
   @override
@@ -961,6 +977,13 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get timeOfDose => 'Uhrzeit der Dosis';
+
+  @override
+  String get onceHint =>
+      'Eine einzelne Dosis. Sobald sie gegeben oder ausgelassen wurde, ist sie beendet und bleibt im Verlauf.';
+
+  @override
+  String get dayOfDose => 'Tag der Dosis';
 
   @override
   String get courseUntilStopped => 'Bis zum Absetzen';

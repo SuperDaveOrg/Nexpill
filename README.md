@@ -27,6 +27,11 @@ permission.
 an earlier web version whose reminders couldn't be relied on; see
 [docs/port-from-pwa.md](docs/port-from-pwa.md) for how the port went.
 
+**Testers wanted:**
+<p align="center">
+Nexpill in your language. A beta of the next version speaks German, Spanish, French, Italian, Portuguese (Portugal) and Russian, and each translation needs a native speaker to check it before release. If you'd like to help, the beta and what to look for are at [nexpill.superdavelab.com/beta](https://nexpill.superdavelab.com/beta/).
+</p>
+
 ## Why Nexpill exists
 
 Nexpill was written by a caregiver, for caregivers. It grew out of helping
@@ -46,8 +51,8 @@ keeps a dose from being late.
 ## What it handles
 
 - Schedules every few hours (including odd intervals like 4 h 45 m), at set
-  times of day, as needed with a minimum gap, and tapers that change
-  interval by date.
+  times of day, as needed with a minimum gap, tapers that change
+  interval by date, and a single dose at a set date and time.
 - Several patients, each with their own medications.
 - Corrections that replace a mistaken entry without erasing it.
 - Remaining supply, with a low-supply warning.

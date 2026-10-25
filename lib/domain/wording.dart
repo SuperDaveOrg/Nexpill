@@ -79,7 +79,8 @@ String listText(List<String> items) => switch (items.length) {
     };
 
 /// The schedule in a phrase: "Every 8 hours", "At 08:00 and 20:00",
-/// "As needed, at least 6 hours apart", or the taper's steps.
+/// "As needed, at least 6 hours apart", "Once, Jun 10, 2026 2:30 PM", or
+/// the taper's steps.
 String scheduleText(MedicationSchedule schedule) => switch (schedule) {
       IntervalSchedule(:final intervalMinutes) =>
         strings.scheduleEvery(durationText(intervalMinutes)),
@@ -98,12 +99,18 @@ String scheduleText(MedicationSchedule schedule) => switch (schedule) {
                             dateText(r.startDate), dateText(r.endDate!)),
                     durationText(r.intervalMinutes)),
             ].join('; '),
+      OnceSchedule(:final at) => strings.scheduleOnce(dateTimeText(at)),
     };
 
 /// The schedule as it stands [now], short enough for a card: a taper shows
 /// the step the timing engine has in force and what comes next, not every
-/// step.
+/// step, and a single dose when it is, "Once, tomorrow at 3:00 PM".
 String scheduleShortText(MedicationSchedule schedule, DateTime now) {
+  if (schedule case OnceSchedule(:final at)) {
+    return dateOnly(at.toLocal()) == dateOnly(now)
+        ? strings.scheduleOnceToday(clockText(at))
+        : strings.scheduleOnce(whenText(at, now));
+  }
   if (schedule is! TaperSchedule || schedule.rules.isEmpty) {
     return scheduleText(schedule);
   }
@@ -198,8 +205,9 @@ String dayHeading(DateTime day, DateTime now) {
 
 /// Why a finished medication has nothing more due: "Taper finished",
 /// "Course finished: last day was Jun 14, 2026", "Course finished: all 5
-/// doses given".
+/// doses given", "Single dose logged".
 String finishedText(Medication m) => switch (m.course) {
+      _ when m.schedule is OnceSchedule => strings.singleDoseFinished,
       EndsAfterDay(:final lastDay) =>
         strings.courseFinishedLastDay(dateText(lastDay)),
       EndsAfterDoses(:final doses) => strings.courseFinishedDoses(doses),

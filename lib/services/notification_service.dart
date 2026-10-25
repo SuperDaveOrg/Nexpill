@@ -274,7 +274,10 @@ class ReminderTag {
         final latest = latestEntry(id, care.doses);
         if (latest == null) return true;
         // A skip is logged at the time it was due, so ask the engine instead.
-        if (latest.skipped) return calculateSchedule(m, care.doses, at).eligibleNow;
+        if (latest.skipped) {
+          final s = calculateSchedule(m, care.doses, at);
+          return !s.finished && s.eligibleNow;
+        }
         return latest.givenAt.isBefore(at);
       });
 

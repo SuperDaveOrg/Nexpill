@@ -84,10 +84,10 @@ void main() {
     expect([for (final d in back.doses) if (d.skipped) d.id], ['sample-d6']);
   });
 
-  test('writes version 4, and still restores versions 3 and 2', () {
+  test('writes version 5, and still restores versions 4, 3 and 2', () {
     final json = sampleJson();
-    expect(json['nexpillBackup'], 4);
-    for (final version in [3, 2]) {
+    expect(json['nexpillBackup'], 5);
+    for (final version in [4, 3, 2]) {
       json['nexpillBackup'] = version;
       final back = decodeBackup(jsonEncode(json));
       expect(back.medications.length, sample.medications.length);
@@ -114,6 +114,17 @@ void main() {
       expect([for (final p in back.patients) (p.displayName, p.isSelf)],
           [(name, true), ('Sam', false)]);
     }
+  });
+
+  test('a single dose round-trips its time', () {
+    final at = DateTime.utc(2026, 6, 11, 13);
+    final json = sampleJson();
+    firstMed(json)['schedule'] = {'type': 'once', 'at': '2026-06-11T15:00:00+02:00'};
+    final back = decodeBackup(jsonEncode(json));
+    final m = back.medications.firstWhere((m) => m.schedule is OnceSchedule);
+    expect((m.schedule as OnceSchedule).at, at);
+    final again = jsonDecode(encodeBackup(back, exportedAt: now)) as Map<String, dynamic>;
+    expect(firstMed(again)['schedule'], {'type': 'once', 'at': '2026-06-11T13:00:00.000Z'});
   });
 
   test('still restores version 1', () {
@@ -148,7 +159,7 @@ void main() {
               (e) => e.message, 'message', contains('isn\'t a Nexpill backup'))));
     });
 
-    test('a newer format', () => refuses((j) => j['nexpillBackup'] = 5, 'newer version'));
+    test('a newer format', () => refuses((j) => j['nexpillBackup'] = 6, 'newer version'));
 
     test('someone else without a name', () => refuses(
         (j) => ((j['patients'] as List).first as Map).remove('name'),
