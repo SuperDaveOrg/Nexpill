@@ -9,6 +9,8 @@ turns that section into the release's own when it's cut.
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-10-25
+
 ### Added
 - A single dose at a set date and time: choose "Once" under When, then the
   day and time. It's due and reminded like any other dose, can ring as an
