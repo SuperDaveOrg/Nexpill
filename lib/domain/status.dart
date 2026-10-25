@@ -30,7 +30,8 @@ enum MedicationStatusLabel {
   /// An as-needed medication that may be given now.
   availablePrn,
 
-  /// A taper whose last step has ended: nothing more is due.
+  /// A course or taper that has ended, or a single dose that's been logged:
+  /// nothing more is due.
   finished;
 
   /// Where a medication in this state goes in a list: what needs doing
@@ -94,7 +95,9 @@ MedicationStatus computeMedicationStatus(
   final label = switch (schedule) {
     _ when result.finished => MedicationStatusLabel.finished,
     // Nothing logged at all: a skip, though not a dose given, moves it on.
-    _ when latestEntry(medication.id, doseEvents) == null =>
+    // A single dose has a set time, so it's due, or late, like any other.
+    _ when schedule is! OnceSchedule &&
+            latestEntry(medication.id, doseEvents) == null =>
       MedicationStatusLabel.neverTaken,
     PrnSchedule() when result.eligibleNow => MedicationStatusLabel.availablePrn,
     _ when !result.eligibleNow => minutesUntilEligible <= dueSoonWindowMinutes

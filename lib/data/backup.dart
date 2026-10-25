@@ -13,8 +13,9 @@ import 'package:nexpill/models/patient.dart';
 /// editor and importable by some other app one day, so nobody is locked in.
 ///
 /// Version 2 added `course`, version 3 skipped doses, version 4 the phone's
-/// owner, who may have no name. Files of every earlier version still restore.
-const backupFormatVersion = 4;
+/// owner, who may have no name, version 5 the single-dose schedule. Files of
+/// every earlier version still restore.
+const backupFormatVersion = 5;
 
 /// A file that can't be restored, with a reason fit to show the user.
 class BackupFormatException implements Exception {
@@ -93,6 +94,10 @@ Map<String, Object?> _encodeMedication(Medication m, List<DoseEvent> doses) {
                 'everyMinutes': r.intervalMinutes,
               },
           ],
+        },
+      OnceSchedule(:final at) => {
+          'type': 'once',
+          'at': _instant(at),
         },
     },
     'reminders': {
@@ -282,6 +287,7 @@ MedicationSchedule _decodeSchedule(_Reader s) {
             intervalMinutes: step.minutes('everyMinutes'),
           ),
       ]),
+    'once' => OnceSchedule(s.instant('at')),
     final type => throw BackupFormatException(
         '${s.where} has an unknown schedule type "$type".'),
   };

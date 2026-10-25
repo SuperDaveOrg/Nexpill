@@ -48,6 +48,7 @@ void main() {
     await repo.saveMedication(med('b', const FixedTimesSchedule([ClockTime(8, 0), ClockTime(20, 30)])));
     await repo.saveMedication(med('c', const PrnSchedule(360)));
     await repo.saveMedication(med('d', taper));
+    await repo.saveMedication(med('e', OnceSchedule(DateTime(2026, 6, 11, 15))));
 
     final meds = {for (final m in await repo.medications()) m.id: m.schedule};
     expect((meds['a'] as IntervalSchedule).intervalMinutes, 285);
@@ -57,6 +58,7 @@ void main() {
     expect([for (final r in rules) isoDate(r.startDate)], ['2026-06-01', '2026-06-05']);
     expect(rules.first.endDate, DateTime(2026, 6, 5));
     expect(rules.last.endDate, isNull);
+    expect((meds['e'] as OnceSchedule).at, DateTime(2026, 6, 11, 15).toUtc());
   });
 
   test('reminder settings are stored as set, including the PRN default', () async {
@@ -122,7 +124,8 @@ void main() {
     final row = med('a', const IntervalSchedule(480)).toRow()
       ..remove('course_last_day')
       ..remove('course_doses')
-      ..remove('purpose');
+      ..remove('purpose')
+      ..remove('once_at');
     await old.insert('medications', row);
     await old.close();
 
@@ -149,7 +152,9 @@ void main() {
     await old.setVersion(2);
     await old.insert('patients', sam.toRow()..remove('is_self'));
     await old.insert('medications',
-        med('a', const IntervalSchedule(480)).toRow()..remove('purpose'));
+        med('a', const IntervalSchedule(480)).toRow()
+          ..remove('purpose')
+          ..remove('once_at'));
     await old.insert('dose_events', {
       'id': 'd', 'medication_id': 'a', 'given_at': 0,
     });
@@ -173,6 +178,7 @@ void main() {
     // Back to version 4's patients table.
     await db.execute('DROP INDEX idx_patients_self');
     await db.execute('ALTER TABLE patients DROP COLUMN is_self');
+    await db.execute('ALTER TABLE medications DROP COLUMN once_at');
     await db.insert('patients', sam.toRow()..remove('is_self'));
     await db.setVersion(4);
     await v4.close();
@@ -189,6 +195,27 @@ void main() {
             const Patient(id: 'me2', displayName: '', isSelf: true)),
         throwsA(isA<DatabaseException>()),
         reason: 'only one of you');
+    await upgraded.close();
+  });
+
+  test('a version 5 database upgrades, and then stores a single dose', () async {
+    final path = '${dir.path}/v5.db';
+    final v5 = NexpillDatabase(path: path, factory: databaseFactoryFfi);
+    final db = await v5.database;
+    // Back to version 5's medications table.
+    await db.execute('ALTER TABLE medications DROP COLUMN once_at');
+    await db.insert('patients', sam.toRow());
+    await db.insert('medications',
+        med('a', const IntervalSchedule(480)).toRow()..remove('once_at'));
+    await db.setVersion(5);
+    await v5.close();
+
+    final upgraded = NexpillDatabase(path: path, factory: databaseFactoryFfi);
+    final upgradedRepo = CareRepository(db: upgraded);
+    expect((await upgradedRepo.medications()).single.id, 'a');
+    await upgradedRepo.saveMedication(med('b', OnceSchedule(DateTime(2026, 6, 11, 15))));
+    final once = (await upgradedRepo.medications()).firstWhere((m) => m.id == 'b');
+    expect((once.schedule as OnceSchedule).at, DateTime(2026, 6, 11, 15).toUtc());
     await upgraded.close();
   });
 

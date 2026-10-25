@@ -15,7 +15,7 @@ class NexpillDatabase {
   static final NexpillDatabase instance = NexpillDatabase();
 
   static const _fileName = 'nexpill.db';
-  static const version = 5;
+  static const version = 6;
 
   final String? _path;
   final DatabaseFactory? _factory;
@@ -143,6 +143,10 @@ class NexpillDatabase {
           'ALTER TABLE patients ADD COLUMN is_self INTEGER NOT NULL DEFAULT 0');
       await db.execute(
           'CREATE UNIQUE INDEX idx_patients_self ON patients(is_self) WHERE is_self = 1');
+    }
+    if (oldVersion < 6) {
+      // A single dose: when it's due, as UTC milliseconds.
+      await db.execute('ALTER TABLE medications ADD COLUMN once_at INTEGER');
     }
   }
 

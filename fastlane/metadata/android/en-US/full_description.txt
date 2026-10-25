@@ -8,6 +8,7 @@ Each medication says where it stands right now: due in 8 minutes, overdue by 25,
 • At set times of day
 • As needed, with a minimum gap between doses
 • Tapers whose interval changes by date
+• A single dose at a set date and time
 
 <b>Reminders that arrive on time</b>
 Exact alarms held by the phone itself, so they come on the minute: with no signal, in airplane mode, after a restart. Mark a dose given or snooze it straight from the notification. For the doses that can't be missed, a reminder can ring like an alarm clock until someone deals with it.
