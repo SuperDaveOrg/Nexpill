@@ -434,6 +434,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get csvSkipped => 'Skipped';
 
   @override
+  String get csvRefill => 'Refill';
+
+  @override
   String get csvCorrection => 'Correction';
 
   @override
@@ -662,6 +665,25 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get refill => 'Refill';
+
+  @override
+  String refillTitle(String medication) {
+    return 'Refill $medication';
+  }
+
+  @override
+  String get refillAmount => 'Amount to add';
+
+  @override
+  String get refillAdd => 'Add';
+
+  @override
+  String refilled(String medication, String left) {
+    return '$medication refilled. $left.';
+  }
+
+  @override
   String get earlyTitle => 'This is early';
 
   @override
@@ -771,6 +793,15 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String deleteRefillMessage(
+    String medication,
+    String dateTime,
+    String amount,
+  ) {
+    return '$medication, $dateTime: +$amount. Delete it if it was logged by mistake; what\'s left goes down by that much. If the amount was wrong, refill again with the right one.';
+  }
+
+  @override
   String get delete => 'Delete';
 
   @override
@@ -804,6 +835,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get historyCorrection => 'correction';
 
   @override
+  String historyRefill(String amount) {
+    return 'Refill: +$amount';
+  }
+
+  @override
   String get historyCorrected => 'corrected';
 
   @override
@@ -831,7 +867,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get errorCourseDoses => 'Enter how many doses the course has.';
 
   @override
-  String get errorStartingSupply => 'Enter how much there is to start with.';
+  String get errorAmountLeft => 'Enter how much is left.';
 
   @override
   String get errorPerDose => 'Enter how much one dose uses.';
@@ -1103,7 +1139,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get trackSupplyHint => 'Counts down with each dose logged.';
 
   @override
-  String get startingAmount => 'Starting amount';
+  String get amountLeft => 'Amount left';
 
   @override
   String get unit => 'Unit';

@@ -666,6 +666,12 @@ abstract class AppLocalizations {
   /// **'Skipped'**
   String get csvSkipped;
 
+  /// Status column of the dose-history spreadsheet, for a refill: supply added rather than a dose. Its Dose column says how much, e.g. '+100 tablets'.
+  ///
+  /// In en, this message translates to:
+  /// **'Refill'**
+  String get csvRefill;
+
   /// Status cell in the exported spreadsheet: this entry corrects an earlier one.
   ///
   /// In en, this message translates to:
@@ -984,6 +990,36 @@ abstract class AppLocalizations {
   /// **'{left}: running low'**
   String supplyRunningLow(String left);
 
+  /// Card menu item, shown when supply is tracked: add a new pack from the pharmacy to what's left.
+  ///
+  /// In en, this message translates to:
+  /// **'Refill'**
+  String get refill;
+
+  /// Title of the dialog that adds to a medication's supply.
+  ///
+  /// In en, this message translates to:
+  /// **'Refill {medication}'**
+  String refillTitle(String medication);
+
+  /// Field label in the refill dialog: how much the new pack adds, e.g. 100 (tablets).
+  ///
+  /// In en, this message translates to:
+  /// **'Amount to add'**
+  String get refillAmount;
+
+  /// Confirming button of the refill dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Add'**
+  String get refillAdd;
+
+  /// Message after a refill: {left} is supplyLeft with the new total, e.g. 'Ibuprofen refilled. 112 tablets left.'
+  ///
+  /// In en, this message translates to:
+  /// **'{medication} refilled. {left}.'**
+  String refilled(String medication, String left);
+
   /// Title of the dialog shown when Give is tapped before the dose is due.
   ///
   /// In en, this message translates to:
@@ -1164,6 +1200,12 @@ abstract class AppLocalizations {
   /// **'{medication}, {dateTime}. Use this only if the dose was never given; to fix its time, correct it instead. Any corrections of it go too.'**
   String deleteDoseMessage(String medication, String dateTime);
 
+  /// Body of the delete confirmation for a refill in dose history. {medication} is a name typed by the user, {dateTime} when it was logged, {amount} the quantity added with its unit.
+  ///
+  /// In en, this message translates to:
+  /// **'{medication}, {dateTime}: +{amount}. Delete it if it was logged by mistake; what\'s left goes down by that much. If the amount was wrong, refill again with the right one.'**
+  String deleteRefillMessage(String medication, String dateTime, String amount);
+
   /// Confirming button of the delete dialogs (history entry, medication, person) and the Delete item in a person's menu on the People screen.
   ///
   /// In en, this message translates to:
@@ -1217,6 +1259,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'correction'**
   String get historyCorrection;
+
+  /// Line under a refill in dose history: {amount} is the quantity added with its unit, e.g. 'Refill: +100 tablets'.
+  ///
+  /// In en, this message translates to:
+  /// **'Refill: +{amount}'**
+  String historyRefill(String amount);
 
   /// Tag in a history entry's detail line: this entry was replaced by a correction and is shown struck through.
   ///
@@ -1272,11 +1320,11 @@ abstract class AppLocalizations {
   /// **'Enter how many doses the course has.'**
   String get errorCourseDoses;
 
-  /// Validation error in the editor's Supply section: Starting amount is missing or negative.
+  /// Validation error in the editor's Supply section: Amount left is missing or negative.
   ///
   /// In en, this message translates to:
-  /// **'Enter how much there is to start with.'**
-  String get errorStartingSupply;
+  /// **'Enter how much is left.'**
+  String get errorAmountLeft;
 
   /// Validation error in the editor's Supply section: Each dose uses is missing or zero.
   ///
@@ -1746,11 +1794,11 @@ abstract class AppLocalizations {
   /// **'Counts down with each dose logged.'**
   String get trackSupplyHint;
 
-  /// Field label in the Supply section: how much there is when tracking starts.
+  /// Field label in the Supply section: how much there is now. It counts down with each dose, and Refill adds to it.
   ///
   /// In en, this message translates to:
-  /// **'Starting amount'**
-  String get startingAmount;
+  /// **'Amount left'**
+  String get amountLeft;
 
   /// Field label in the Supply section: what the supply is counted in, e.g. tablets, ml.
   ///

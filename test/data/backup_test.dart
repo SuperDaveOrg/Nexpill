@@ -68,7 +68,7 @@ void main() {
   test('is readable: pretty JSON, whole numbers, UTC instants', () {
     final text = encodeBackup(sample, exportedAt: now);
     expect(text, contains('\n  "patients": ['));
-    expect(text, contains('"startingQuantity": 30,'));
+    expect(text, contains('"startingQuantity": 10,'));
     expect(text, matches(RegExp(r'"givenAt": "\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d\.\d{3}Z"')));
   });
 
@@ -84,10 +84,25 @@ void main() {
     expect([for (final d in back.doses) if (d.skipped) d.id], ['sample-d6']);
   });
 
-  test('writes version 5, and still restores versions 4, 3 and 2', () {
+  test('a refill round-trips, and a medication without any says nothing', () {
     final json = sampleJson();
-    expect(json['nexpillBackup'], 5);
-    for (final version in [4, 3, 2]) {
+    final meds = [
+      for (final p in json['patients'] as List) ...(p['medications'] as List),
+    ];
+    final acet = meds.firstWhere((m) => m['id'] == 'sample-acet') as Map;
+    expect(acet['refills'], [
+      {'id': 'sample-r1', 'at': sample.refills.single.refilledAt.toIso8601String(), 'amount': 20},
+    ]);
+    expect(meds.where((m) => (m as Map).containsKey('refills')), hasLength(1));
+    final back = decodeBackup(jsonEncode(json)).refills.single;
+    expect((back.id, back.medicationId, back.amount, back.refilledAt),
+        ('sample-r1', 'sample-acet', 20.0, sample.refills.single.refilledAt));
+  });
+
+  test('writes version 6, and still restores versions 5, 4, 3 and 2', () {
+    final json = sampleJson();
+    expect(json['nexpillBackup'], 6);
+    for (final version in [5, 4, 3, 2]) {
       json['nexpillBackup'] = version;
       final back = decodeBackup(jsonEncode(json));
       expect(back.medications.length, sample.medications.length);
@@ -159,7 +174,13 @@ void main() {
               (e) => e.message, 'message', contains('isn\'t a Nexpill backup'))));
     });
 
-    test('a newer format', () => refuses((j) => j['nexpillBackup'] = 6, 'newer version'));
+    test('a newer format', () => refuses((j) => j['nexpillBackup'] = 7, 'newer version'));
+
+    test('a refill that adds nothing', () => refuses(
+        (j) => firstMed(j)['refills'] = [
+              {'id': 'r', 'at': '2026-06-10T08:00:00Z', 'amount': 0},
+            ],
+        '"amount"'));
 
     test('someone else without a name', () => refuses(
         (j) => ((j['patients'] as List).first as Map).remove('name'),

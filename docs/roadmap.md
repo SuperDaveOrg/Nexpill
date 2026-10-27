@@ -36,6 +36,7 @@ below is what the PWA did and the Flutter app must do before a first release.
 | Everyone: with more than one person, home shows each one's next medication; back from a person returns there | Done |
 | Your own medications: "Me" as well as people you care for, shown as "you", no name needed | Done |
 | A single dose at a set date and time, finished once given or skipped ([#32](https://github.com/SuperDaveOrg/Nexpill/issues/32)) | Done |
+| Refill: add a new pack to what's left, from the card, kept in history and the spreadsheet ([#44](https://github.com/SuperDaveOrg/Nexpill/issues/44)) | Done |
 
 ---
 

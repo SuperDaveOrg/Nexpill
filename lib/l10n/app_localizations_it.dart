@@ -435,6 +435,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get csvSkipped => 'Saltata';
 
   @override
+  String get csvRefill => 'Rifornimento';
+
+  @override
   String get csvCorrection => 'Correzione';
 
   @override
@@ -663,6 +666,25 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
+  String get refill => 'Rifornisci';
+
+  @override
+  String refillTitle(String medication) {
+    return 'Rifornisci $medication';
+  }
+
+  @override
+  String get refillAmount => 'Quantità da aggiungere';
+
+  @override
+  String get refillAdd => 'Aggiungi';
+
+  @override
+  String refilled(String medication, String left) {
+    return '$medication: rifornito. $left.';
+  }
+
+  @override
   String get earlyTitle => 'È presto';
 
   @override
@@ -772,6 +794,15 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
+  String deleteRefillMessage(
+    String medication,
+    String dateTime,
+    String amount,
+  ) {
+    return '$medication, $dateTime: +$amount. Eliminalo se è stato registrato per errore; la quantità rimasta cala di altrettanto. Se la quantità era sbagliata, rifornisci di nuovo con quella giusta.';
+  }
+
+  @override
   String get delete => 'Elimina';
 
   @override
@@ -805,6 +836,11 @@ class AppLocalizationsIt extends AppLocalizations {
   String get historyCorrection => 'correzione';
 
   @override
+  String historyRefill(String amount) {
+    return 'Rifornimento: +$amount';
+  }
+
+  @override
   String get historyCorrected => 'corretta';
 
   @override
@@ -834,7 +870,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get errorCourseDoses => 'Indica quante dosi prevede il ciclo.';
 
   @override
-  String get errorStartingSupply => 'Indica la quantità iniziale.';
+  String get errorAmountLeft => 'Indica quanto ne rimane.';
 
   @override
   String get errorPerDose => 'Indica quanto ne usa una dose.';
@@ -1109,7 +1145,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get trackSupplyHint => 'Si riduce a ogni dose registrata.';
 
   @override
-  String get startingAmount => 'Quantità iniziale';
+  String get amountLeft => 'Quantità rimasta';
 
   @override
   String get unit => 'Unità';

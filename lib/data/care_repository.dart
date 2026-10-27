@@ -8,8 +8,9 @@ import 'package:nexpill/models/care_snapshot.dart';
 import 'package:nexpill/models/dose_event.dart';
 import 'package:nexpill/models/medication.dart';
 import 'package:nexpill/models/patient.dart';
+import 'package:nexpill/models/refill.dart';
 
-/// Reads and writes patients, their medications, and dose history.
+/// Reads and writes patients, their medications, dose history and refills.
 class CareRepository {
   CareRepository({NexpillDatabase? db}) : _db = db ?? NexpillDatabase.instance;
 
@@ -113,7 +114,7 @@ class CareRepository {
         where: 'id = ?', whereArgs: [id]);
   }
 
-  /// Removes [id] and its dose history. To stop a medication but keep its
+  /// Removes [id], its dose history and refills. To stop a medication but keep its
   /// history, deactivate it instead.
   Future<void> deleteMedication(String id) async {
     final db = await _db.database;
@@ -207,6 +208,27 @@ class CareRepository {
     await db.delete('dose_events', where: 'id = ?', whereArgs: [id]);
   }
 
+  // --- Refills -------------------------------------------------------------
+
+  /// Logs [amount] more of [medicationId], now, and returns the entry.
+  Future<Refill> logRefill(String medicationId, double amount) async {
+    final refill = Refill(
+      id: newId(),
+      medicationId: medicationId,
+      refilledAt: DateTime.now().toUtc(),
+      amount: amount,
+    );
+    final db = await _db.database;
+    await db.insert('refills', refill.toRow());
+    return refill;
+  }
+
+  /// Removes a refill logged by mistake.
+  Future<void> deleteRefill(String id) async {
+    final db = await _db.database;
+    await db.delete('refills', where: 'id = ?', whereArgs: [id]);
+  }
+
   // --- Everything ----------------------------------------------------------
 
   Future<CareSnapshot> snapshot() async {
@@ -216,6 +238,9 @@ class CareRepository {
       medications: await _medications(db),
       doses: (await db.query('dose_events', orderBy: 'given_at DESC, id DESC'))
           .map(DoseEvent.fromRow)
+          .toList(),
+      refills: (await db.query('refills', orderBy: 'refilled_at DESC, id DESC'))
+          .map(Refill.fromRow)
           .toList(),
     );
   }
@@ -234,6 +259,9 @@ class CareRepository {
       }
       for (final d in _referencedFirst(snapshot.doses)) {
         await txn.insert('dose_events', d.toRow());
+      }
+      for (final r in snapshot.refills) {
+        await txn.insert('refills', r.toRow());
       }
     });
   }

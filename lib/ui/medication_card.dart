@@ -7,7 +7,7 @@ import 'package:nexpill/models/medication.dart';
 import 'package:nexpill/ui/theme.dart';
 import 'package:nexpill/ui/language.dart';
 
-enum CardAction { edit, history, stop, resume }
+enum CardAction { edit, history, refill, stop, resume }
 
 /// One medication at a glance: what it is, the one thing to know about it
 /// right now, and a button to give it. Tapping the card edits it.
@@ -97,6 +97,11 @@ class MedicationCard extends StatelessWidget {
                         value: CardAction.history,
                         child: Text(context.l.doseHistory),
                       ),
+                      if (inventory.configured)
+                        PopupMenuItem(
+                          value: CardAction.refill,
+                          child: Text(context.l.refill),
+                        ),
                       if (onSkip != null && !due)
                         PopupMenuItem(
                           onTap: onSkip,
@@ -184,11 +189,13 @@ class MedicationCard extends StatelessWidget {
     );
   }
 
+  /// "12 tablets left", never below none.
+  static String leftText(BuildContext context, double remaining, String? unit) =>
+      context.l.supplyLeft(amountText(remaining < 0 ? 0 : remaining, unit));
+
   static String _supplyText(
       BuildContext context, InventoryStatus i, String? unit) {
-    final left = context.l.supplyLeft(
-        '${quantityText(i.remaining! < 0 ? 0 : i.remaining!)}'
-        '${unit == null ? '' : ' $unit'}');
+    final left = leftText(context, i.remaining!, unit);
     return switch (i.level) {
       InventoryLevel.out => context.l.supplyNoneLeft,
       InventoryLevel.low => context.l.supplyRunningLow(left),

@@ -3,6 +3,7 @@ import 'package:nexpill/models/care_snapshot.dart';
 import 'package:nexpill/models/dose_event.dart';
 import 'package:nexpill/models/medication.dart';
 import 'package:nexpill/models/patient.dart';
+import 'package:nexpill/models/refill.dart';
 
 /// Fictional people and medications for trying the app and for screenshots.
 /// Never real data.
@@ -10,7 +11,7 @@ import 'package:nexpill/models/patient.dart';
 /// Built relative to [now], so every status and kind of reminder shows up
 /// straight away: one dose due within minutes, one overdue, a fixed-time
 /// medication, a taper mid-way, an as-needed one, a course with an end,
-/// and a correction.
+/// a correction and a refill.
 CareSnapshot sampleCare(DateTime now) {
   const alex = Patient(id: 'sample-alex', displayName: 'Alex Rivera');
   const jordan = Patient(id: 'sample-jordan', displayName: 'Jordan Lee');
@@ -66,7 +67,7 @@ CareSnapshot sampleCare(DateTime now) {
           purpose: 'Pain after surgery',
           instructions: 'Keep ahead of the pain: every 4 hours, day and night.',
           reminders: const ReminderSettings(enabled: true, earlyMinutes: 10, alarm: true),
-          stock: 30),
+          stock: 10),
       med('sample-amox', alex.id, 'Amoxicillin', '1 capsule',
           const IntervalSchedule(8 * 60),
           strength: '500 mg',
@@ -114,6 +115,13 @@ CareSnapshot sampleCare(DateTime now) {
           id: 'sample-d7',
           medicationId: 'sample-vitd',
           givenAt: DateTime(today.year, today.month, today.day - 1, 9, 10).toUtc()),
+    ],
+    refills: [
+      Refill(
+          id: 'sample-r1',
+          medicationId: 'sample-acet',
+          refilledAt: now.subtract(const Duration(days: 1, hours: 2)).toUtc(),
+          amount: 20),
     ],
   );
 }

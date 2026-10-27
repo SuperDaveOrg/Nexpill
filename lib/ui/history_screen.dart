@@ -5,7 +5,9 @@ import 'package:nexpill/domain/wording.dart';
 import 'package:nexpill/export/dose_history_csv.dart';
 import 'package:nexpill/export/file_names.dart';
 import 'package:nexpill/models/dose_event.dart';
+import 'package:nexpill/models/medication.dart';
 import 'package:nexpill/models/patient.dart';
+import 'package:nexpill/models/refill.dart';
 import 'package:nexpill/ui/care_store.dart';
 import 'package:nexpill/ui/dialogs.dart';
 import 'package:nexpill/ui/give_dose_sheet.dart';
@@ -16,7 +18,7 @@ import 'package:nexpill/ui/language.dart';
 /// one medication, given [medicationId].
 ///
 /// History is an audit trail: a corrected entry stays, struck through, with
-/// its correction beside it.
+/// its correction beside it. Refills are listed among the doses.
 class HistoryScreen extends StatefulWidget {
   const HistoryScreen({
     super.key,
@@ -98,6 +100,20 @@ class _HistoryScreenState extends State<HistoryScreen> {
     }
   }
 
+  /// Deletes a refill logged by mistake, after asking.
+  Future<void> _deleteRefill(Refill refill, Medication medication) async {
+    final ok = await confirmAction(
+      context,
+      title: context.l.deleteEntryTitle,
+      message: context.l.deleteRefillMessage(
+          medication.name,
+          dateTimeText(refill.refilledAt),
+          amountText(refill.amount, medication.doseUnit)),
+      action: context.l.delete,
+    );
+    if (ok) await widget.store.change((repo) => repo.deleteRefill(refill.id));
+  }
+
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
@@ -116,11 +132,28 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 (filter == null || d.medicationId == filter))
               d,
         ];
+        final refills = [
+          for (final r in care.refills)
+            if (meds.containsKey(r.medicationId) &&
+                (filter == null || r.medicationId == filter))
+              r,
+        ];
         final replaced = {for (final d in care.doses) ?d.supersedesId};
 
-        final days = <DateTime, List<DoseEvent>>{};
-        for (final d in doses) {
-          days.putIfAbsent(dateOnly(d.givenAt.toLocal()), () => []).add(d);
+        // Doses and refills together, newest first.
+        final entries = <(DateTime, String, Widget)>[
+          for (final d in doses)
+            (d.givenAt, d.id, _entry(theme, d, meds[d.medicationId]?.name ?? '',
+                replaced: replaced.contains(d.id))),
+          for (final r in refills)
+            (r.refilledAt, r.id, _refill(r, meds[r.medicationId]!)),
+        ]..sort((a, b) {
+            final byTime = b.$1.compareTo(a.$1);
+            return byTime != 0 ? byTime : b.$2.compareTo(a.$2);
+          });
+        final days = <DateTime, List<Widget>>{};
+        for (final (at, _, tile) in entries) {
+          days.putIfAbsent(dateOnly(at.toLocal()), () => []).add(tile);
         }
 
         return Scaffold(
@@ -134,7 +167,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
               IconButton(
                 tooltip: context.l.saveAsCsv,
                 icon: const Icon(Icons.file_download_outlined),
-                onPressed: doses.isEmpty ? null : _export,
+                onPressed: entries.isEmpty ? null : _export,
               ),
             ],
           ),
@@ -150,14 +183,14 @@ class _HistoryScreenState extends State<HistoryScreen> {
                     onDeleted: () => setState(() => _medicationId = null),
                   ),
                 ),
-              if (doses.isEmpty)
+              if (entries.isEmpty)
                 Padding(
                   padding: const EdgeInsets.only(top: 48),
                   child: Text(context.l.nothingLogged,
                       textAlign: TextAlign.center,
                       style: theme.textTheme.bodyLarge),
                 ),
-              for (final MapEntry(key: day, value: entries) in days.entries) ...[
+              for (final MapEntry(key: day, value: tiles) in days.entries) ...[
                 Padding(
                   padding: const EdgeInsets.fromLTRB(8, 20, 8, 8),
                   child: Text(dayHeading(day, now).toUpperCase(),
@@ -167,10 +200,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 Card(
                   clipBehavior: Clip.antiAlias,
                   child: Column(children: [
-                    for (final (i, d) in entries.indexed) ...[
+                    for (final (i, tile) in tiles.indexed) ...[
                       if (i > 0) const Divider(indent: 16, endIndent: 16),
-                      _entry(theme, d, meds[d.medicationId]?.name ?? '',
-                          replaced: replaced.contains(d.id)),
+                      tile,
                     ],
                   ]),
                 ),
@@ -181,6 +213,14 @@ class _HistoryScreenState extends State<HistoryScreen> {
       },
     );
   }
+
+  Widget _refill(Refill r, Medication medication) => ListTile(
+        onTap: () => _deleteRefill(r, medication),
+        title: Text('${clockText(r.refilledAt)}  ·  ${medication.name}'),
+        subtitle: Text(context.l
+            .historyRefill(amountText(r.amount, medication.doseUnit))),
+        trailing: const Icon(Icons.chevron_right),
+      );
 
   Widget _entry(ThemeData theme, DoseEvent d, String name, {required bool replaced}) {
     final details = [

@@ -434,6 +434,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get csvSkipped => 'Ausgelassen';
 
   @override
+  String get csvRefill => 'Nachfüllung';
+
+  @override
   String get csvCorrection => 'Korrektur';
 
   @override
@@ -662,6 +665,25 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get refill => 'Nachfüllen';
+
+  @override
+  String refillTitle(String medication) {
+    return '$medication nachfüllen';
+  }
+
+  @override
+  String get refillAmount => 'Menge zum Hinzufügen';
+
+  @override
+  String get refillAdd => 'Hinzufügen';
+
+  @override
+  String refilled(String medication, String left) {
+    return '$medication nachgefüllt. $left.';
+  }
+
+  @override
   String get earlyTitle => 'Das ist zu früh';
 
   @override
@@ -771,6 +793,15 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String deleteRefillMessage(
+    String medication,
+    String dateTime,
+    String amount,
+  ) {
+    return '$medication, $dateTime: +$amount. Lösche den Eintrag, wenn er versehentlich gemacht wurde; der Bestand sinkt um diese Menge. War die Menge falsch, fülle danach mit der richtigen nach.';
+  }
+
+  @override
   String get delete => 'Löschen';
 
   @override
@@ -804,6 +835,11 @@ class AppLocalizationsDe extends AppLocalizations {
   String get historyCorrection => 'Korrektur';
 
   @override
+  String historyRefill(String amount) {
+    return 'Nachgefüllt: +$amount';
+  }
+
+  @override
   String get historyCorrected => 'korrigiert';
 
   @override
@@ -834,7 +870,7 @@ class AppLocalizationsDe extends AppLocalizations {
       'Gib ein, wie viele Dosen die Behandlung umfasst.';
 
   @override
-  String get errorStartingSupply => 'Gib die Anfangsmenge ein.';
+  String get errorAmountLeft => 'Gib ein, wie viel noch vorhanden ist.';
 
   @override
   String get errorPerDose => 'Gib ein, wie viel eine Dosis verbraucht.';
@@ -1109,7 +1145,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get trackSupplyHint => 'Zählt mit jeder eingetragenen Dosis herunter.';
 
   @override
-  String get startingAmount => 'Anfangsmenge';
+  String get amountLeft => 'Noch vorhanden';
 
   @override
   String get unit => 'Einheit';

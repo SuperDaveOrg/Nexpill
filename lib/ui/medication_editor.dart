@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:nexpill/data/ids.dart';
 import 'package:nexpill/domain/dates.dart';
 import 'package:nexpill/domain/dose_history.dart';
+import 'package:nexpill/domain/inventory.dart';
 import 'package:nexpill/domain/wording.dart';
 import 'package:nexpill/models/medication.dart';
 import 'package:nexpill/models/patient.dart';
@@ -36,7 +37,9 @@ class _MedicationEditorState extends State<MedicationEditor> {
       ? MedicationDraft.blank(widget.patient.id, DateTime.now())
       : MedicationDraft.of(widget.existing!,
           givenSoFar:
-              effectiveDoses(widget.existing!.id, widget.store.care.doses).length);
+              effectiveDoses(widget.existing!.id, widget.store.care.doses).length,
+          refilledSoFar:
+              refillTotal(widget.existing!.id, widget.store.care.refills));
   Map<String, String> _errors = {};
   bool _saving = false;
 
@@ -533,8 +536,8 @@ class _MedicationEditorState extends State<MedicationEditor> {
             child: Column(children: [
               Row(children: [
                 Expanded(
-                  child: _text(context.l.startingAmount, _d.startingQuantity ?? '',
-                      (v) => _d.startingQuantity = v,
+                  child: _text(context.l.amountLeft, _d.amountLeft ?? '',
+                      (v) => _d.amountLeft = v,
                       keyboard: const TextInputType.numberWithOptions(decimal: true)),
                 ),
                 const SizedBox(width: 12),

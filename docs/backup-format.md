@@ -11,7 +11,7 @@ in one step: a file with a problem anywhere is refused whole.
 
 ## Versioning
 
-`nexpillBackup` is the format version, currently **5**. Adding an optional
+`nexpillBackup` is the format version, currently **6**. Adding an optional
 field doesn't change it. Changing what a field means, or adding a required
 one, needs a new version, a section here, and a reader that still accepts the
 old versions. Nexpill refuses a file whose version it doesn't know.
@@ -29,6 +29,7 @@ older app refuses the file instead of half-restoring it.
 | 3 | Adds the dose's optional `skipped`. Without the version change, an older Nexpill would read a skip as a dose given, using up supply and counting towards a course. A version 2 file is read as version 3 with no skips. |
 | 4 | Adds the patient's optional `self`, for the phone's owner, whose `name` may then be absent. Without the version change, an older Nexpill would refuse a file with a nameless patient for the wrong reason, or forget who the owner is. A version 3 file is read as version 4 with no owner. |
 | 5 | Adds the `once` schedule type, a single dose at a set time. Without the version change, an older Nexpill would refuse the file as having an unknown schedule type, rather than saying it needs updating. A version 4 file is read as version 5 unchanged. |
+| 6 | Adds the medication's optional `refills`. Without the version change, an older Nexpill would drop them and restore less supply than there is. A version 5 file is read as version 6 with no refills. |
 
 ## Example
 
@@ -108,6 +109,7 @@ the whole file; Nexpill writes random UUIDs.
 | `inventory` | object | See below. |
 | `course` | object, optional | When the medication stops by itself. See below. Absent for one that carries on until stopped. |
 | `doses` | array | Dose history, oldest first. |
+| `refills` | array, optional | Supply added, oldest first. See below. Absent when there are none. |
 
 ### Schedule
 
@@ -137,13 +139,22 @@ All minute values are positive integers.
 | Field | Type | |
 |---|---|---|
 | `enabled` | boolean | Whether supply is tracked. |
-| `startingQuantity` | number, optional | How much there was to begin with. |
+| `startingQuantity` | number, optional | How much there was to begin with. May be below zero when `refills` more than make up for it: Nexpill sets it to whatever makes the amount left come out as last entered. |
 | `perDose` | number, optional | How much one dose uses. |
 | `unit` | string, optional | e.g. "tablets", "ml". |
 | `lowAt` | number, optional | Warn at or below this much. |
 
-What's left is always worked out, never stored: `startingQuantity` minus
-`perDose` for each dose that counts.
+What's left is always worked out, never stored: `startingQuantity`, plus
+every refill's `amount`, minus `perDose` for each dose that counts.
+Nexpill never writes a `startingQuantity` that the refills leave below zero.
+
+### Refill
+
+| Field | Type | |
+|---|---|---|
+| `id` | string | |
+| `at` | instant | When it was logged. |
+| `amount` | number | How much was added, in the inventory's `unit`. Above zero. |
 
 ### Course
 

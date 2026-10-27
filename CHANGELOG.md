@@ -16,6 +16,19 @@ turns that section into the release's own when it's cut.
   settings for the app). Reminders, the printable summary and the
   dose-history spreadsheet are in the same language. Times still follow the
   phone's 12- or 24-hour setting.
+- Refill a medication's supply: "Refill" in the card's menu adds a new
+  pack to what's left, leaving its schedule and doses as they were
+  ([#44](https://github.com/SuperDaveOrg/Nexpill/issues/44)). Each refill
+  is kept in the medication's history and in the dose-history spreadsheet;
+  one logged by mistake can be deleted there.
+
+### Changed
+- The Supply section's "Starting amount" is now "Amount left": it shows
+  what's left, and changing it sets that. Turning supply tracking on for a
+  medication already being given now starts from the amount entered,
+  rather than counting the doses already given against it.
+- Backups are format version 6, which can hold refills. Older versions of
+  Nexpill can't restore them; this version restores every earlier file.
 
 ## [0.7.0] - 2026-10-25
 

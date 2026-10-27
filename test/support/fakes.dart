@@ -4,6 +4,7 @@ import 'package:nexpill/domain/reminder_planner.dart';
 import 'package:nexpill/models/dose_event.dart';
 import 'package:nexpill/models/medication.dart';
 import 'package:nexpill/models/patient.dart';
+import 'package:nexpill/models/refill.dart';
 import 'package:nexpill/services/notification_service.dart';
 
 /// [CareRepository] in memory, for widget tests, where real database I/O
@@ -12,6 +13,7 @@ class InMemoryCareRepository implements CareRepository {
   final _patients = <String, Patient>{};
   final _medications = <String, Medication>{};
   final _doses = <String, DoseEvent>{};
+  final _refills = <String, Refill>{};
 
   @override
   Future<CareSnapshot> snapshot() async => CareSnapshot(
@@ -22,6 +24,8 @@ class InMemoryCareRepository implements CareRepository {
         medications: [..._medications.values]
           ..sort((a, b) => a.name.compareTo(b.name)),
         doses: [..._doses.values]..sort((a, b) => b.givenAt.compareTo(a.givenAt)),
+        refills: [..._refills.values]
+          ..sort((a, b) => b.refilledAt.compareTo(a.refilledAt)),
       );
 
   @override
@@ -58,6 +62,7 @@ class InMemoryCareRepository implements CareRepository {
   Future<void> deleteMedication(String id) async {
     _medications.remove(id);
     _doses.removeWhere((_, d) => d.medicationId == id);
+    _refills.removeWhere((_, r) => r.medicationId == id);
   }
 
   @override
@@ -115,6 +120,19 @@ class InMemoryCareRepository implements CareRepository {
   }
 
   @override
+  Future<Refill> logRefill(String medicationId, double amount) async {
+    final r = Refill(
+        id: newId(),
+        medicationId: medicationId,
+        refilledAt: DateTime.now().toUtc(),
+        amount: amount);
+    return _refills[r.id] = r;
+  }
+
+  @override
+  Future<void> deleteRefill(String id) async => _refills.remove(id);
+
+  @override
   Future<void> replaceAll(CareSnapshot s) async {
     await deleteAllData();
     for (final p in s.patients) {
@@ -126,6 +144,9 @@ class InMemoryCareRepository implements CareRepository {
     for (final d in s.doses) {
       _doses[d.id] = d;
     }
+    for (final r in s.refills) {
+      _refills[r.id] = r;
+    }
   }
 
   @override
@@ -133,6 +154,7 @@ class InMemoryCareRepository implements CareRepository {
     _patients.clear();
     _medications.clear();
     _doses.clear();
+    _refills.clear();
   }
 }
 

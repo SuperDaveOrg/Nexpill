@@ -72,6 +72,7 @@ void main() {
         final inventory = computeInventoryStatus(
           medication,
           history(c['history'] as String, medication.id),
+          const [],
         );
         expect(_inventoryAsPwa(inventory), _numbersAsDoubles(c['expect']));
       });

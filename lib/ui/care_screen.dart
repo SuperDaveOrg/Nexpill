@@ -16,6 +16,7 @@ import 'package:nexpill/ui/layout.dart';
 import 'package:nexpill/ui/medication_card.dart';
 import 'package:nexpill/ui/medication_editor.dart';
 import 'package:nexpill/ui/patients_screen.dart';
+import 'package:nexpill/ui/refill_dialog.dart';
 import 'package:nexpill/ui/settings_screen.dart';
 
 /// The home screen: one patient's medications, what needs doing first at
@@ -144,12 +145,46 @@ class _CareScreenState extends State<CareScreen> with WidgetsBindingObserver {
     ));
   }
 
+  /// Logs a new pack added to [m]'s supply, kept in its history. Its doses
+  /// and schedule are untouched.
+  Future<void> _refill(Medication m) async {
+    final care = _store.care;
+    final amount = await showRefillDialog(context,
+        medication: m,
+        inventory: computeInventoryStatus(m, care.doses, care.refills));
+    if (amount == null) return;
+    final ready = withShortfallCleared(m, care.doses, care.refills);
+    final refill = await _store.change((repo) async {
+      if (!identical(ready, m)) await repo.saveMedication(ready);
+      return repo.logRefill(m.id, amount);
+    });
+    if (!mounted) return;
+    final after = _store.care;
+    final left = computeInventoryStatus(
+            after.medication(m.id) ?? ready, after.doses, after.refills)
+        .remaining!;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(context.l
+          .refilled(m.name, MedicationCard.leftText(context, left, m.doseUnit))),
+      persist: false,
+      action: SnackBarAction(
+        label: context.l.undo,
+        onPressed: () => _store.change((repo) async {
+          await repo.deleteRefill(refill.id);
+          if (!identical(ready, m)) await repo.saveMedication(m);
+        }),
+      ),
+    ));
+  }
+
   Future<void> _action(Patient patient, Medication m, CardAction action) async {
     switch (action) {
       case CardAction.edit:
         _push(MedicationEditor(store: _store, patient: patient, existing: m));
       case CardAction.history:
         _push(HistoryScreen(store: _store, patient: patient, medicationId: m.id));
+      case CardAction.refill:
+        await _refill(m);
       case CardAction.stop:
         await _store.change((repo) => repo.setMedicationActive(m.id, false));
         if (!mounted) return;
@@ -361,7 +396,7 @@ class _CareScreenState extends State<CareScreen> with WidgetsBindingObserver {
               MedicationCard(
                 medication: m,
                 status: status,
-                inventory: computeInventoryStatus(m, care.doses),
+                inventory: computeInventoryStatus(m, care.doses, care.refills),
                 course: courseShortText(m, care.doses),
                 now: now,
                 lastGivenBy: latestDose(m.id, care.doses)?.givenBy,
