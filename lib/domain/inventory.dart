@@ -73,3 +73,17 @@ InventoryStatus computeInventoryStatus(
     lowSupplyThreshold: threshold,
   );
 }
+
+/// [medication] with [amount] more in its supply, e.g. a new pack from the
+/// pharmacy. Adds to what's shown as left, which never goes below zero: if
+/// more doses were logged than the supply allowed, the count was wrong, and
+/// a refill starts again from the pack in hand. Call only when the status is
+/// configured.
+Medication refilled(
+    Medication medication, Iterable<DoseEvent> doseEvents, double amount) {
+  final remaining = computeInventoryStatus(medication, doseEvents).remaining!;
+  return medication.copyWith(
+    initialQuantity:
+        medication.initialQuantity! + amount + (remaining < 0 ? -remaining : 0),
+  );
+}

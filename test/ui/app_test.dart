@@ -250,6 +250,32 @@ void main() {
         .contains('sample-amox'), isFalse);
   });
 
+  testWidgets('refill adds a new pack to what\'s left, and can be undone', (tester) async {
+    await repo.replaceAll(sampleCare(DateTime.now()));
+    await start(tester, tall: true, open: 'Alex Rivera');
+    final left = find.textContaining('tablets left');
+    final before = tester.widget<Text>(left).data!;
+    final count = int.parse(before.split(' ').first);
+
+    await tester.tap(find.byTooltip('More for Acetaminophen'));
+    await tester.pumpAndSettle();
+    expect(find.text('Refill'), findsOneWidget);
+    await tester.tap(find.text('Refill'));
+    await tester.pumpAndSettle();
+    expect(find.text('Refill Acetaminophen'), findsOneWidget);
+    await tester.enterText(find.byType(TextField), '100');
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Add'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('${count + 100} tablets left'), findsOneWidget);
+    expect(find.text('Acetaminophen refilled. ${count + 100} tablets left.'),
+        findsOneWidget);
+    await tester.tap(find.text('Undo'));
+    await tester.pumpAndSettle();
+    expect(find.text(before), findsOneWidget);
+  });
+
   testWidgets('tapping a card edits it; the list ends with an add button', (tester) async {
     await repo.replaceAll(sampleCare(DateTime.now()));
     await start(tester, tall: true, open: 'Alex Rivera');

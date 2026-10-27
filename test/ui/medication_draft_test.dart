@@ -90,11 +90,11 @@ void main() {
     });
   });
 
-  test('supply needs a starting amount and a positive amount per dose', () {
+  test('supply needs an amount left and a positive amount per dose', () {
     final d = named()..trackSupply = true;
     expect(d.validate().keys, ['supply']);
     d
-      ..startingQuantity = '30'
+      ..amountLeft = '30'
       ..perDose = '0';
     expect(d.validate().keys, ['supply']);
     d
@@ -104,6 +104,28 @@ void main() {
     final m = d.build(() => 'x');
     expect(m.doseAmount, 0.5);
     expect(m.lowSupplyThreshold, 5);
+  });
+
+  test('supply is edited as how much is left, given the doses so far', () {
+    final m = (named()
+          ..trackSupply = true
+          ..amountLeft = '30'
+          ..perDose = '2')
+        .build(() => 'id');
+    final d = MedicationDraft.of(m, givenSoFar: 5);
+    expect(d.amountLeft, '20');
+    d.amountLeft = '120';
+    expect(d.build(() => 'id').initialQuantity, 130);
+    expect(MedicationDraft.of(m, givenSoFar: 20).amountLeft, '0',
+        reason: 'never below none left');
+  });
+
+  test('tracking supply after doses were given starts from the amount entered', () {
+    final m = named().build(() => 'id');
+    final d = MedicationDraft.of(m, givenSoFar: 4)
+      ..trackSupply = true
+      ..amountLeft = '10';
+    expect(d.build(() => 'id').initialQuantity, 14);
   });
 
   group('how long', () {
@@ -170,7 +192,7 @@ void main() {
       ..setKind(ScheduleKind.fixedTimes)
       ..times = [const ClockTime(9, 30)]
       ..trackSupply = true
-      ..startingQuantity = '2.5'
+      ..amountLeft = '2.5'
       ..purpose = ' Blood pressure ';
     final m = original.build(() => 'id');
     expect(m.purpose, 'Blood pressure');

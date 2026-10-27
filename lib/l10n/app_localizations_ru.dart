@@ -683,6 +683,25 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
+  String get refill => 'Пополнить';
+
+  @override
+  String refillTitle(String medication) {
+    return 'Пополнить: $medication';
+  }
+
+  @override
+  String get refillAmount => 'Сколько добавить';
+
+  @override
+  String get refillAdd => 'Добавить';
+
+  @override
+  String refilled(String medication, String left) {
+    return '$medication: запас пополнен. $left.';
+  }
+
+  @override
   String get earlyTitle => 'Ещё рано';
 
   @override
@@ -856,7 +875,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get errorCourseDoses => 'Укажите, сколько доз в курсе.';
 
   @override
-  String get errorStartingSupply => 'Укажите, сколько есть в начале.';
+  String get errorAmountLeft => 'Укажите, сколько осталось.';
 
   @override
   String get errorPerDose => 'Укажите, сколько уходит на одну дозу.';
@@ -1138,7 +1157,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get trackSupplyHint => 'Уменьшается с каждой записанной дозой.';
 
   @override
-  String get startingAmount => 'Начальное количество';
+  String get amountLeft => 'Осталось';
 
   @override
   String get unit => 'Единица';

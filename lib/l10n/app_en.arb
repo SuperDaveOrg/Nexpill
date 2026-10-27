@@ -1084,6 +1084,39 @@
       }
     }
   },
+  "refill": "Refill",
+  "@refill": {
+    "description": "Card menu item, shown when supply is tracked: add a new pack from the pharmacy to what's left."
+  },
+  "refillTitle": "Refill {medication}",
+  "@refillTitle": {
+    "description": "Title of the dialog that adds to a medication's supply.",
+    "placeholders": {
+      "medication": {
+        "type": "String"
+      }
+    }
+  },
+  "refillAmount": "Amount to add",
+  "@refillAmount": {
+    "description": "Field label in the refill dialog: how much the new pack adds, e.g. 100 (tablets)."
+  },
+  "refillAdd": "Add",
+  "@refillAdd": {
+    "description": "Confirming button of the refill dialog."
+  },
+  "refilled": "{medication} refilled. {left}.",
+  "@refilled": {
+    "description": "Message after a refill: {left} is supplyLeft with the new total, e.g. 'Ibuprofen refilled. 112 tablets left.'",
+    "placeholders": {
+      "medication": {
+        "type": "String"
+      },
+      "left": {
+        "type": "String"
+      }
+    }
+  },
   "earlyTitle": "This is early",
   "@earlyTitle": {
     "description": "Title of the dialog shown when Give is tapped before the dose is due."
@@ -1344,9 +1377,9 @@
   "@errorCourseDoses": {
     "description": "Validation error under the 'Number of doses' field of a new course."
   },
-  "errorStartingSupply": "Enter how much there is to start with.",
-  "@errorStartingSupply": {
-    "description": "Validation error in the editor's Supply section: Starting amount is missing or negative."
+  "errorAmountLeft": "Enter how much is left.",
+  "@errorAmountLeft": {
+    "description": "Validation error in the editor's Supply section: Amount left is missing or negative."
   },
   "errorPerDose": "Enter how much one dose uses.",
   "@errorPerDose": {
@@ -1710,9 +1743,9 @@
   "@trackSupplyHint": {
     "description": "Subtitle of the Track how much is left switch."
   },
-  "startingAmount": "Starting amount",
-  "@startingAmount": {
-    "description": "Field label in the Supply section: how much there is when tracking starts."
+  "amountLeft": "Amount left",
+  "@amountLeft": {
+    "description": "Field label in the Supply section: how much there is now. It counts down with each dose, and Refill adds to it."
   },
   "unit": "Unit",
   "@unit": {

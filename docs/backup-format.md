@@ -137,7 +137,7 @@ All minute values are positive integers.
 | Field | Type | |
 |---|---|---|
 | `enabled` | boolean | Whether supply is tracked. |
-| `startingQuantity` | number, optional | How much there was to begin with. |
+| `startingQuantity` | number, optional | How much there was to begin with, plus every refill. |
 | `perDose` | number, optional | How much one dose uses. |
 | `unit` | string, optional | e.g. "tablets", "ml". |
 | `lowAt` | number, optional | Warn at or below this much. |

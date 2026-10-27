@@ -663,6 +663,25 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String get refill => 'Reponer';
+
+  @override
+  String refillTitle(String medication) {
+    return 'Reponer $medication';
+  }
+
+  @override
+  String get refillAmount => 'Cantidad que añadir';
+
+  @override
+  String get refillAdd => 'Añadir';
+
+  @override
+  String refilled(String medication, String left) {
+    return '$medication repuesto. $left.';
+  }
+
+  @override
   String get earlyTitle => 'Es pronto';
 
   @override
@@ -832,7 +851,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get errorCourseDoses => 'Indica cuántas dosis tiene el tratamiento.';
 
   @override
-  String get errorStartingSupply => 'Indica cuánto hay al empezar.';
+  String get errorAmountLeft => 'Indica cuánto queda.';
 
   @override
   String get errorPerDose => 'Indica cuánto usa una dosis.';
@@ -1107,7 +1126,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get trackSupplyHint => 'Se descuenta con cada dosis registrada.';
 
   @override
-  String get startingAmount => 'Cantidad inicial';
+  String get amountLeft => 'Cantidad restante';
 
   @override
   String get unit => 'Unidad';

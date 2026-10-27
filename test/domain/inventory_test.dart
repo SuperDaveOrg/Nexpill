@@ -64,4 +64,19 @@ void main() {
     expect(r.level, isNull);
     expect(r.remaining, isNull);
   });
+
+  group('refilled', () {
+    test('adds to what\'s left, keeping the history', () {
+      final events = [dose('1'), dose('2')];
+      final m = refilled(tracked(initial: 60, perDose: 25), events, 100);
+      expect(m.initialQuantity, 160);
+      expect(computeInventoryStatus(m, events).remaining, 110);
+    });
+
+    test('starts from none left when more was given than there was', () {
+      final events = [dose('1'), dose('2'), dose('3')];
+      final m = refilled(tracked(initial: 50, perDose: 25), events, 100);
+      expect(computeInventoryStatus(m, events).remaining, 100);
+    });
+  });
 }

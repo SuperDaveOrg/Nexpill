@@ -16,6 +16,7 @@ import 'package:nexpill/ui/layout.dart';
 import 'package:nexpill/ui/medication_card.dart';
 import 'package:nexpill/ui/medication_editor.dart';
 import 'package:nexpill/ui/patients_screen.dart';
+import 'package:nexpill/ui/refill_dialog.dart';
 import 'package:nexpill/ui/settings_screen.dart';
 
 /// The home screen: one patient's medications, what needs doing first at
@@ -144,12 +145,34 @@ class _CareScreenState extends State<CareScreen> with WidgetsBindingObserver {
     ));
   }
 
+  /// Adds a new pack to [m]'s supply. Its doses and schedule are untouched.
+  Future<void> _refill(Medication m) async {
+    final amount = await showRefillDialog(context,
+        medication: m, inventory: computeInventoryStatus(m, _store.care.doses));
+    if (amount == null) return;
+    final refill = refilled(m, _store.care.doses, amount);
+    await _store.change((repo) => repo.saveMedication(refill));
+    if (!mounted) return;
+    final left = computeInventoryStatus(refill, _store.care.doses).remaining!;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(context.l
+          .refilled(m.name, MedicationCard.leftText(context, left, m.doseUnit))),
+      persist: false,
+      action: SnackBarAction(
+        label: context.l.undo,
+        onPressed: () => _store.change((repo) => repo.saveMedication(m)),
+      ),
+    ));
+  }
+
   Future<void> _action(Patient patient, Medication m, CardAction action) async {
     switch (action) {
       case CardAction.edit:
         _push(MedicationEditor(store: _store, patient: patient, existing: m));
       case CardAction.history:
         _push(HistoryScreen(store: _store, patient: patient, medicationId: m.id));
+      case CardAction.refill:
+        await _refill(m);
       case CardAction.stop:
         await _store.change((repo) => repo.setMedicationActive(m.id, false));
         if (!mounted) return;

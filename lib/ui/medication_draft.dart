@@ -29,7 +29,7 @@ class MedicationDraft {
         taperSteps = [TaperStepDraft(start: dateOnly(today))];
 
   /// [givenSoFar] is how many of [m]'s doses count, so a course can be set
-  /// as the doses still to give.
+  /// as the doses still to give, and a supply as how much is left.
   MedicationDraft.of(Medication m, {this.givenSoFar = 0})
       : id = m.id,
         patientId = m.patientId,
@@ -44,7 +44,7 @@ class MedicationDraft {
         overdueRepeatMinutes = m.reminders.overdueRepeatMinutes,
         alarm = m.reminders.alarm,
         trackSupply = m.inventoryEnabled,
-        startingQuantity = _num(m.initialQuantity),
+        amountLeft = _left(m, givenSoFar),
         perDose = _num(m.doseAmount) ?? '1',
         unit = m.doseUnit ?? '',
         lowAt = _num(m.lowSupplyThreshold),
@@ -117,7 +117,9 @@ class MedicationDraft {
   bool remindersTouched = false;
 
   bool trackSupply = false;
-  String? startingQuantity;
+  /// How much is left now. Saved as the starting quantity it implies, given
+  /// the doses already counted.
+  String? amountLeft;
   String perDose = '1';
   String unit = '';
   String? lowAt;
@@ -177,10 +179,10 @@ class MedicationDraft {
       }
     }
     if (trackSupply) {
-      final start = _parse(startingQuantity);
+      final left = _parse(amountLeft);
       final each = _parse(perDose);
-      if (start == null || start < 0) {
-        errors['supply'] = strings.errorStartingSupply;
+      if (left == null || left < 0) {
+        errors['supply'] = strings.errorAmountLeft;
       } else if (each == null || each <= 0) {
         errors['supply'] = strings.errorPerDose;
       } else if (lowAt != null && lowAt!.trim().isNotEmpty && (_parse(lowAt) ?? -1) < 0) {
@@ -240,7 +242,9 @@ class MedicationDraft {
         alarm: alarmAvailable && alarm,
       ),
       inventoryEnabled: trackSupply,
-      initialQuantity: trackSupply ? _parse(startingQuantity) : null,
+      initialQuantity: trackSupply
+          ? _parse(amountLeft)! + givenSoFar * _parse(perDose)!
+          : null,
       doseAmount: trackSupply ? _parse(perDose) : null,
       doseUnit: trackSupply ? opt(unit) : null,
       lowSupplyThreshold: trackSupply ? _parse(lowAt) : null,
@@ -269,4 +273,12 @@ class MedicationDraft {
       s == null ? null : double.tryParse(s.trim().replaceAll(',', '.'));
 
   static String? _num(double? q) => q == null ? null : quantityText(q);
+
+  /// What [m]'s card says is left: never below zero.
+  static String? _left(Medication m, int givenSoFar) {
+    final start = m.initialQuantity;
+    if (start == null) return null;
+    final left = start - givenSoFar * (m.doseAmount ?? 0);
+    return quantityText(left < 0 ? 0 : left);
+  }
 }

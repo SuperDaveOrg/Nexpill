@@ -533,8 +533,8 @@ class _MedicationEditorState extends State<MedicationEditor> {
             child: Column(children: [
               Row(children: [
                 Expanded(
-                  child: _text(context.l.startingAmount, _d.startingQuantity ?? '',
-                      (v) => _d.startingQuantity = v,
+                  child: _text(context.l.amountLeft, _d.amountLeft ?? '',
+                      (v) => _d.amountLeft = v,
                       keyboard: const TextInputType.numberWithOptions(decimal: true)),
                 ),
                 const SizedBox(width: 12),
