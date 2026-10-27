@@ -6,6 +6,7 @@ import 'package:nexpill/domain/wording.dart';
 import 'package:nexpill/models/dose_event.dart';
 import 'package:nexpill/models/medication.dart';
 import 'package:nexpill/models/patient.dart';
+import 'package:nexpill/models/refill.dart';
 
 /// The backup file format. See docs/backup-format.md, which is the contract;
 /// this file is one implementation of it.
@@ -14,9 +15,9 @@ import 'package:nexpill/models/patient.dart';
 /// editor and importable by some other app one day, so nobody is locked in.
 ///
 /// Version 2 added `course`, version 3 skipped doses, version 4 the phone's
-/// owner, who may have no name, version 5 the single-dose schedule. Files of
-/// every earlier version still restore.
-const backupFormatVersion = 5;
+/// owner, who may have no name, version 5 the single-dose schedule, version 6
+/// refills. Files of every earlier version still restore.
+const backupFormatVersion = 6;
 
 /// A file that can't be restored, with a reason fit to show the user.
 class BackupFormatException implements Exception {
@@ -40,6 +41,10 @@ String encodeBackup(CareSnapshot care, {required DateTime exportedAt}) {
   for (final d in care.doses) {
     dosesByMed.putIfAbsent(d.medicationId, () => []).add(d);
   }
+  final refillsByMed = <String, List<Refill>>{};
+  for (final r in care.refills) {
+    refillsByMed.putIfAbsent(r.medicationId, () => []).add(r);
+  }
 
   final json = {
     'nexpillBackup': backupFormatVersion,
@@ -54,7 +59,8 @@ String encodeBackup(CareSnapshot care, {required DateTime exportedAt}) {
           'notificationsEnabled': p.notificationsEnabled,
           'medications': [
             for (final m in medsByPatient[p.id] ?? const <Medication>[])
-              _encodeMedication(m, dosesByMed[m.id] ?? const []),
+              _encodeMedication(m, dosesByMed[m.id] ?? const [],
+                  refillsByMed[m.id] ?? const []),
           ],
         },
     ],
@@ -62,8 +68,11 @@ String encodeBackup(CareSnapshot care, {required DateTime exportedAt}) {
   return const JsonEncoder.withIndent('  ').convert(json);
 }
 
-Map<String, Object?> _encodeMedication(Medication m, List<DoseEvent> doses) {
+Map<String, Object?> _encodeMedication(
+    Medication m, List<DoseEvent> doses, List<Refill> refills) {
   final ordered = [...doses]..sort((a, b) => a.givenAt.compareTo(b.givenAt));
+  final refillsInOrder = [...refills]
+    ..sort((a, b) => a.refilledAt.compareTo(b.refilledAt));
   return {
     'id': m.id,
     'name': m.name,
@@ -131,6 +140,15 @@ Map<String, Object?> _encodeMedication(Medication m, List<DoseEvent> doses) {
           if (d.skipped) 'skipped': true,
         },
     ],
+    if (refillsInOrder.isNotEmpty)
+      'refills': [
+        for (final r in refillsInOrder)
+          {
+            'id': r.id,
+            'at': _instant(r.refilledAt),
+            'amount': _number(r.amount),
+          },
+      ],
   };
 }
 
@@ -164,6 +182,7 @@ CareSnapshot decodeBackup(String text) {
   final patients = <Patient>[];
   final medications = <Medication>[];
   final doses = <DoseEvent>[];
+  final refills = <Refill>[];
 
   for (final p in root.list('patients')) {
     final patientId = p.id(ids);
@@ -226,11 +245,23 @@ CareSnapshot decodeBackup(String text) {
       }
       _checkCorrections(
           doses.where((d) => d.medicationId == medId), m.string('name'));
+
+      for (final r in m.optionalList('refills')) {
+        refills.add(Refill(
+          id: r.id(ids),
+          medicationId: medId,
+          refilledAt: r.instant('at'),
+          amount: r.positiveNumber('amount'),
+        ));
+      }
     }
   }
 
   return CareSnapshot(
-      patients: patients, medications: medications, doses: doses);
+      patients: patients,
+      medications: medications,
+      doses: doses,
+      refills: refills);
 }
 
 /// Every correction must replace a dose of the same medication, and
@@ -329,6 +360,15 @@ class _Reader {
   double? optionalNumber(String key) =>
       _json[key] == null ? null : value<num>(key).toDouble();
 
+  /// A number above zero, such as an amount added.
+  double positiveNumber(String key) {
+    final v = value<num>(key);
+    if (v <= 0) {
+      throw BackupFormatException(strings.backupImpossible(where, key, '$v'));
+    }
+    return v.toDouble();
+  }
+
   int minutes(String key, {bool allowZero = false}) {
     final v = value<int>(key);
     if (v < (allowZero ? 0 : 1) || v > 60 * 24 * 365) {
@@ -389,6 +429,9 @@ class _Reader {
         _Reader(item, _describe(key, i, item)),
     ];
   }
+
+  List<_Reader> optionalList(String key) =>
+      _json[key] == null ? const [] : list(key);
 
   String _describe(String key, int i, Object? item) {
     final name = item is Map ? item['name'] : null;

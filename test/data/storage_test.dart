@@ -179,6 +179,7 @@ void main() {
     await db.execute('DROP INDEX idx_patients_self');
     await db.execute('ALTER TABLE patients DROP COLUMN is_self');
     await db.execute('ALTER TABLE medications DROP COLUMN once_at');
+    await db.execute('DROP TABLE refills');
     await db.insert('patients', sam.toRow()..remove('is_self'));
     await db.setVersion(4);
     await v4.close();
@@ -204,6 +205,7 @@ void main() {
     final db = await v5.database;
     // Back to version 5's medications table.
     await db.execute('ALTER TABLE medications DROP COLUMN once_at');
+    await db.execute('DROP TABLE refills');
     await db.insert('patients', sam.toRow());
     await db.insert('medications',
         med('a', const IntervalSchedule(480)).toRow()..remove('once_at'));
@@ -217,6 +219,38 @@ void main() {
     final once = (await upgradedRepo.medications()).firstWhere((m) => m.id == 'b');
     expect((once.schedule as OnceSchedule).at, DateTime(2026, 6, 11, 15).toUtc());
     await upgraded.close();
+  });
+
+  test('a version 6 database upgrades, and then stores refills', () async {
+    final path = '${dir.path}/v6.db';
+    final v6 = NexpillDatabase(path: path, factory: databaseFactoryFfi);
+    final db = await v6.database;
+    // Back to version 6, which had no refills.
+    await db.execute('DROP TABLE refills');
+    await db.insert('patients', sam.toRow());
+    await db.insert('medications', med('a', const IntervalSchedule(480)).toRow());
+    await db.setVersion(6);
+    await v6.close();
+
+    final upgraded = NexpillDatabase(path: path, factory: databaseFactoryFfi);
+    final upgradedRepo = CareRepository(db: upgraded);
+    expect((await upgradedRepo.snapshot()).refills, isEmpty);
+    await upgradedRepo.logRefill('a', 30);
+    expect((await upgradedRepo.snapshot()).refills.single.amount, 30);
+    await upgraded.close();
+  });
+
+  test('refills: log, read back newest first, and delete', () async {
+    await repo.savePatient(sam);
+    await repo.saveMedication(med('a', const IntervalSchedule(60)));
+    final first = await repo.logRefill('a', 28);
+    final second = await repo.logRefill('a', 2.5);
+    final refills = (await repo.snapshot()).refills;
+    expect([for (final r in refills) r.id], [second.id, first.id]);
+    expect(refills.first.amount, 2.5);
+    expect(refills.first.refilledAt.isUtc, isTrue);
+    await repo.deleteRefill(first.id);
+    expect([for (final r in (await repo.snapshot()).refills) r.id], [second.id]);
   });
 
   test('doses: log, correct, and read back newest first', () async {
@@ -276,6 +310,7 @@ void main() {
     expect([for (final p in left.patients) p.id], ['sample-jordan']);
     expect(left.medications.every((m) => m.patientId == 'sample-jordan'), isTrue);
     expect(left.doses.every((d) => d.medicationId == 'sample-vitd'), isTrue);
+    expect(left.refills, isEmpty, reason: 'the refill was Alex\'s');
   });
 
   test('replaceAll then snapshot gives back the same care', () async {
@@ -286,6 +321,8 @@ void main() {
     expect(back.medications.length, sample.medications.length);
     expect({for (final d in back.doses) d.id: d.givenAt},
         {for (final d in sample.doses) d.id: d.givenAt});
+    expect({for (final r in back.refills) r.id: (r.refilledAt, r.amount)},
+        {for (final r in sample.refills) r.id: (r.refilledAt, r.amount)});
   });
 
   test('replaceAll is all or nothing', () async {
@@ -304,6 +341,7 @@ void main() {
     await repo.replaceAll(sampleCare(DateTime(2026, 6, 10, 12)));
     await repo.deleteAllData();
     final left = await repo.snapshot();
-    expect([left.patients, left.medications, left.doses], everyElement(isEmpty));
+    expect([left.patients, left.medications, left.doses, left.refills],
+        everyElement(isEmpty));
   });
 }

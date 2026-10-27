@@ -15,7 +15,7 @@ class NexpillDatabase {
   static final NexpillDatabase instance = NexpillDatabase();
 
   static const _fileName = 'nexpill.db';
-  static const version = 6;
+  static const version = 7;
 
   final String? _path;
   final DatabaseFactory? _factory;
@@ -148,12 +148,27 @@ class NexpillDatabase {
       // A single dose: when it's due, as UTC milliseconds.
       await db.execute('ALTER TABLE medications ADD COLUMN once_at INTEGER');
     }
+    if (oldVersion < 7) {
+      // More added to a medication's supply: when, and how much.
+      await db.execute('''
+        CREATE TABLE refills (
+          id            TEXT PRIMARY KEY,
+          medication_id TEXT NOT NULL
+                        REFERENCES medications(id) ON DELETE CASCADE,
+          refilled_at   INTEGER NOT NULL,
+          amount        REAL NOT NULL
+        )
+      ''');
+      await db.execute(
+          'CREATE INDEX idx_refills_medication ON refills(medication_id, refilled_at)');
+    }
   }
 
   /// Empties every table. Used by "delete everything" and by restore, which
   /// rebuilds from a backup inside the same transaction.
   static Future<void> resetAll(DatabaseExecutor txn) async {
     // Children first; cascades would do it, but this doesn't rely on them.
+    await txn.delete('refills');
     await txn.delete('dose_events');
     await txn.delete('taper_rules');
     await txn.delete('medications');

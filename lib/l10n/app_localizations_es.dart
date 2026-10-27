@@ -434,6 +434,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get csvSkipped => 'Omitida';
 
   @override
+  String get csvRefill => 'Reposición';
+
+  @override
   String get csvCorrection => 'Corrección';
 
   @override
@@ -791,6 +794,15 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String deleteRefillMessage(
+    String medication,
+    String dateTime,
+    String amount,
+  ) {
+    return '$medication, $dateTime: +$amount. Bórrala si se registró por error; lo que queda baja en esa cantidad. Si la cantidad era incorrecta, vuelve a reponer con la correcta.';
+  }
+
+  @override
   String get delete => 'Borrar';
 
   @override
@@ -822,6 +834,11 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get historyCorrection => 'corrección';
+
+  @override
+  String historyRefill(String amount) {
+    return 'Reposición: +$amount';
+  }
 
   @override
   String get historyCorrected => 'corregida';

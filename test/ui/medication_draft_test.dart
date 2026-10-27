@@ -120,6 +120,19 @@ void main() {
         reason: 'never below none left');
   });
 
+  test('refills count towards what\'s left, and stay counted after an edit', () {
+    final m = (named()
+          ..trackSupply = true
+          ..amountLeft = '10')
+        .build(() => 'id');
+    final d = MedicationDraft.of(m, givenSoFar: 8, refilledSoFar: 100);
+    expect(d.amountLeft, '102');
+    d.amountLeft = '50';
+    final saved = d.build(() => 'id');
+    expect(saved.initialQuantity, -42, reason: 'refills more than make up for it');
+    expect(saved.initialQuantity! + 100 - 8, 50);
+  });
+
   test('tracking supply after doses were given starts from the amount entered', () {
     final m = named().build(() => 'id');
     final d = MedicationDraft.of(m, givenSoFar: 4)

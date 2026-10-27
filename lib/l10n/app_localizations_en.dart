@@ -434,6 +434,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get csvSkipped => 'Skipped';
 
   @override
+  String get csvRefill => 'Refill';
+
+  @override
   String get csvCorrection => 'Correction';
 
   @override
@@ -790,6 +793,15 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String deleteRefillMessage(
+    String medication,
+    String dateTime,
+    String amount,
+  ) {
+    return '$medication, $dateTime: +$amount. Delete it if it was logged by mistake; what\'s left goes down by that much. If the amount was wrong, refill again with the right one.';
+  }
+
+  @override
   String get delete => 'Delete';
 
   @override
@@ -821,6 +833,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get historyCorrection => 'correction';
+
+  @override
+  String historyRefill(String amount) {
+    return 'Refill: +$amount';
+  }
 
   @override
   String get historyCorrected => 'corrected';

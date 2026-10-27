@@ -17,7 +17,7 @@ void main() {
     test('has a header and one row per entry, newest first', () {
       final lines = doseHistoryCsv(sample).split('\r\n')..removeLast();
       expect(lines.first, startsWith('Given at,Given at (UTC),Patient,Medication'));
-      expect(lines.length, sample.doses.length + 1);
+      expect(lines.length, sample.doses.length + sample.refills.length + 1);
       expect(lines[1], contains('Ibuprofen'), reason: 'given 2 hours ago');
     });
 
@@ -30,6 +30,15 @@ void main() {
     test('marks skipped doses, with no dose given', () {
       final csv = doseHistoryCsv(sample);
       expect(csv, contains(',Vitamin D,,,,Skipped,,sample-d6'));
+    });
+
+    test('includes refills, saying how much was added', () {
+      final csv = doseHistoryCsv(sample);
+      expect(csv, contains(',Acetaminophen,+20 tablets,,,Refill,,sample-r1'));
+      final lines = csv.split('\r\n');
+      expect(lines.indexWhere((l) => l.endsWith('sample-r1')),
+          lessThan(lines.indexWhere((l) => l.endsWith('sample-d7'))),
+          reason: 'newest first: the refill came after yesterday\'s 9:10 dose');
     });
 
     test('one patient only', () {

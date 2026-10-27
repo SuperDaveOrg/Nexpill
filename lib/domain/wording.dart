@@ -164,6 +164,10 @@ String remindersText(ReminderSettings r) {
 String quantityText(double q) =>
     q == q.roundToDouble() ? q.toInt().toString() : q.toString();
 
+/// A quantity with its unit, if it has one: "12 tablets", "2.5".
+String amountText(double q, String? unit) =>
+    '${quantityText(q)}${unit == null ? '' : ' $unit'}';
+
 /// A time relative to [now]'s day: "4:28 PM", "tomorrow at 8:00 AM",
 /// "yesterday at 8:00 PM", or "Sep 30 at 8:00 AM".
 String whenText(DateTime at, DateTime now) {

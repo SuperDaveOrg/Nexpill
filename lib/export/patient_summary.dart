@@ -28,9 +28,8 @@ String patientSummary(CareSnapshot care, Patient patient, {required DateTime now
     final status = computeMedicationStatus(m, care.doses, now);
     final last = status.schedule.lastGivenAt;
     final finished = status.label == MedicationStatusLabel.finished;
-    final inventory = computeInventoryStatus(m, care.doses);
-    final amount = '${quantityText(inventory.remaining ?? 0)}'
-        '${m.doseUnit == null ? '' : ' ${m.doseUnit}'}';
+    final inventory = computeInventoryStatus(m, care.doses, care.refills);
+    final amount = amountText(inventory.remaining ?? 0, m.doseUnit);
     lines.addAll([
       '${i + 1}. ${m.name}${m.strengthText == null ? '' : ' (${m.strengthText})'}',
       for (final line in [

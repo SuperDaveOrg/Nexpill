@@ -145,22 +145,34 @@ class _CareScreenState extends State<CareScreen> with WidgetsBindingObserver {
     ));
   }
 
-  /// Adds a new pack to [m]'s supply. Its doses and schedule are untouched.
+  /// Logs a new pack added to [m]'s supply, kept in its history. Its doses
+  /// and schedule are untouched.
   Future<void> _refill(Medication m) async {
+    final care = _store.care;
     final amount = await showRefillDialog(context,
-        medication: m, inventory: computeInventoryStatus(m, _store.care.doses));
+        medication: m,
+        inventory: computeInventoryStatus(m, care.doses, care.refills));
     if (amount == null) return;
-    final refill = refilled(m, _store.care.doses, amount);
-    await _store.change((repo) => repo.saveMedication(refill));
+    final ready = withShortfallCleared(m, care.doses, care.refills);
+    final refill = await _store.change((repo) async {
+      if (!identical(ready, m)) await repo.saveMedication(ready);
+      return repo.logRefill(m.id, amount);
+    });
     if (!mounted) return;
-    final left = computeInventoryStatus(refill, _store.care.doses).remaining!;
+    final after = _store.care;
+    final left = computeInventoryStatus(
+            after.medication(m.id) ?? ready, after.doses, after.refills)
+        .remaining!;
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text(context.l
           .refilled(m.name, MedicationCard.leftText(context, left, m.doseUnit))),
       persist: false,
       action: SnackBarAction(
         label: context.l.undo,
-        onPressed: () => _store.change((repo) => repo.saveMedication(m)),
+        onPressed: () => _store.change((repo) async {
+          await repo.deleteRefill(refill.id);
+          if (!identical(ready, m)) await repo.saveMedication(m);
+        }),
       ),
     ));
   }
@@ -384,7 +396,7 @@ class _CareScreenState extends State<CareScreen> with WidgetsBindingObserver {
               MedicationCard(
                 medication: m,
                 status: status,
-                inventory: computeInventoryStatus(m, care.doses),
+                inventory: computeInventoryStatus(m, care.doses, care.refills),
                 course: courseShortText(m, care.doses),
                 now: now,
                 lastGivenBy: latestDose(m.id, care.doses)?.givenBy,

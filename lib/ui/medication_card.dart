@@ -191,8 +191,7 @@ class MedicationCard extends StatelessWidget {
 
   /// "12 tablets left", never below none.
   static String leftText(BuildContext context, double remaining, String? unit) =>
-      context.l.supplyLeft('${quantityText(remaining < 0 ? 0 : remaining)}'
-          '${unit == null ? '' : ' $unit'}');
+      context.l.supplyLeft(amountText(remaining < 0 ? 0 : remaining, unit));
 
   static String _supplyText(
       BuildContext context, InventoryStatus i, String? unit) {

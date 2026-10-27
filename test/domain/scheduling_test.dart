@@ -225,7 +225,7 @@ void main() {
             reminders: const ReminderSettings(enabled: true),
             inventoryEnabled: true, initialQuantity: 10, doseAmount: 1,
             course: const EndsAfterDoses(1));
-        expect(computeInventoryStatus(m, [morning]).remaining, 10);
+        expect(computeInventoryStatus(m, [morning], const []).remaining, 10);
         expect(calculateSchedule(m, [morning], DateTime(2026, 3, 28, 13)).finished, isFalse);
       });
 

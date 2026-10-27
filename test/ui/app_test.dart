@@ -271,9 +271,36 @@ void main() {
     expect(find.text('${count + 100} tablets left'), findsOneWidget);
     expect(find.text('Acetaminophen refilled. ${count + 100} tablets left.'),
         findsOneWidget);
+    expect((await repo.snapshot()).refills.map((r) => r.amount), contains(100));
     await tester.tap(find.text('Undo'));
     await tester.pumpAndSettle();
     expect(find.text(before), findsOneWidget);
+    expect((await repo.snapshot()).refills.map((r) => r.amount), isNot(contains(100)));
+  });
+
+  testWidgets('a refill is in the history, and deleting it takes it off what\'s left',
+      (tester) async {
+    await repo.replaceAll(sampleCare(DateTime.now()));
+    await start(tester, tall: true, open: 'Alex Rivera');
+    final count = int.parse(
+        tester.widget<Text>(find.textContaining('tablets left')).data!.split(' ').first);
+
+    await tester.tap(find.byTooltip('More for Acetaminophen'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Dose history'));
+    await tester.pumpAndSettle();
+    expect(find.text('Refill: +20 tablets'), findsOneWidget);
+    await tester.tap(find.text('Refill: +20 tablets'));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('Acetaminophen, '), findsOneWidget);
+    await tester.tap(find.text('Delete'));
+    await tester.pumpAndSettle();
+    expect(find.text('Refill: +20 tablets'), findsNothing);
+    expect((await repo.snapshot()).refills, isEmpty);
+
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+    expect(find.text('${count - 20} tablets left'), findsOneWidget);
   });
 
   testWidgets('tapping a card edits it; the list ends with an add button', (tester) async {

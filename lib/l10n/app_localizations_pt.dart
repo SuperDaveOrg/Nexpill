@@ -440,6 +440,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get csvSkipped => 'Saltada';
 
   @override
+  String get csvRefill => 'Reposição';
+
+  @override
   String get csvCorrection => 'Correção';
 
   @override
@@ -797,6 +800,15 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
+  String deleteRefillMessage(
+    String medication,
+    String dateTime,
+    String amount,
+  ) {
+    return '$medication, $dateTime: +$amount. Elimine-a se foi registada por engano; o stock desce na mesma quantidade. Se a quantidade estava errada, reponha de novo com a certa.';
+  }
+
+  @override
   String get delete => 'Eliminar';
 
   @override
@@ -828,6 +840,11 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get historyCorrection => 'correção';
+
+  @override
+  String historyRefill(String amount) {
+    return 'Reposição: +$amount';
+  }
 
   @override
   String get historyCorrected => 'corrigida';
