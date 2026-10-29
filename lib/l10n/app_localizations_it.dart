@@ -139,7 +139,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String statusMissed(String duration) {
-    return 'Mancata: era prevista $duration fa';
+    return 'Dose mancata: era prevista $duration fa';
   }
 
   @override
@@ -222,7 +222,7 @@ class AppLocalizationsIt extends AppLocalizations {
       count,
       locale: localeName,
       other: 'Ciclo terminato: date tutte le $count dosi',
-      one: 'Ciclo terminato: la sua unica dose è stata data',
+      one: 'Ciclo terminato: data la sua unica dose',
     );
     return '$_temp0';
   }
@@ -308,7 +308,7 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
-  String get cardMissed => 'Mancata';
+  String get cardMissed => 'Dose mancata';
 
   @override
   String cardMissedWasDue(String when, String duration) {
@@ -513,7 +513,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String summaryRunningLow(String amount) {
-    return '$amount (in esaurimento)';
+    return '$amount (scorta in esaurimento)';
   }
 
   @override
@@ -662,7 +662,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String supplyRunningLow(String left) {
-    return '$left: in esaurimento';
+    return '$left: scorta in esaurimento';
   }
 
   @override
@@ -685,7 +685,7 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
-  String get earlyTitle => 'È presto';
+  String get earlyTitle => 'È ancora presto';
 
   @override
   String earlyMessageDue(String medication, String when, String duration) {
@@ -946,7 +946,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get fieldInstructions => 'Istruzioni';
 
   @override
-  String get fieldInstructionsHint => 'Facoltativo, es. a stomaco pieno';
+  String get fieldInstructionsHint => 'Facoltativo, es. durante i pasti';
 
   @override
   String get sectionWhen => 'Quando';
@@ -971,7 +971,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get deleteMedication => 'Elimina il farmaco';
 
   @override
-  String get addMedication => 'Aggiungi il farmaco';
+  String get addMedication => 'Aggiungi farmaco';
 
   @override
   String get saveChanges => 'Salva le modifiche';
@@ -1113,7 +1113,7 @@ class AppLocalizationsIt extends AppLocalizations {
       'Quando una dose è da dare, e di nuovo finché è in ritardo.';
 
   @override
-  String get headsUp => 'Preavviso prima dell\'orario';
+  String get headsUp => 'Preavviso prima della dose';
 
   @override
   String get none => 'Nessuno';
@@ -1136,7 +1136,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get ringLikeAlarmHint =>
-      'Il suono della sveglia, ripetuto finché non la segni come data o la posticipi.';
+      'Il suono della sveglia, che si ripete finché non segni la dose come data o non posticipi il promemoria.';
 
   @override
   String get trackSupply => 'Tieni il conto di quanto ne resta';
@@ -1249,7 +1249,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String tapToSeeThem(String count) {
-    return '$count · tocca per vedere';
+    return '$count · tocca per vederli';
   }
 
   @override
@@ -1307,7 +1307,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get allowNotificationsHint =>
-      'Consenti le notifiche perché i promemoria ti possano raggiungere.';
+      'Consenti le notifiche per ricevere i promemoria.';
 
   @override
   String get allow => 'Consenti';
@@ -1389,7 +1389,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String noBrowser(String website) {
-    return 'Nessun browser per aprirlo. Visita $website.';
+    return 'Nessun browser per aprire il link. Visita $website.';
   }
 
   @override
@@ -1457,7 +1457,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get deleteAllMessage =>
-      'Tutte le persone, i farmaci e le dosi su questo telefono, e tutti i promemoria. Non si può annullare; se potresti volerli recuperare, salva prima un backup.';
+      'Tutte le persone, i farmaci e le dosi su questo telefono, e tutti i promemoria. Non si può annullare: se pensi che potrebbero servirti ancora, salva prima un backup.';
 
   @override
   String get deleteEverything => 'Elimina tutto';
@@ -1539,7 +1539,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get website => 'Sito web';
 
   @override
-  String get sendFeedback => 'Invia un commento';
+  String get sendFeedback => 'Invia feedback';
 
   @override
   String get sendFeedbackHint => 'Un modulo sul sito web, nel tuo browser.';
@@ -1584,14 +1584,14 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get aboutPermissionsBody =>
-      'Notifiche, per i promemoria. Sveglie esatte, perché arrivino al minuto. Avvio dopo il riavvio, per reimpostarli. Vibrazione. L\'elenco è tutto qui.';
+      'Notifiche, per i promemoria. Sveglie e promemoria, perché arrivino puntuali al minuto. Esecuzione all\'avvio, per reimpostarli dopo un riavvio. Controllo della vibrazione. Nient\'altro.';
 
   @override
   String get aboutFreeTitle => 'Gratis, per sempre';
 
   @override
   String get aboutFreeBody =>
-      'Nexpill è stata scritta da chi assiste qualcuno, per chi assiste qualcuno. Sarà sempre gratuita e open source: nessun prezzo, nessuna versione premium, nessuna pubblicità.';
+      'Nexpill è stata scritta da chi si prende cura di qualcuno, per chi si prende cura di qualcuno. Sarà sempre gratuita e open source: nessun prezzo, nessuna versione premium, nessuna pubblicità.';
 
   @override
   String get aboutCheckTitle => 'Puoi verificare il nostro lavoro';
@@ -1609,7 +1609,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get aboutTradeOff =>
-      'Un compromesso da sapere: non c\'è una copia nel cloud, quindi se perdi o resetti il telefono perdi lo storico. Salva ogni tanto un file di backup dalle Impostazioni e conservalo da qualche parte che non sia questo telefono.';
+      'Un compromesso da tenere presente: non c\'è una copia nel cloud, quindi se perdi o resetti il telefono perdi lo storico. Salva ogni tanto un file di backup dalle Impostazioni e conservalo da qualche parte che non sia questo telefono.';
 
   @override
   String versionNumber(String version) {
