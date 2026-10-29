@@ -15,7 +15,8 @@ turns that section into the release's own when it's cut.
   in Settings → Language (or, on Android 13 and later, in the phone's
   settings for the app). Reminders, the printable summary and the
   dose-history spreadsheet are in the same language. Times still follow the
-  phone's 12- or 24-hour setting.
+  phone's 12- or 24-hour setting. Thanks to mrCabez for reviewing the
+  Italian ([#46](https://github.com/SuperDaveOrg/Nexpill/pull/46)).
 - Refill a medication's supply: "Refill" in the card's menu adds a new
   pack to what's left, leaving its schedule and doses as they were
   ([#44](https://github.com/SuperDaveOrg/Nexpill/issues/44)). Each refill
