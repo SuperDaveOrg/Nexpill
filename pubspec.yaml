@@ -15,19 +15,19 @@ dependencies:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
-  flutter_local_notifications: ^22.3.1
+  flutter_local_notifications: ^22.3.3
   intl: ^0.20.3
   path: ^1.9.1
-  shared_preferences: ^2.5.5
-  sqflite: ^2.4.4
-  timezone: ^0.11.1
-  url_launcher: ^6.3.2
+  shared_preferences: ^2.5.6
+  sqflite: ^2.4.5
+  timezone: ^0.11.2
+  url_launcher: ^6.3.3
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
-  sqflite_common_ffi: ^2.4.3
+  sqflite_common_ffi: ^2.4.5
 
 flutter:
   uses-material-design: true
