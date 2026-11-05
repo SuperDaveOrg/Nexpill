@@ -29,7 +29,7 @@ an earlier web version whose reminders couldn't be relied on; see
 
 **Help translate Nexpill:**
 <p align="center">
-The next version speaks German, Spanish, French, Italian, Portuguese (Portugal) and Russian, each a first draft that needs a native speaker before release. Fix the words yourself on <a href="https://hosted.weblate.org/engage/nexpill/">Hosted Weblate</a>, in the browser with no Git needed, or check them in the running app: the beta and what to look for are at <a href="https://nexpill.superdavelab.com/beta/">nexpill.superdavelab.com/beta</a>. A language Nexpill doesn't speak yet is welcome too; see <a href="docs/translating.md">docs/translating.md</a>.
+Nexpill speaks German, Spanish, French, Italian, Portuguese (Portugal) and Russian. Most of these are first drafts that no native speaker has checked yet, and fixes go out as they come in. Fix the words yourself on <a href="https://hosted.weblate.org/engage/nexpill/">Hosted Weblate</a>, in the browser with no Git needed. A language Nexpill doesn't speak yet is welcome too; see <a href="docs/translating.md">docs/translating.md</a>.
 </p>
 <p align="center">
 <a href="https://hosted.weblate.org/engage/nexpill/"><img src="https://hosted.weblate.org/widget/nexpill/svg-badge.svg" alt="Translation status"></a>

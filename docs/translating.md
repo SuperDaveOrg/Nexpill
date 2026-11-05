@@ -146,9 +146,9 @@ Other rules:
 | Language | State |
 |---|---|
 | English | The source. |
-| German | First draft, written with an AI assistant. **Needs review by a native speaker before release**, like every language below; the place to do it is [Weblate](https://hosted.weblate.org/projects/nexpill/). |
-| Spanish | First draft, written with an AI assistant. **Needs review by a native speaker before release**, above all the statuses in the table above. |
+| German | Released in 0.8.0 as a first draft, written with an AI assistant. **Still needs review by a native speaker**, like every language below; the place to do it is [Weblate](https://hosted.weblate.org/projects/nexpill/). Corrections go out in patch releases as they come in. |
+| Spanish | The same, above all the statuses in the table above. |
 | French | The same. |
-| Italian | The same. |
-| Portuguese (Portugal) | The same. The file is plain `pt`, so Brazilian phones get it too; Brazilian Portuguese would be its own `app_pt_BR.arb`. |
-| Russian | The same. Asked for by a user. |
+| Italian | Reviewed by a native speaker for 0.8.0, except the Coming up screen's words, which are a first draft. |
+| Portuguese (Portugal) | The same as German. The file is plain `pt`, so Brazilian phones get it too; Brazilian Portuguese would be its own `app_pt_BR.arb`. |
+| Russian | The same as German. Asked for by a user. |
