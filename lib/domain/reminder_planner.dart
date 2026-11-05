@@ -107,7 +107,7 @@ class ReminderPlanner {
 
     // Between two change points the engine's answer holds still, so each
     // stretch is one question to it.
-    final points = [from, ..._changePoints(m, doses, from, until), until];
+    final points = [from, ...changePoints(m, doses, from, until), until];
     for (var i = 0; i < points.length - 1; i++) {
       final start = points[i];
       final end = points[i + 1];
@@ -153,7 +153,7 @@ class ReminderPlanner {
   /// change without a new dose: fixed slots coming round, taper steps
   /// starting or ending, and — for a taper never given — each beat of its
   /// rhythm.
-  static List<DateTime> _changePoints(
+  static List<DateTime> changePoints(
       Medication m, List<DoseEvent> doses, DateTime from, DateTime until) {
     final points = <DateTime>{};
     void add(DateTime t) {

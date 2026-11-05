@@ -22,6 +22,11 @@ turns that section into the release's own when it's cut.
   ([#44](https://github.com/SuperDaveOrg/Nexpill/issues/44)). Each refill
   is kept in the medication's history and in the dose-history spreadsheet;
   one logged by mistake can be deleted there.
+- Coming up: what someone has to take over the next 12 hours, 24 hours,
+  3 days or 7 days, by time and in total, for loading a pill dispenser.
+  It's in the calendar button at the top of their medications, and counts
+  medications with reminders off as well. As-needed medications, and ones
+  counted from a first dose not yet given, are listed without times.
 
 ### Changed
 - The Supply section's "Starting amount" is now "Amount left": it shows

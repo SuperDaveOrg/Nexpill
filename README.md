@@ -59,6 +59,8 @@ keeps a dose from being late.
 - Several patients, each with their own medications.
 - Corrections that replace a mistaken entry without erasing it.
 - Remaining supply, with a low-supply warning.
+- What's coming up over the next 12 hours to 7 days, for loading a pill
+  dispenser.
 
 ## Privacy
 
@@ -69,6 +71,12 @@ excluded from Android's cloud backup. See [docs/privacy.md](docs/privacy.md).
 
 *Nexpill tracks timing. It does not give medical advice, recommend doses or
 check interactions.*
+
+## Supporting Nexpill
+
+Nexpill costs nothing and always will, and nothing in the app will ever ask
+you for money. If you'd like to chip in anyway, you can
+[donate on Liberapay](https://liberapay.com/superdave/).
 
 ## Development
 

@@ -1668,4 +1668,43 @@ class AppLocalizationsRu extends AppLocalizations {
   String versionNumber(String version) {
     return 'Версия $version';
   }
+
+  @override
+  String get comingUp => 'Предстоящие дозы';
+
+  @override
+  String get comingUpOnTime =>
+      'При условии, что каждая доза дана вовремя. Поздняя доза может сдвинуть следующие.';
+
+  @override
+  String get comingUpNothing => 'На это время ничего не запланировано.';
+
+  @override
+  String get comingUpTotals => 'Всего';
+
+  @override
+  String comingUpDoses(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count дозы',
+      many: '$count доз',
+      few: '$count дозы',
+      one: '$count доза',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get comingUpNoSetTime => 'Без точного времени';
+
+  @override
+  String comingUpFromFirstDose(String schedule) {
+    return '$schedule, отсчёт от первой дозы';
+  }
+
+  @override
+  String comingUpDosesOf(String doses, String dose) {
+    return '$doses по $dose';
+  }
 }

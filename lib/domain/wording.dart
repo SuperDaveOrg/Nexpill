@@ -277,3 +277,23 @@ String personName(Patient p) => p.hasName ? p.displayName : strings.personYou;
 /// have their own wording, since languages build them differently.
 String personInSentence(Patient p) =>
     p.isSelf ? strings.personYouAfterFor : p.displayName;
+
+/// What one dose of [m] is: "200 mg, 2 tablets", or as much of that as was
+/// filled in.
+String doseLineText(Medication m) => [
+      if (m.strengthText case final strength? when strength.isNotEmpty) strength,
+      if (m.defaultDoseText.isNotEmpty) m.defaultDoseText,
+    ].join(strings.listSeparator);
+
+/// How much of [m] a forecast adds up to: "4 doses, 8 tablets" if its supply
+/// is counted, so the amount is known; otherwise "4 doses of 200 mg", since
+/// "4 doses, 200 mg" could be read as 200 mg in all.
+String forecastTotalText(Medication m, int doses) {
+  final count = strings.comingUpDoses(doses);
+  final amount = m.doseAmount;
+  if (m.inventoryEnabled && amount != null && amount > 0) {
+    return '$count${strings.listSeparator}${amountText(amount * doses, m.doseUnit)}';
+  }
+  final line = doseLineText(m);
+  return line.isEmpty ? count : strings.comingUpDosesOf(count, line);
+}

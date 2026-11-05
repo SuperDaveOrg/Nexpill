@@ -403,5 +403,13 @@
   "aboutHeadline": "Os seus registos ficam consigo.",
   "aboutIntro": "O Nexpill regista quando foi dada cada dose e quando se pode dar a seguinte, e envia lembretes a tempo. Não dá aconselhamento médico.",
   "aboutTradeOff": "Há um compromisso que convém conhecer: não há cópia na nuvem, por isso, se o telemóvel se perder ou for apagado, perde-se o histórico. Guarde de vez em quando um ficheiro de cópia de segurança a partir das Definições, e mantenha-o noutro sítio que não este telemóvel.",
-  "versionNumber": "Versão {version}"
+  "versionNumber": "Versão {version}",
+  "comingUp": "Próximas doses",
+  "comingUpOnTime": "Pressupõe que cada dose é dada a horas. Uma dose atrasada pode alterar as seguintes.",
+  "comingUpNothing": "Nada previsto neste período.",
+  "comingUpTotals": "No total",
+  "comingUpDoses": "{count, plural, one{{count} dose} other{{count} doses}}",
+  "comingUpNoSetTime": "Sem hora fixa",
+  "comingUpFromFirstDose": "{schedule}, a contar da primeira dose",
+  "comingUpDosesOf": "{doses} de {dose}"
 }

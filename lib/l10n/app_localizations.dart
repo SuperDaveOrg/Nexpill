@@ -2531,6 +2531,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Version {version}'**
   String versionNumber(String version);
+
+  /// Title of the screen listing the doses due over the next hours or days, and the tooltip of the button that opens it. People use it to see what to take, for example to load a pill dispenser.
+  ///
+  /// In en, this message translates to:
+  /// **'Coming up'**
+  String get comingUp;
+
+  /// Note at the top of the Coming up screen: the times shown are a projection.
+  ///
+  /// In en, this message translates to:
+  /// **'Assumes each dose is given on time. A late dose can move the ones after it.'**
+  String get comingUpOnTime;
+
+  /// On the Coming up screen, when no doses fall in the chosen 12 hours, 24 hours, 3 days or 7 days.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing scheduled in this time.'**
+  String get comingUpNothing;
+
+  /// Heading on the Coming up screen, above how many doses of each medication fall in the chosen time.
+  ///
+  /// In en, this message translates to:
+  /// **'In total'**
+  String get comingUpTotals;
+
+  /// How many doses of a medication fall in the chosen time on the Coming up screen: '4 doses'. May be followed by an amount: '4 doses, 8 tablets'.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 dose} other{{count} doses}}'**
+  String comingUpDoses(int count);
+
+  /// Heading on the Coming up screen, above medications that can't be given a time: as-needed ones, and ones whose interval hasn't started.
+  ///
+  /// In en, this message translates to:
+  /// **'No set time'**
+  String get comingUpNoSetTime;
+
+  /// On the Coming up screen, for an interval medication never given, so its times aren't known yet. {schedule} is a phrase like 'Every 8 hours'.
+  ///
+  /// In en, this message translates to:
+  /// **'{schedule}, counted from the first dose'**
+  String comingUpFromFirstDose(String schedule);
+
+  /// On the Coming up screen: '3 doses of 10 mg'. Must read as that much in EACH dose, not in all. {doses} is comingUpDoses; {dose} is what one dose is, as the caregiver wrote it, e.g. '500 mg, 1 capsule'.
+  ///
+  /// In en, this message translates to:
+  /// **'{doses} of {dose}'**
+  String comingUpDosesOf(String doses, String dose);
 }
 
 class _AppLocalizationsDelegate
