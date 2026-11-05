@@ -1,0 +1,4 @@
+• Nexpill now speaks German, Spanish, French, Italian, Portuguese and Russian. Most are first drafts: fix a word at hosted.weblate.org/engage/nexpill
+• New: Coming up shows what's due over the next 12 hours to 7 days, for loading a pill dispenser.
+• New: Refill adds a new pack to what's left.
+• Backups made with this version need Nexpill 0.8.0 or later to restore. Older backups still restore as before.

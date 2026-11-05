@@ -9,6 +9,8 @@ turns that section into the release's own when it's cut.
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-11-05
+
 ### Added
 - Nexpill in German, Spanish, French, Italian, Portuguese (Portugal) and
   Russian, as well as English. It follows the phone's language, or pick one
@@ -16,7 +18,10 @@ turns that section into the release's own when it's cut.
   settings for the app). Reminders, the printable summary and the
   dose-history spreadsheet are in the same language. Times still follow the
   phone's 12- or 24-hour setting. Thanks to mrCabez for reviewing the
-  Italian ([#46](https://github.com/SuperDaveOrg/Nexpill/pull/46)).
+  Italian ([#46](https://github.com/SuperDaveOrg/Nexpill/pull/46)). The
+  others are first drafts that no native speaker has checked yet; corrections
+  are welcome on [Hosted Weblate](https://hosted.weblate.org/engage/nexpill/)
+  and will go out as they come in.
 - Refill a medication's supply: "Refill" in the card's menu adds a new
   pack to what's left, leaving its schedule and doses as they were
   ([#44](https://github.com/SuperDaveOrg/Nexpill/issues/44)). Each refill
