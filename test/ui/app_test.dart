@@ -87,6 +87,30 @@ void main() {
     expect(find.textContaining('logged'), findsNothing);
   });
 
+  testWidgets('coming up: every dose in the window, with a total', (tester) async {
+    final now = DateTime.now();
+    await repo.savePatient(const Patient(id: 'sam', displayName: 'Sam'));
+    await repo.saveMedication(const Medication(
+      id: 'a',
+      patientId: 'sam',
+      name: 'Amoxicillin',
+      defaultDoseText: '1 tablet',
+      schedule: IntervalSchedule(8 * 60),
+      reminders: ReminderSettings(enabled: false),
+    ));
+    await repo.logDose('a', givenAt: now);
+    await start(tester);
+
+    await tester.tap(find.byTooltip('Coming up'));
+    await tester.pumpAndSettle();
+    expect(find.text('3 doses of 1 tablet'), findsOneWidget,
+        reason: '24 hours by default, reminders off or not');
+
+    await tester.tap(find.text('12 hr'));
+    await tester.pumpAndSettle();
+    expect(find.text('1 dose of 1 tablet'), findsOneWidget);
+  });
+
   testWidgets('first run, for yourself: no name asked, and it says "you"',
       (tester) async {
     await start(tester);

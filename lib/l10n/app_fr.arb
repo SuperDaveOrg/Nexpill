@@ -403,5 +403,13 @@
   "aboutHeadline": "Vos données restent avec vous.",
   "aboutIntro": "Nexpill suit quand chaque dose a été donnée et quand la suivante peut l'être, et vous rappelle à l'heure. Il ne donne pas d'avis médical.",
   "aboutTradeOff": "Une contrepartie à connaître : il n'y a pas de copie dans le cloud, donc un téléphone perdu ou réinitialisé, c'est un historique perdu. Enregistrez de temps en temps un fichier de sauvegarde depuis les Paramètres, et gardez-le ailleurs que sur ce téléphone.",
-  "versionNumber": "Version {version}"
+  "versionNumber": "Version {version}",
+  "comingUp": "À venir",
+  "comingUpOnTime": "En supposant que chaque dose est donnée à l'heure. Une dose en retard peut décaler les suivantes.",
+  "comingUpNothing": "Rien de prévu sur cette période.",
+  "comingUpTotals": "Au total",
+  "comingUpDoses": "{count, plural, one{{count} dose} other{{count} doses}}",
+  "comingUpNoSetTime": "Sans heure fixe",
+  "comingUpFromFirstDose": "{schedule}, à compter de la première dose",
+  "comingUpDosesOf": "{doses} de {dose}"
 }

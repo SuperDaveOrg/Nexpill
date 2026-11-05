@@ -1615,4 +1615,41 @@ class AppLocalizationsIt extends AppLocalizations {
   String versionNumber(String version) {
     return 'Versione $version';
   }
+
+  @override
+  String get comingUp => 'Prossime dosi';
+
+  @override
+  String get comingUpOnTime =>
+      'Presuppone che ogni dose venga data in orario. Una dose in ritardo può spostare le successive.';
+
+  @override
+  String get comingUpNothing => 'Niente in programma in questo periodo.';
+
+  @override
+  String get comingUpTotals => 'In totale';
+
+  @override
+  String comingUpDoses(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count dosi',
+      one: '1 dose',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get comingUpNoSetTime => 'Senza orario fisso';
+
+  @override
+  String comingUpFromFirstDose(String schedule) {
+    return '$schedule, contando dalla prima dose';
+  }
+
+  @override
+  String comingUpDosesOf(String doses, String dose) {
+    return '$doses da $dose';
+  }
 }

@@ -2407,5 +2407,55 @@
         "type": "String"
       }
     }
+  },
+  "comingUp": "Coming up",
+  "@comingUp": {
+    "description": "Title of the screen listing the doses due over the next hours or days, and the tooltip of the button that opens it. People use it to see what to take, for example to load a pill dispenser."
+  },
+  "comingUpOnTime": "Assumes each dose is given on time. A late dose can move the ones after it.",
+  "@comingUpOnTime": {
+    "description": "Note at the top of the Coming up screen: the times shown are a projection."
+  },
+  "comingUpNothing": "Nothing scheduled in this time.",
+  "@comingUpNothing": {
+    "description": "On the Coming up screen, when no doses fall in the chosen 12 hours, 24 hours, 3 days or 7 days."
+  },
+  "comingUpTotals": "In total",
+  "@comingUpTotals": {
+    "description": "Heading on the Coming up screen, above how many doses of each medication fall in the chosen time."
+  },
+  "comingUpDoses": "{count, plural, =1{1 dose} other{{count} doses}}",
+  "@comingUpDoses": {
+    "description": "How many doses of a medication fall in the chosen time on the Coming up screen: '4 doses'. May be followed by an amount: '4 doses, 8 tablets'.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "comingUpNoSetTime": "No set time",
+  "@comingUpNoSetTime": {
+    "description": "Heading on the Coming up screen, above medications that can't be given a time: as-needed ones, and ones whose interval hasn't started."
+  },
+  "comingUpFromFirstDose": "{schedule}, counted from the first dose",
+  "@comingUpFromFirstDose": {
+    "description": "On the Coming up screen, for an interval medication never given, so its times aren't known yet. {schedule} is a phrase like 'Every 8 hours'.",
+    "placeholders": {
+      "schedule": {
+        "type": "String"
+      }
+    }
+  },
+  "comingUpDosesOf": "{doses} of {dose}",
+  "@comingUpDosesOf": {
+    "description": "On the Coming up screen: '3 doses of 10 mg'. Must read as that much in EACH dose, not in all. {doses} is comingUpDoses; {dose} is what one dose is, as the caregiver wrote it, e.g. '500 mg, 1 capsule'.",
+    "placeholders": {
+      "doses": {
+        "type": "String"
+      },
+      "dose": {
+        "type": "String"
+      }
+    }
   }
 }

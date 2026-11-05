@@ -9,6 +9,7 @@ import 'package:nexpill/models/patient.dart';
 import 'package:nexpill/services/preferences.dart';
 import 'package:nexpill/ui/care_store.dart';
 import 'package:nexpill/ui/everyone_screen.dart';
+import 'package:nexpill/ui/forecast_screen.dart';
 import 'package:nexpill/ui/give_dose_sheet.dart';
 import 'package:nexpill/ui/history_screen.dart';
 import 'package:nexpill/ui/language.dart';
@@ -310,6 +311,12 @@ class _CareScreenState extends State<CareScreen> with WidgetsBindingObserver {
           ),
         ),
         actions: [
+          IconButton(
+            tooltip: context.l.comingUp,
+            icon: const Icon(Icons.event_note_outlined),
+            onPressed: () =>
+                _push(ForecastScreen(store: _store, patient: patient)),
+          ),
           IconButton(
             tooltip: context.l.doseHistory,
             icon: const Icon(Icons.history),
