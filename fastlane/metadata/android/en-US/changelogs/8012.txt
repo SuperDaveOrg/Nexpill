@@ -1,0 +1,3 @@
+• Fixed a serious bug: all reminders could silently stop if a reminder came due while Nexpill was updating its schedule, such as after tapping a notification button just before the minute. Please update.
+• Snooze now lasts as long as the medication's "Repeat while overdue" setting, and the button says so: "Snooze 30 min".
+• Snoozing now keeps that reminder quiet until the snooze ends. Repeats used to ring during a snooze.
