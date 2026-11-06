@@ -168,6 +168,9 @@ class FakeNotifications extends NotificationService {
   Future<void> apply(ReminderPlan plan, CareSnapshot care) async => lastPlan = plan;
 
   @override
+  Future<Map<String, DateTime>> snoozedUntil(CareSnapshot care) async => const {};
+
+  @override
   Future<bool> notificationsAllowed() async => allowed;
 
   @override

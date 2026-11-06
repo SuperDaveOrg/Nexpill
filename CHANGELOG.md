@@ -9,6 +9,22 @@ turns that section into the release's own when it's cut.
 
 ## [Unreleased]
 
+### Changed
+- Snooze on a due or overdue dose now lasts as long as that medication's
+  "Repeat while overdue" setting, instead of always 5 minutes, and the button
+  says so ("Snooze 30 min"). Early heads-ups and as-needed reminders still
+  snooze for 5 minutes.
+
+### Fixed
+- Reminders could all silently stop. If a reminder came due while the plan
+  was being rebuilt, for instance after tapping a button on a notification
+  just before the minute, the rebuild failed partway with the old alarms
+  already cancelled, leaving nothing scheduled until Nexpill was next opened
+  or changed. That reminder now rings straight away and the rest stay set.
+- Snoozing now keeps a reminder quiet until the snooze ends. The medication's
+  repeats used to ring during a snooze anyway, and snoozing one of them
+  started a second snooze alongside the first.
+
 ## [0.8.0] - 2026-11-05
 
 ### Added

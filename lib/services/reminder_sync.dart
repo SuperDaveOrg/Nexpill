@@ -19,7 +19,11 @@ Future<void> syncReminders(
   DateTime? now,
 }) async {
   final care = await (repository ?? CareRepository()).snapshot();
-  final plan = const ReminderPlanner().plan(care, from: now ?? DateTime.now());
+  final plan = const ReminderPlanner().plan(
+    care,
+    from: now ?? DateTime.now(),
+    snoozedUntil: await notifications.snoozedUntil(care),
+  );
   await notifications.apply(plan, care);
 }
 
@@ -57,7 +61,7 @@ Future<void> onReminderAction(NotificationResponse response) async {
         await repository.snapshot(),
         tag.medicationIds,
         now: now,
-        at: now.add(const Duration(minutes: NotificationService.snoozeMinutes)),
+        at: now.add(Duration(minutes: tag.snoozeMinutes)),
       );
       if (again != null) await notifications.snooze(again, since: tag.at);
   }

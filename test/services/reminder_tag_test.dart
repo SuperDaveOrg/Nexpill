@@ -50,4 +50,59 @@ void main() {
       expect(ReminderTag(tag.at, const ['drops']).stillDue(care([])), isTrue);
     });
   });
+
+  group('Snooze on a reminder', () {
+    final until = DateTime.utc(2026, 6, 10, 12, 30);
+
+    test('the tag carries its length and end through the notification', () {
+      final back = ReminderTag.tryParse(
+          ReminderTag(tag.at, const ['drops'], snoozeMinutes: 30, until: until)
+              .encode())!;
+      expect(back.snoozeMinutes, 30);
+      expect(back.until, until);
+    });
+
+    test('a tag from before this setting snoozes for the 5 minutes it says', () {
+      final back = ReminderTag.tryParse('{"at":0,"m":["drops"]}')!;
+      expect(back.snoozeMinutes, 5);
+      expect(back.until, isNull);
+    });
+
+    test('ends are per medication, and the later of two wins', () {
+      final later = until.add(const Duration(minutes: 10));
+      final ends = snoozeEnds([
+        ReminderTag(tag.at, const ['drops', 'amox'], until: until),
+        ReminderTag(tag.at, const ['amox'], until: later),
+      ], care([]));
+      expect(ends, {'drops': until, 'amox': later});
+    });
+
+    test('a dose given since is no longer held back', () {
+      final given = DoseEvent(
+          id: 'x', medicationId: 'drops', givenAt: DateTime(2026, 6, 10, 8, 10));
+      final ends = snoozeEnds(
+          [ReminderTag(tag.at, const ['drops', 'amox'], until: until)],
+          care([given]));
+      expect(ends.keys, ['amox']);
+    });
+
+    test('a pending snooze from before this setting holds nothing back', () {
+      expect(snoozeEnds([ReminderTag(tag.at, const ['drops'])], care([])), isEmpty);
+    });
+  });
+
+  group('alarmTime', () {
+    final now = DateTime.utc(2026, 6, 10, 8, 59, 3);
+
+    test('leaves a time still to come alone', () {
+      final at = DateTime.utc(2026, 6, 10, 9);
+      expect(alarmTime(at, now), at);
+    });
+
+    test('rings straight away if the time went by during a replan', () {
+      final soon = now.add(const Duration(seconds: 1));
+      expect(alarmTime(DateTime.utc(2026, 6, 10, 8, 59), now), soon);
+      expect(alarmTime(now, now), soon);
+    });
+  });
 }

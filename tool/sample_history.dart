@@ -5,7 +5,7 @@
 
 import 'dart:io';
 
-import 'package:nexpill/data/backup.dart';
+import 'package:nexpill/data/backup_writer.dart';
 import 'package:nexpill/data/sample_data.dart';
 
 void main(List<String> args) {

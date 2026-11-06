@@ -102,8 +102,10 @@ Differences in shape, not behaviour:
   `exactAllowWhileIdle`, or `alarmClock` with the alarm sound repeating until
   dealt with for alarm-mode medications. `USE_EXACT_ALARM`, so no prompt.
   Each sync also clears shown notifications for doses given since.
-- "Mark given" and "Snooze 5 min" work from the notification without opening
-  the app (`onReminderAction`, run in a background isolate), then replan.
+- "Mark given" and "Snooze" work from the notification without opening the
+  app (`onReminderAction`, run in a background isolate), then replan. Snooze
+  on a due or overdue dose lasts as long as the medication's "Repeat while
+  overdue" and holds its repeats back until then; on anything else, 5 minutes.
 - Replanning happens on every app start and after every change. The
   plugin re-registers alarms after a reboot or update by itself.
 - Tapping a reminder opens that patient; the screens reread the data on
