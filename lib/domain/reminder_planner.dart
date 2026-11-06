@@ -21,7 +21,8 @@ import 'package:nexpill/models/patient.dart';
 ///   patient whose notifications are off.
 /// - An early heads-up, if set, before a dose is due; then "due now".
 /// - Overdue reminders repeat every `overdueRepeatMinutes` — at most
-///   [maxOverdueRepeats] times, and only until the next dose is due.
+///   [maxOverdueRepeats] times, and only until the next dose is due. A
+///   snooze holds them back until it ends; see [ReminderPlanner.plan].
 /// - As-needed medications get only "can be given again", once per dose.
 /// - A course stops reminding when it ends, a taper when its last step
 ///   does, and a single dose once it's given or skipped.
@@ -46,7 +47,16 @@ class ReminderPlanner {
   /// doesn't ring all night.
   final int maxOverdueRepeats;
 
-  ReminderPlan plan(CareSnapshot care, {required DateTime from}) {
+  /// [snoozedUntil] is when each snoozed medication's snooze ends, by
+  /// medication id. Its overdue repeats up to then are left out, since the
+  /// snooze itself rings then, and so is one in the minute after, which would
+  /// only ring on top of it. Nothing else is held back: a dose coming due
+  /// during a snooze is a new dose, and still says so.
+  ReminderPlan plan(
+    CareSnapshot care, {
+    required DateTime from,
+    Map<String, DateTime> snoozedUntil = const {},
+  }) {
     final until = from.add(horizon);
     // Planned a day past the horizon, only to learn whether anything lies
     // beyond it.
@@ -63,6 +73,12 @@ class ReminderPlanner {
       }
       for (final item in _medicationReminders(m, care.doses, from, beyond)) {
         final at = _ceilToMinute(item.firesAt);
+        final snoozeEnds = snoozedUntil[m.id];
+        if (item.kind == ReminderKind.overdue &&
+            snoozeEnds != null &&
+            !at.isAfter(snoozeEnds.add(const Duration(minutes: 1)))) {
+          continue;
+        }
         groups.putIfAbsent((m.patientId, at), () => []).add(item);
       }
     }
@@ -216,6 +232,9 @@ class ReminderPlan {
   final DateTime? refreshNoticeAt;
 }
 
+/// Snooze on a reminder that has no repeat setting to follow.
+const defaultSnoozeMinutes = 5;
+
 enum ReminderKind {
   /// The early heads-up.
   dueSoon,
@@ -246,6 +265,15 @@ class ReminderItem {
           medication.schedule is FixedTimesSchedule ||
           medication.schedule is OnceSchedule);
 
+  /// How long Snooze puts this off: until the next repeat would have rung,
+  /// for a dose that's due. Anything else has no repeats to follow.
+  int get snoozeMinutes => switch (kind) {
+        ReminderKind.dueNow ||
+        ReminderKind.overdue =>
+          medication.reminders.overdueRepeatMinutes,
+        ReminderKind.dueSoon || ReminderKind.available => defaultSnoozeMinutes,
+      };
+
   /// "Amoxicillin due now".
   String get text => switch (kind) {
         ReminderKind.dueSoon =>
@@ -273,6 +301,10 @@ class PlannedNotification {
 
   /// Whether it offers Skip: as-needed doses are never due, so can't be.
   bool get canSkip => items.any((i) => i.medication.schedule is! PrnSchedule);
+
+  /// The shortest of its items', so nothing on it waits longer than it asked.
+  int get snoozeMinutes =>
+      items.map((i) => i.snoozeMinutes).reduce((a, b) => a < b ? a : b);
 
   List<String> get medicationIds => [for (final i in items) i.medication.id];
 

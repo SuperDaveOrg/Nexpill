@@ -25,8 +25,6 @@ class NotificationService {
   final FlutterLocalNotificationsPlugin _plugin;
   bool _ready = false;
 
-  static const snoozeMinutes = 5;
-
   /// How a reminder is shown. [rings] is alarm mode: the alarm sound,
   /// repeating until acknowledged. [tag] is how it's found again in the
   /// shade. Every reminder, the test one included, is built here, so
@@ -37,10 +35,11 @@ class NotificationService {
     bool multiline = false,
     bool withActions = true,
     bool canSkip = false,
+    int snoozeMinutes = defaultSnoozeMinutes,
   }) {
     final style = multiline ? const BigTextStyleInformation('') : null;
     final actions = withActions
-        ? [_given, if (canSkip) _skip, _snooze]
+        ? [_given, if (canSkip) _skip, _snooze(snoozeMinutes)]
         : null;
     if (rings) {
       return AndroidNotificationDetails(
@@ -90,8 +89,8 @@ class NotificationService {
       AndroidNotificationAction(actionGiven, strings.actionMarkGiven);
   static AndroidNotificationAction get _skip =>
       AndroidNotificationAction(actionSkip, strings.actionSkip);
-  static AndroidNotificationAction get _snooze => AndroidNotificationAction(
-      actionSnooze, strings.actionSnooze(snoozeMinutes));
+  static AndroidNotificationAction _snooze(int minutes) =>
+      AndroidNotificationAction(actionSnooze, strings.actionSnooze(minutes));
 
   static const actionGiven = 'given';
   static const actionSkip = 'skip';
@@ -150,7 +149,7 @@ class NotificationService {
     }
 
     for (final n in plan.notifications) {
-      final tag = ReminderTag(n.at, n.medicationIds);
+      final tag = ReminderTag(n.at, n.medicationIds, snoozeMinutes: n.snoozeMinutes);
       await _schedule(_plannedId(n), n, tag);
     }
 
@@ -168,12 +167,45 @@ class NotificationService {
     await _clearGiven(care);
   }
 
-  /// Shows [n] again at its time. [since] is when the snoozed reminder
-  /// first fired, so a dose logged at any point after it — including during
-  /// the snooze — cancels the repeat.
+  /// When each medication's pending snooze ends, for the planner to hold
+  /// its repeats back. Android's list of pending alarms is the record of
+  /// them, and it outlasts a restart of the app or the phone.
+  Future<Map<String, DateTime>> snoozedUntil(CareSnapshot care) async {
+    final pending = await _plugin.pendingNotificationRequests();
+    return snoozeEnds(
+      [
+        for (final p in pending)
+          if (p.id >= _snoozeBase) ?ReminderTag.tryParse(p.payload),
+      ],
+      care,
+    );
+  }
+
+  /// Shows [n] again at its time, instead of any other reminder about the
+  /// same medications, so one tap on Snooze quiets all of them. [since] is
+  /// when the snoozed reminder first fired, so a dose logged at any point
+  /// after it — including during the snooze — cancels the repeat.
   Future<void> snooze(PlannedNotification n, {required DateTime since}) async {
-    final tag = ReminderTag(since, n.medicationIds);
-    await _schedule(_snoozeBase + (_hash(tag.encode()) & 0x0fffffff), n, tag);
+    bool replaced(ReminderTag tag) =>
+        tag.medicationIds.every(n.medicationIds.contains);
+
+    for (final pending in await _plugin.pendingNotificationRequests()) {
+      final tag = ReminderTag.tryParse(pending.payload);
+      if (pending.id >= _snoozeBase && tag != null && replaced(tag)) {
+        await _plugin.cancel(id: pending.id);
+      }
+    }
+    for (final shown in await _android?.getActiveNotifications() ?? const []) {
+      final tag = ReminderTag.tryParse(shown.tag);
+      if (shown.id != null && tag != null && replaced(tag)) {
+        await _plugin.cancel(id: shown.id!, tag: shown.tag);
+      }
+    }
+
+    final tag = ReminderTag(since, n.medicationIds,
+        snoozeMinutes: n.snoozeMinutes, until: n.at);
+    final id = ReminderTag(since, n.medicationIds).encode();
+    await _schedule(_snoozeBase + (_hash(id) & 0x0fffffff), n, tag);
   }
 
   Future<void> _schedule(int id, PlannedNotification n, ReminderTag tag) async {
@@ -182,13 +214,14 @@ class NotificationService {
       title: n.title,
       body: n.body,
       payload: tag.encode(),
-      scheduledDate: tz.TZDateTime.from(n.at, tz.UTC),
+      scheduledDate: tz.TZDateTime.from(alarmTime(n.at, DateTime.now()), tz.UTC),
       notificationDetails: NotificationDetails(
         android: _details(
             rings: n.rings,
             tag: tag.encode(),
             multiline: n.items.length > 1,
-            canSkip: n.canSkip),
+            canSkip: n.canSkip,
+            snoozeMinutes: tag.snoozeMinutes),
       ),
       androidScheduleMode: n.rings
           ? AndroidScheduleMode.alarmClock
@@ -246,12 +279,28 @@ class NotificationService {
 /// from the pending list (as its payload) or the shade (as its tag).
 @immutable
 class ReminderTag {
-  const ReminderTag(this.at, this.medicationIds);
+  const ReminderTag(
+    this.at,
+    this.medicationIds, {
+    this.snoozeMinutes = defaultSnoozeMinutes,
+    this.until,
+  });
 
   final DateTime at;
   final List<String> medicationIds;
 
-  String encode() => jsonEncode({'at': at.millisecondsSinceEpoch, 'm': medicationIds});
+  /// What the Snooze button on this notification says, and so what it does.
+  final int snoozeMinutes;
+
+  /// When this snooze ends, if it is one.
+  final DateTime? until;
+
+  String encode() => jsonEncode({
+        'at': at.millisecondsSinceEpoch,
+        'm': medicationIds,
+        's': snoozeMinutes,
+        if (until != null) 'u': until!.millisecondsSinceEpoch,
+      });
 
   static ReminderTag? tryParse(String? s) {
     if (s == null) return null;
@@ -260,6 +309,13 @@ class ReminderTag {
       return ReminderTag(
         DateTime.fromMillisecondsSinceEpoch(j['at'] as int, isUtc: true),
         (j['m'] as List).cast<String>(),
+        // Absent on anything scheduled before Snooze followed the repeat
+        // setting, whose button says 5 minutes.
+        snoozeMinutes: j['s'] as int? ?? defaultSnoozeMinutes,
+        until: switch (j['u']) {
+          final int ms => DateTime.fromMillisecondsSinceEpoch(ms, isUtc: true),
+          _ => null,
+        },
       );
     } catch (_) {
       return null;
@@ -295,6 +351,35 @@ class ReminderTag {
     }
     return skips;
   }
+}
+
+/// When to set the alarm for a reminder due at [at], as of [now].
+///
+/// Replanning cancels every alarm and then sets them again, which takes
+/// seconds, so a reminder can come due while it's underway. Android has no
+/// alarm for it by then, and the plugin refuses a time in the past: that would
+/// lose this reminder and, by stopping the replan, all those after it. So one
+/// whose time has just gone rings straight away.
+DateTime alarmTime(DateTime at, DateTime now) {
+  final soonest = now.add(const Duration(seconds: 1));
+  return at.isAfter(soonest) ? at : soonest;
+}
+
+/// When each medication's snooze ends, from [snoozes], the tags of those
+/// still pending. A medication whose dose has been given or skipped since
+/// isn't held back, and if two snoozes cover one, the later end wins.
+Map<String, DateTime> snoozeEnds(Iterable<ReminderTag> snoozes, CareSnapshot care) {
+  final ends = <String, DateTime>{};
+  for (final tag in snoozes) {
+    final until = tag.until;
+    if (until == null) continue;
+    for (final id in tag.medicationIds) {
+      if (!ReminderTag(tag.at, [id]).stillDue(care)) continue;
+      final end = ends[id];
+      if (end == null || until.isAfter(end)) ends[id] = until;
+    }
+  }
+  return ends;
 }
 
 /// FNV-1a: a hash that stays the same between runs, unlike String.hashCode.

@@ -564,7 +564,7 @@ abstract class AppLocalizations {
   /// **'Skip'**
   String get actionSkip;
 
-  /// Button on a reminder notification: shows it again in {minutes} minutes (currently 5).
+  /// Button on a reminder notification: shows it again in {minutes} minutes (the medication's repeat-while-overdue setting, e.g. 30).
   ///
   /// In en, this message translates to:
   /// **'Snooze {minutes} min'**

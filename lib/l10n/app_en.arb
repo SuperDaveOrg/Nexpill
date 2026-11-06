@@ -600,7 +600,7 @@
   },
   "actionSnooze": "Snooze {minutes} min",
   "@actionSnooze": {
-    "description": "Button on a reminder notification: shows it again in {minutes} minutes (currently 5).",
+    "description": "Button on a reminder notification: shows it again in {minutes} minutes (the medication's repeat-while-overdue setting, e.g. 30).",
     "placeholders": {
       "minutes": {
         "type": "int"

@@ -405,6 +405,107 @@ void main() {
     expect(n.title, startsWith('amox overdue since'));
   });
 
+  group('snooze', () {
+    final breakfast = med(
+      'pill',
+      const FixedTimesSchedule([ClockTime(9, 0)]),
+    );
+    final due = DateTime(2026, 6, 10, 9);
+
+    List<String> overdueTimes(ReminderPlan plan) => [
+          for (final n in plan.notifications)
+            if (n.items.any((i) => i.kind == ReminderKind.overdue)) _hm(n.at),
+        ];
+
+    test('holds repeats back until it ends, and no longer', () {
+      final plan = const ReminderPlanner().plan(
+        care([breakfast], []),
+        from: due.add(const Duration(minutes: 10)),
+        snoozedUntil: {'pill': due.add(const Duration(minutes: 40))},
+      );
+      expect(overdueTimes(plan).take(2), ['10/10:00', '10/10:30']);
+    });
+
+    test('a repeat at the very minute it ends is left to the snooze', () {
+      final plan = const ReminderPlanner().plan(
+        care([breakfast], []),
+        from: due,
+        snoozedUntil: {'pill': due.add(const Duration(minutes: 30))},
+      );
+      expect(overdueTimes(plan).first, '10/10:00');
+    });
+
+    test('a repeat just after it ends does not ring on top of it', () {
+      final plan = const ReminderPlanner().plan(
+        care([breakfast], []),
+        from: due,
+        snoozedUntil: {'pill': due.add(const Duration(minutes: 29, seconds: 53))},
+      );
+      expect(overdueTimes(plan).first, '10/10:00');
+    });
+
+    test('a snooze of one medication leaves others on the reminder ringing', () {
+      final other = med('other', const FixedTimesSchedule([ClockTime(9, 0)]));
+      final plan = const ReminderPlanner().plan(
+        care([breakfast, other], []),
+        from: due,
+        snoozedUntil: {'pill': due.add(const Duration(minutes: 30))},
+      );
+      final first = plan.notifications.firstWhere(
+          (n) => n.items.any((i) => i.kind == ReminderKind.overdue));
+      expect(_hm(first.at), '10/09:30');
+      expect(first.medicationIds, ['other']);
+    });
+
+    test('never holds back the next dose coming due', () {
+      final twice = med(
+          'pill', const FixedTimesSchedule([ClockTime(9, 0), ClockTime(9, 45)]));
+      final plan = const ReminderPlanner().plan(
+        care([twice], []),
+        from: due,
+        snoozedUntil: {'pill': due.add(const Duration(hours: 1))},
+      );
+      expect(
+        plan.notifications.first.items.single.kind,
+        ReminderKind.dueNow,
+      );
+      expect(_hm(plan.notifications.first.at), '10/09:45');
+    });
+
+    group('length', () {
+      PlannedNotification one(Medication m, ReminderKind kind) =>
+          PlannedNotification(
+            at: due,
+            patient: sam,
+            items: [ReminderItem(m, kind, due, due)],
+          );
+      Medication every(int minutes) => med(
+            'pill',
+            const FixedTimesSchedule([ClockTime(9, 0)]),
+            reminders: ReminderSettings(
+                enabled: true, overdueRepeatMinutes: minutes),
+          );
+
+      test('follows Repeat while overdue for a dose that is due', () {
+        expect(one(every(30), ReminderKind.dueNow).snoozeMinutes, 30);
+        expect(one(every(60), ReminderKind.overdue).snoozeMinutes, 60);
+      });
+
+      test('stays short where there are no repeats to follow', () {
+        expect(one(every(30), ReminderKind.dueSoon).snoozeMinutes, 5);
+        expect(one(every(30), ReminderKind.available).snoozeMinutes, 5);
+      });
+
+      test('is the shortest on a notification with several', () {
+        final n = PlannedNotification(at: due, patient: sam, items: [
+          ReminderItem(every(60), ReminderKind.dueNow, due, due),
+          ReminderItem(every(15), ReminderKind.overdue, due, due),
+        ]);
+        expect(n.snoozeMinutes, 15);
+      });
+    });
+  });
+
   test('ClockTime.on keeps wall-clock times across a DST change', () {
     // Whatever the zone, 08:00 on any day is 08:00 local.
     expect(const ClockTime(8, 0).on(DateTime(2026, 3, 29)).hour, 8);
