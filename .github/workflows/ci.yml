@@ -57,5 +57,10 @@ jobs:
           TZ=America/Chicago flutter test test/domain
           TZ=Asia/Kolkata flutter test test/domain
 
+      # Under plain Dart, with no Flutter: anything it imports must stay free
+      # of it, which analyze and the tests can't see.
+      - name: Sample data tool
+        run: dart run tool/sample_history.dart "$RUNNER_TEMP/sample.json"
+
       - name: Release build and permission check
         run: tool/build_release.sh --ref HEAD --skip-tests --allow-debug-signing
