@@ -618,6 +618,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get couldNotSave => 'Não foi possível guardar o ficheiro.';
 
   @override
+  String get days => 'Dias';
+
+  @override
   String get hours => 'Horas';
 
   @override

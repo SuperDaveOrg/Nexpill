@@ -999,13 +999,17 @@
   "@couldNotSave": {
     "description": "Message shown when saving a backup, dose history or summary file fails."
   },
+  "days": "Days",
+  "@days": {
+    "description": "Label of the days box in the editor's duration field, before Hours and Minutes (Every…, At least this long apart, a taper step's interval)."
+  },
   "hours": "Hours",
   "@hours": {
     "description": "Label of the hours box in the editor's duration field (Every…, At least this long apart, a taper step's interval)."
   },
   "minutes": "Minutes",
   "@minutes": {
-    "description": "Label of the minutes box in the editor's duration field, next to Hours."
+    "description": "Label of the minutes box in the editor's duration field, after Days and Hours."
   },
   "cardMoreFor": "More for {medication}",
   "@cardMoreFor": {

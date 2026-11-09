@@ -9,6 +9,11 @@ turns that section into the release's own when it's cut.
 
 ## [Unreleased]
 
+### Changed
+- Intervals can now be set in days as well as hours and minutes, up to 30
+  days, for a medication taken every 5 days, say. The longest interval
+  used to be 72 hours.
+
 ## [0.8.1] - 2026-11-06
 
 ### Fixed
