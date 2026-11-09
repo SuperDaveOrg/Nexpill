@@ -133,6 +133,7 @@
   "backupWhereItem": "{where}, {key} n. {number}",
   "cancel": "Annulla",
   "couldNotSave": "Impossibile salvare il file.",
+  "days": "Giorni",
   "hours": "Ore",
   "minutes": "Minuti",
   "cardMoreFor": "Altre opzioni per {medication}",

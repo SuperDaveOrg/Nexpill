@@ -906,13 +906,19 @@ abstract class AppLocalizations {
   /// **'Couldn\'t save the file.'**
   String get couldNotSave;
 
+  /// Label of the days box in the editor's duration field, before Hours and Minutes (Every…, At least this long apart, a taper step's interval).
+  ///
+  /// In en, this message translates to:
+  /// **'Days'**
+  String get days;
+
   /// Label of the hours box in the editor's duration field (Every…, At least this long apart, a taper step's interval).
   ///
   /// In en, this message translates to:
   /// **'Hours'**
   String get hours;
 
-  /// Label of the minutes box in the editor's duration field, next to Hours.
+  /// Label of the minutes box in the editor's duration field, after Days and Hours.
   ///
   /// In en, this message translates to:
   /// **'Minutes'**

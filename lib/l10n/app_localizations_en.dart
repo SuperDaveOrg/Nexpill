@@ -611,6 +611,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get couldNotSave => 'Couldn\'t save the file.';
 
   @override
+  String get days => 'Days';
+
+  @override
   String get hours => 'Hours';
 
   @override

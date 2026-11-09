@@ -133,6 +133,7 @@
   "backupWhereItem": "{where}, {key} № {number}",
   "cancel": "Отмена",
   "couldNotSave": "Не удалось сохранить файл.",
+  "days": "Дни",
   "hours": "Часы",
   "minutes": "Минуты",
   "cardMoreFor": "Другие действия: {medication}",
