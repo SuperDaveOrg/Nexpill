@@ -10,7 +10,8 @@ import 'package:nexpill/ui/language.dart';
 enum CardAction { edit, history, refill, stop, resume }
 
 /// One medication at a glance: what it is, the one thing to know about it
-/// right now, and a button to give it. Tapping the card edits it.
+/// right now, and a button to give it, or for the phone's owner's own
+/// ([forSelf]) to take it. Tapping the card edits it.
 class MedicationCard extends StatelessWidget {
   const MedicationCard({
     super.key,
@@ -20,6 +21,7 @@ class MedicationCard extends StatelessWidget {
     required this.now,
     required this.onGive,
     required this.onAction,
+    this.forSelf = false,
     this.onSkip,
     this.lastGivenBy,
     this.course,
@@ -29,6 +31,7 @@ class MedicationCard extends StatelessWidget {
   final MedicationStatus status;
   final InventoryStatus inventory;
   final DateTime now;
+  final bool forSelf;
   final String? lastGivenBy;
 
   /// How much of a course is left, e.g. "3 doses left"; null if none.
@@ -45,7 +48,8 @@ class MedicationCard extends StatelessWidget {
     final theme = Theme.of(context);
     final colors = StatusColors.of(context);
     final m = medication;
-    final (headline, detail) = cardText(status, m, now);
+    final words = DoseWords(self: forSelf);
+    final (headline, detail) = cardText(status, m, now, self: forSelf);
     final accent = colors.forStatus(status.label, theme.colorScheme.onSurface);
     final last = status.schedule.lastGivenAt;
     final due = status.schedule.eligibleNow;
@@ -153,8 +157,9 @@ class MedicationCard extends StatelessWidget {
                           Text(detail, style: theme.textTheme.bodyMedium),
                           if (last != null)
                             Text(
-                              lastGivenBy == null
-                                  ? context.l.lastGiven(whenText(last, now))
+                              // Their own doses don't say who gave them.
+                              lastGivenBy == null || forSelf
+                                  ? words.lastGiven(whenText(last, now))
                                   : context.l.lastGivenBy(
                                       whenText(last, now), lastGivenBy!),
                               style: theme.textTheme.bodySmall,
@@ -178,7 +183,7 @@ class MedicationCard extends StatelessWidget {
                       TextButton(onPressed: onSkip, child: Text(context.l.skip)),
                       const SizedBox(width: 4),
                     ],
-                    FilledButton(onPressed: onGive, child: Text(context.l.give)),
+                    FilledButton(onPressed: onGive, child: Text(words.give)),
                   ],
                 ),
               ),

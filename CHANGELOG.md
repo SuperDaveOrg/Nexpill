@@ -14,6 +14,13 @@ turns that section into the release's own when it's cut.
   days, for a medication taken every 5 days, say. The longest interval
   used to be 72 hours.
 
+### Changed
+- Your own medications are taken, not given. For "Me", Nexpill now says
+  "Take", "Not taken yet", "Can be taken now" and "Last taken", and the
+  reminder button reads "Mark taken", in every language. Logging your own
+  dose no longer asks who gave it. Everyone else's wording is unchanged,
+  and so are the columns of the exported history.
+
 ## [0.8.1] - 2026-11-06
 
 ### Fixed

@@ -194,13 +194,25 @@
   "@statusNotGiven": {
     "description": "Card status: no dose of this medication has been logged yet."
   },
+  "statusNotGivenSelf": "Not taken yet",
+  "@statusNotGivenSelf": {
+    "description": "statusNotGiven, as said to the phone's owner about their own medication ('Me'): they take the dose rather than give it. In a language where statusNotGiven doesn't speak of giving, repeat it unchanged. About statusNotGiven: Card status: no dose of this medication has been logged yet."
+  },
   "statusCanGiveNow": "Can be given now",
   "@statusCanGiveNow": {
     "description": "Card status for an as-needed medication: the minimum gap has passed, so a dose is allowed now. Allowed, never required."
   },
+  "statusCanGiveNowSelf": "Can be taken now",
+  "@statusCanGiveNowSelf": {
+    "description": "statusCanGiveNow, as said to the phone's owner about their own medication ('Me'): they take the dose rather than give it. In a language where statusCanGiveNow doesn't speak of giving, repeat it unchanged. About statusCanGiveNow: Card status for an as-needed medication: the minimum gap has passed, so a dose is allowed now. Allowed, never required."
+  },
   "statusDueNow": "Due now",
   "@statusDueNow": {
     "description": "Card status, also used in reminders: the dose should be given now."
+  },
+  "statusDueNowSelf": "Due now",
+  "@statusDueNowSelf": {
+    "description": "statusDueNow, as said to the phone's owner about their own medication ('Me'): they take the dose rather than give it. In a language where statusDueNow doesn't speak of giving, repeat it unchanged. About statusDueNow: Card status, also used in reminders: the dose should be given now."
   },
   "statusNextAt": "Next at {time}",
   "@statusNextAt": {
@@ -223,6 +235,15 @@
   "statusMissed": "Missed: was due {duration} ago",
   "@statusMissed": {
     "description": "Card status: so late that the next dose is nearly due. Keep it distinct from overdue.",
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "statusMissedSelf": "Missed: was due {duration} ago",
+  "@statusMissedSelf": {
+    "description": "statusMissed, as said to the phone's owner about their own medication ('Me'): they take the dose rather than give it. In a language where statusMissed doesn't speak of giving, repeat it unchanged. About statusMissed: Card status: so late that the next dose is nearly due. Keep it distinct from overdue.",
     "placeholders": {
       "duration": {
         "type": "String"
@@ -358,6 +379,15 @@
       }
     }
   },
+  "courseFinishedDosesSelf": "{count, plural, =1{Course finished: its 1 dose taken} other{Course finished: all {count} doses taken}}",
+  "@courseFinishedDosesSelf": {
+    "description": "courseFinishedDoses, as said to the phone's owner about their own medication ('Me'): they take the dose rather than give it. In a language where courseFinishedDoses doesn't speak of giving, repeat it unchanged. About courseFinishedDoses: Card detail under 'Finished' and summary status: the course ended because all its {count} doses have been given.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "courseLastDay": "Last day {date}",
   "@courseLastDay": {
     "description": "Course line in the exported medication summary: the course runs through {date}, its last day.",
@@ -370,6 +400,15 @@
   "courseDosesSoFar": "{total, plural, =1{1 dose, {given} given so far} other{{total} doses, {given} given so far}}",
   "@courseDosesSoFar": {
     "description": "Course line in the exported medication summary: the course is {total} doses long and {given} of them have been given. Only {total} chooses the plural form; {given} is a number.",
+    "placeholders": {
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "courseDosesSoFarSelf": "{total, plural, =1{1 dose, {given} taken so far} other{{total} doses, {given} taken so far}}",
+  "@courseDosesSoFarSelf": {
+    "description": "courseDosesSoFar, as said to the phone's owner about their own medication ('Me'): they take the dose rather than give it. In a language where courseDosesSoFar doesn't speak of giving, repeat it unchanged. About courseDosesSoFar: Course line in the exported medication summary: the course is {total} doses long and {given} of them have been given. Only {total} chooses the plural form; {given} is a number.",
     "placeholders": {
       "total": {
         "type": "int"
@@ -416,6 +455,15 @@
       }
     }
   },
+  "cardAvailableFromSelf": "Next dose from {when}",
+  "@cardAvailableFromSelf": {
+    "description": "cardAvailableFrom, as said to the phone's owner about their own medication ('Me'): they take the dose rather than give it. In a language where cardAvailableFrom doesn't speak of giving, repeat it unchanged. About cardAvailableFrom: Card headline for an as-needed medication still inside its minimum gap: a dose is allowed again from {when}.",
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
   "cardNextDose": "Next dose {when}",
   "@cardNextDose": {
     "description": "Card headline: the next dose is due {when}; giving it now would be too early.",
@@ -437,6 +485,15 @@
   "cardDueIn": "Due in {duration}",
   "@cardDueIn": {
     "description": "Card headline: not yet; the dose becomes due in {duration}.",
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "cardDueInSelf": "Due in {duration}",
+  "@cardDueInSelf": {
+    "description": "cardDueIn, as said to the phone's owner about their own medication ('Me'): they take the dose rather than give it. In a language where cardDueIn doesn't speak of giving, repeat it unchanged. About cardDueIn: Card headline: not yet; the dose becomes due in {duration}.",
     "placeholders": {
       "duration": {
         "type": "String"
@@ -479,6 +536,15 @@
       }
     }
   },
+  "cardWasDueSelf": "was due {when}",
+  "@cardWasDueSelf": {
+    "description": "cardWasDue, as said to the phone's owner about their own medication ('Me'): they take the dose rather than give it. In a language where cardWasDue doesn't speak of giving, repeat it unchanged. About cardWasDue: Card detail line under 'Overdue…'.",
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
   "cardMissed": "Missed",
   "@cardMissed": {
     "description": "Card headline: so late that the next dose is nearly due. Keep it distinct from overdue."
@@ -486,6 +552,18 @@
   "cardMissedWasDue": "was due {when}, {duration} ago",
   "@cardMissedWasDue": {
     "description": "Card detail line under 'Missed'.",
+    "placeholders": {
+      "when": {
+        "type": "String"
+      },
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "cardMissedWasDueSelf": "was due {when}, {duration} ago",
+  "@cardMissedWasDueSelf": {
+    "description": "cardMissedWasDue, as said to the phone's owner about their own medication ('Me'): they take the dose rather than give it. In a language where cardMissedWasDue doesn't speak of giving, repeat it unchanged. About cardMissedWasDue: Card detail line under 'Missed'.",
     "placeholders": {
       "when": {
         "type": "String"
@@ -515,9 +593,30 @@
       }
     }
   },
+  "reminderDueAtSelf": "{medication} due at {time}",
+  "@reminderDueAtSelf": {
+    "description": "reminderDueAt, as said to the phone's owner about their own medication ('Me'): they take the dose rather than give it. In a language where reminderDueAt doesn't speak of giving, repeat it unchanged. About reminderDueAt: Reminder notification title, read half-asleep: keep it short. {medication} is a name typed by the user.",
+    "placeholders": {
+      "medication": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "reminderDueNow": "{medication} due now",
   "@reminderDueNow": {
     "description": "Reminder notification title: the dose should be given now.",
+    "placeholders": {
+      "medication": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderDueNowSelf": "{medication} due now",
+  "@reminderDueNowSelf": {
+    "description": "reminderDueNow, as said to the phone's owner about their own medication ('Me'): they take the dose rather than give it. In a language where reminderDueNow doesn't speak of giving, repeat it unchanged. About reminderDueNow: Reminder notification title: the dose should be given now.",
     "placeholders": {
       "medication": {
         "type": "String"
@@ -539,6 +638,15 @@
   "reminderAvailable": "{medication} can be given again",
   "@reminderAvailable": {
     "description": "Reminder notification title for an as-needed medication: a dose is allowed again. Allowed, never required.",
+    "placeholders": {
+      "medication": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderAvailableSelf": "{medication} can be taken again",
+  "@reminderAvailableSelf": {
+    "description": "reminderAvailable, as said to the phone's owner about their own medication ('Me'): they take the dose rather than give it. In a language where reminderAvailable doesn't speak of giving, repeat it unchanged. About reminderAvailable: Reminder notification title for an as-needed medication: a dose is allowed again. Allowed, never required.",
     "placeholders": {
       "medication": {
         "type": "String"
@@ -593,6 +701,10 @@
   "actionMarkGiven": "Mark given",
   "@actionMarkGiven": {
     "description": "Button on a reminder notification: logs the dose as given now, without opening the app."
+  },
+  "actionMarkGivenSelf": "Mark taken",
+  "@actionMarkGivenSelf": {
+    "description": "actionMarkGiven, as said to the phone's owner about their own medication ('Me'): they take the dose rather than give it. In a language where actionMarkGiven doesn't speak of giving, repeat it unchanged. About actionMarkGiven: Button on a reminder notification: logs the dose as given now, without opening the app."
   },
   "actionSkip": "Skip",
   "@actionSkip": {
@@ -767,9 +879,22 @@
       }
     }
   },
+  "summaryLastGivenSelf": "Last taken: {value}",
+  "@summaryLastGivenSelf": {
+    "description": "summaryLastGiven, as said to the phone's owner about their own medication ('Me'): they take the dose rather than give it. In a language where summaryLastGiven doesn't speak of giving, repeat it unchanged. About summaryLastGiven: Line under a medication in the exported summary: {value} is a date and time, or summaryNotYet.",
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
   "summaryNotYet": "Not yet",
   "@summaryNotYet": {
     "description": "Fills summaryLastGiven when no dose has been given yet: 'Last given: Not yet'."
+  },
+  "summaryNotYetSelf": "Not yet",
+  "@summaryNotYetSelf": {
+    "description": "summaryNotYet, as said to the phone's owner about their own medication ('Me'): they take the dose rather than give it. In a language where summaryNotYet doesn't speak of giving, repeat it unchanged. About summaryNotYet: Fills summaryLastGiven when no dose has been given yet: 'Last given: Not yet'."
   },
   "summaryStatus": "Status: {value}",
   "@summaryStatus": {
@@ -1050,6 +1175,15 @@
       }
     }
   },
+  "lastGivenSelf": "Last taken {when}",
+  "@lastGivenSelf": {
+    "description": "lastGiven, as said to the phone's owner about their own medication ('Me'): they take the dose rather than give it. In a language where lastGiven doesn't speak of giving, repeat it unchanged. About lastGiven: Line on the medication card: when the last dose was given. {when} is one of the when… messages.",
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
   "lastGivenBy": "Last given {when} by {name}",
   "@lastGivenBy": {
     "description": "Line on the medication card: the last dose was given {when} (one of the when… messages) by {name}, as typed when logging it.",
@@ -1069,6 +1203,10 @@
   "give": "Give",
   "@give": {
     "description": "The main button on a medication card: opens the sheet to log a dose. Keep it short."
+  },
+  "giveSelf": "Take",
+  "@giveSelf": {
+    "description": "give, as said to the phone's owner about their own medication ('Me'): they take the dose rather than give it. In a language where give doesn't speak of giving, repeat it unchanged. About give: The main button on a medication card: opens the sheet to log a dose. Keep it short."
   },
   "supplyLeft": "{amount} left",
   "@supplyLeft": {
@@ -1159,6 +1297,21 @@
       }
     }
   },
+  "earlyMessageAvailableSelf": "{medication} can next be taken {when}, in {duration}. Log a dose now anyway?",
+  "@earlyMessageAvailableSelf": {
+    "description": "earlyMessageAvailable, as said to the phone's owner about their own medication ('Me'): they take the dose rather than give it. In a language where earlyMessageAvailable doesn't speak of giving, repeat it unchanged. About earlyMessageAvailable: Body of the early-dose dialog for an as-needed medication: a dose is allowed again {when} (one of the when… messages), in {duration}. {medication} is a name typed by the user.",
+    "placeholders": {
+      "medication": {
+        "type": "String"
+      },
+      "when": {
+        "type": "String"
+      },
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
   "notYet": "Not yet",
   "@notYet": {
     "description": "Button in the early-dose dialog: don't log a dose."
@@ -1171,9 +1324,17 @@
   "@dayGiven": {
     "description": "Title of the date picker when logging a dose that was given earlier."
   },
+  "dayGivenSelf": "Day it was taken",
+  "@dayGivenSelf": {
+    "description": "dayGiven, as said to the phone's owner about their own medication ('Me'): they take the dose rather than give it. In a language where dayGiven doesn't speak of giving, repeat it unchanged. About dayGiven: Title of the date picker when logging a dose that was given earlier."
+  },
   "timeGiven": "Time it was given",
   "@timeGiven": {
     "description": "Title of the time picker when logging a dose that was given earlier."
+  },
+  "timeGivenSelf": "Time it was taken",
+  "@timeGivenSelf": {
+    "description": "timeGiven, as said to the phone's owner about their own medication ('Me'): they take the dose rather than give it. In a language where timeGiven doesn't speak of giving, repeat it unchanged. About timeGiven: Title of the time picker when logging a dose that was given earlier."
   },
   "timeInFuture": "That time hasn't happened yet.",
   "@timeInFuture": {
@@ -1197,6 +1358,15 @@
       }
     }
   },
+  "giveMedicationSelf": "Take {medication}",
+  "@giveMedicationSelf": {
+    "description": "giveMedication, as said to the phone's owner about their own medication ('Me'): they take the dose rather than give it. In a language where giveMedication doesn't speak of giving, repeat it unchanged. About giveMedication: Title of the sheet for logging a dose: {medication} is a name typed by the user.",
+    "placeholders": {
+      "medication": {
+        "type": "String"
+      }
+    }
+  },
   "originalStays": "The original stays in history, marked as corrected.",
   "@originalStays": {
     "description": "Note under the title of the correction sheet: the entry being corrected stays in history."
@@ -1212,6 +1382,15 @@
   "givenWhen": "Given {when}",
   "@givenWhen": {
     "description": "In the give-dose sheet after picking an earlier time: {when} is one of the when… messages.",
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "givenWhenSelf": "Taken {when}",
+  "@givenWhenSelf": {
+    "description": "givenWhen, as said to the phone's owner about their own medication ('Me'): they take the dose rather than give it. In a language where givenWhen doesn't speak of giving, repeat it unchanged. About givenWhen: In the give-dose sheet after picking an earlier time: {when} is one of the when… messages.",
     "placeholders": {
       "when": {
         "type": "String"
@@ -1266,9 +1445,17 @@
   "@deleteEntrySkippedHint": {
     "description": "Subtitle under 'Delete entry' for a skipped dose: without the skip, the dose is due again."
   },
+  "deleteEntrySkippedHintSelf": "The dose becomes due again",
+  "@deleteEntrySkippedHintSelf": {
+    "description": "deleteEntrySkippedHint, as said to the phone's owner about their own medication ('Me'): they take the dose rather than give it. In a language where deleteEntrySkippedHint doesn't speak of giving, repeat it unchanged. About deleteEntrySkippedHint: Subtitle under 'Delete entry' for a skipped dose: without the skip, the dose is due again."
+  },
   "deleteEntryHint": "Only for a dose that was never given",
   "@deleteEntryHint": {
     "description": "Subtitle under 'Delete entry' for a given dose."
+  },
+  "deleteEntryHintSelf": "Only for a dose that was never taken",
+  "@deleteEntryHintSelf": {
+    "description": "deleteEntryHint, as said to the phone's owner about their own medication ('Me'): they take the dose rather than give it. In a language where deleteEntryHint doesn't speak of giving, repeat it unchanged. About deleteEntryHint: Subtitle under 'Delete entry' for a given dose."
   },
   "deleteEntryTitle": "Delete this entry?",
   "@deleteEntryTitle": {
@@ -1289,6 +1476,18 @@
   "deleteDoseMessage": "{medication}, {dateTime}. Use this only if the dose was never given; to fix its time, correct it instead. Any corrections of it go too.",
   "@deleteDoseMessage": {
     "description": "Body of the delete confirmation for a given dose. {medication} is a name typed by the user, {dateTime} when it was given.",
+    "placeholders": {
+      "medication": {
+        "type": "String"
+      },
+      "dateTime": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteDoseMessageSelf": "{medication}, {dateTime}. Use this only if the dose was never taken; to fix its time, correct it instead. Any corrections of it go too.",
+  "@deleteDoseMessageSelf": {
+    "description": "deleteDoseMessage, as said to the phone's owner about their own medication ('Me'): they take the dose rather than give it. In a language where deleteDoseMessage doesn't speak of giving, repeat it unchanged. About deleteDoseMessage: Body of the delete confirmation for a given dose. {medication} is a name typed by the user, {dateTime} when it was given.",
     "placeholders": {
       "medication": {
         "type": "String"
@@ -1404,6 +1603,10 @@
   "errorDosesStillToGive": "Enter how many doses are still to give.",
   "@errorDosesStillToGive": {
     "description": "Validation error under the 'Doses still to give' field of a course some of whose doses have been given."
+  },
+  "errorDosesStillToGiveSelf": "Enter how many doses are still to take.",
+  "@errorDosesStillToGiveSelf": {
+    "description": "errorDosesStillToGive, as said to the phone's owner about their own medication ('Me'): they take the dose rather than give it. In a language where errorDosesStillToGive doesn't speak of giving, repeat it unchanged. About errorDosesStillToGive: Validation error under the 'Doses still to give' field of a course some of whose doses have been given."
   },
   "errorCourseDoses": "Enter how many doses the course has.",
   "@errorCourseDoses": {
@@ -1584,6 +1787,10 @@
   "@intervalHint": {
     "description": "Hint under the interval duration field."
   },
+  "intervalHintSelf": "Counted from the last dose taken.",
+  "@intervalHintSelf": {
+    "description": "intervalHint, as said to the phone's owner about their own medication ('Me'): they take the dose rather than give it. In a language where intervalHint doesn't speak of giving, repeat it unchanged. About intervalHint: Hint under the interval duration field."
+  },
   "atLeastApart": "At least this long apart",
   "@atLeastApart": {
     "description": "Heading over the duration field for an as-needed schedule: the minimum gap between doses."
@@ -1591,6 +1798,10 @@
   "asNeededHint": "Never \"due\" — Nexpill shows when it can be given again.",
   "@asNeededHint": {
     "description": "Hint under the as-needed gap. 'due' is the status word: an as-needed dose is allowed, never required, so the app never calls it due."
+  },
+  "asNeededHintSelf": "Never \"due\" — Nexpill shows when it can be taken again.",
+  "@asNeededHintSelf": {
+    "description": "asNeededHint, as said to the phone's owner about their own medication ('Me'): they take the dose rather than give it. In a language where asNeededHint doesn't speak of giving, repeat it unchanged. About asNeededHint: Hint under the as-needed gap. 'due' is the status word: an as-needed dose is allowed, never required, so the app never calls it due."
   },
   "addTime": "Add time",
   "@addTime": {
@@ -1607,6 +1818,10 @@
   "onceHint": "A single dose. Once it's given or skipped it's finished, and stays in history.",
   "@onceHint": {
     "description": "Hint under the single dose's date and time."
+  },
+  "onceHintSelf": "A single dose. Once it's taken or skipped it's finished, and stays in history.",
+  "@onceHintSelf": {
+    "description": "onceHint, as said to the phone's owner about their own medication ('Me'): they take the dose rather than give it. In a language where onceHint doesn't speak of giving, repeat it unchanged. About onceHint: Hint under the single dose's date and time."
   },
   "dayOfDose": "Day of the dose",
   "@dayOfDose": {
@@ -1645,6 +1860,10 @@
   "@dosesStillToGive": {
     "description": "Label of the number field for a course of doses when some have already been given."
   },
+  "dosesStillToGiveSelf": "Doses still to take",
+  "@dosesStillToGiveSelf": {
+    "description": "dosesStillToGive, as said to the phone's owner about their own medication ('Me'): they take the dose rather than give it. In a language where dosesStillToGive doesn't speak of giving, repeat it unchanged. About dosesStillToGive: Label of the number field for a course of doses when some have already been given."
+  },
   "numberOfDoses": "Number of doses",
   "@numberOfDoses": {
     "description": "Label of the number field for a new course of doses."
@@ -1657,9 +1876,22 @@
   "@courseDosesHint": {
     "description": "Hint under the number of doses of a new course."
   },
+  "courseDosesHintSelf": "Reminders stop once the last one is taken.",
+  "@courseDosesHintSelf": {
+    "description": "courseDosesHint, as said to the phone's owner about their own medication ('Me'): they take the dose rather than give it. In a language where courseDosesHint doesn't speak of giving, repeat it unchanged. About courseDosesHint: Hint under the number of doses of a new course."
+  },
   "courseDosesGivenHint": "{count, plural, =1{1 dose given so far. Reminders stop once the last one is given.} other{{count} doses given so far. Reminders stop once the last one is given.}}",
   "@courseDosesGivenHint": {
     "description": "Hint under 'Doses still to give' when {count} doses of the course have already been given.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "courseDosesGivenHintSelf": "{count, plural, =1{1 dose taken so far. Reminders stop once the last one is taken.} other{{count} doses taken so far. Reminders stop once the last one is taken.}}",
+  "@courseDosesGivenHintSelf": {
+    "description": "courseDosesGivenHint, as said to the phone's owner about their own medication ('Me'): they take the dose rather than give it. In a language where courseDosesGivenHint doesn't speak of giving, repeat it unchanged. About courseDosesGivenHint: Hint under 'Doses still to give' when {count} doses of the course have already been given.",
     "placeholders": {
       "count": {
         "type": "int"
@@ -1725,9 +1957,17 @@
   "@remindAsNeededHint": {
     "description": "Subtitle of the Remind me switch for an as-needed medication: it reminds when a dose is allowed again."
   },
+  "remindAsNeededHintSelf": "When it can be taken again.",
+  "@remindAsNeededHintSelf": {
+    "description": "remindAsNeededHint, as said to the phone's owner about their own medication ('Me'): they take the dose rather than give it. In a language where remindAsNeededHint doesn't speak of giving, repeat it unchanged. About remindAsNeededHint: Subtitle of the Remind me switch for an as-needed medication: it reminds when a dose is allowed again."
+  },
   "remindHint": "When a dose is due, and again while it's overdue.",
   "@remindHint": {
     "description": "Subtitle of the Remind me switch for a scheduled medication."
+  },
+  "remindHintSelf": "When a dose is due, and again while it's overdue.",
+  "@remindHintSelf": {
+    "description": "remindHint, as said to the phone's owner about their own medication ('Me'): they take the dose rather than give it. In a language where remindHint doesn't speak of giving, repeat it unchanged. About remindHint: Subtitle of the Remind me switch for a scheduled medication."
   },
   "headsUp": "Heads-up before it's due",
   "@headsUp": {
@@ -1766,6 +2006,10 @@
   "ringLikeAlarmHint": "The alarm sound, repeating until you mark it given or snooze it.",
   "@ringLikeAlarmHint": {
     "description": "Subtitle of the Ring like an alarm switch."
+  },
+  "ringLikeAlarmHintSelf": "The alarm sound, repeating until you mark it taken or snooze it.",
+  "@ringLikeAlarmHintSelf": {
+    "description": "ringLikeAlarmHint, as said to the phone's owner about their own medication ('Me'): they take the dose rather than give it. In a language where ringLikeAlarmHint doesn't speak of giving, repeat it unchanged. About ringLikeAlarmHint: Subtitle of the Ring like an alarm switch."
   },
   "trackSupply": "Track how much is left",
   "@trackSupply": {
@@ -1819,9 +2063,22 @@
   "@nothingToGiveNow": {
     "description": "Heading on a person's home screen, and under their name on the Everyone screen, when every medication has finished or been stopped."
   },
+  "nothingToGiveNowSelf": "Nothing to take now",
+  "@nothingToGiveNowSelf": {
+    "description": "nothingToGiveNow, as said to the phone's owner about their own medication ('Me'): they take the dose rather than give it. In a language where nothingToGiveNow doesn't speak of giving, repeat it unchanged. About nothingToGiveNow: Heading on a person's home screen, and under their name on the Everyone screen, when every medication has finished or been stopped."
+  },
   "moreDueNow": "+ {count} more due now",
   "@moreDueNow": {
     "description": "On the Everyone screen under the person's first medication: {count} more of their medications are also due or overdue now.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "moreDueNowSelf": "+ {count} more due now",
+  "@moreDueNowSelf": {
+    "description": "moreDueNow, as said to the phone's owner about their own medication ('Me'): they take the dose rather than give it. In a language where moreDueNow doesn't speak of giving, repeat it unchanged. About moreDueNow: On the Everyone screen under the person's first medication: {count} more of their medications are also due or overdue now.",
     "placeholders": {
       "count": {
         "type": "int"
@@ -2017,7 +2274,7 @@
       }
     }
   },
-  "addYourFirst": "Add your first one, and Nexpill will keep track of when each dose can be given.",
+  "addYourFirst": "Add your first one, and Nexpill will keep track of when each dose can be taken.",
   "@addYourFirst": {
     "description": "Text under 'No medications yet' on the phone's owner's own screen."
   },
@@ -2419,6 +2676,10 @@
   "comingUpOnTime": "Assumes each dose is given on time. A late dose can move the ones after it.",
   "@comingUpOnTime": {
     "description": "Note at the top of the Coming up screen: the times shown are a projection."
+  },
+  "comingUpOnTimeSelf": "Assumes each dose is taken on time. A late dose can move the ones after it.",
+  "@comingUpOnTimeSelf": {
+    "description": "comingUpOnTime, as said to the phone's owner about their own medication ('Me'): they take the dose rather than give it. In a language where comingUpOnTime doesn't speak of giving, repeat it unchanged. About comingUpOnTime: Note at the top of the Coming up screen: the times shown are a projection."
   },
   "comingUpNothing": "Nothing scheduled in this time.",
   "@comingUpNothing": {

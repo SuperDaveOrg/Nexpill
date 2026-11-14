@@ -122,10 +122,19 @@ class AppLocalizationsIt extends AppLocalizations {
   String get statusNotGiven => 'Non ancora data';
 
   @override
+  String get statusNotGivenSelf => 'Non ancora presa';
+
+  @override
   String get statusCanGiveNow => 'Si può dare ora';
 
   @override
+  String get statusCanGiveNowSelf => 'Si può prendere ora';
+
+  @override
   String get statusDueNow => 'Da dare ora';
+
+  @override
+  String get statusDueNowSelf => 'Da prendere ora';
 
   @override
   String statusNextAt(String time) {
@@ -139,6 +148,11 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String statusMissed(String duration) {
+    return 'Dose mancata: era prevista $duration fa';
+  }
+
+  @override
+  String statusMissedSelf(String duration) {
     return 'Dose mancata: era prevista $duration fa';
   }
 
@@ -228,6 +242,17 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
+  String courseFinishedDosesSelf(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Ciclo terminato: prese tutte le $count dosi',
+      one: 'Ciclo terminato: presa la sua unica dose',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String courseLastDay(String date) {
     return 'Ultimo giorno: $date';
   }
@@ -239,6 +264,17 @@ class AppLocalizationsIt extends AppLocalizations {
       locale: localeName,
       other: '$given di $total dosi date finora',
       one: '$given di 1 dose data finora',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String courseDosesSoFarSelf(int total, Object given) {
+    String _temp0 = intl.Intl.pluralLogic(
+      total,
+      locale: localeName,
+      other: '$given di $total dosi prese finora',
+      one: '$given di 1 dose presa finora',
     );
     return '$_temp0';
   }
@@ -273,6 +309,11 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
+  String cardAvailableFromSelf(String when) {
+    return 'Si potrà prendere di nuovo $when';
+  }
+
+  @override
   String cardNextDose(String when) {
     return 'Prossima dose $when';
   }
@@ -285,6 +326,11 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String cardDueIn(String duration) {
     return 'Da dare tra $duration';
+  }
+
+  @override
+  String cardDueInSelf(String duration) {
+    return 'Da prendere tra $duration';
   }
 
   @override
@@ -308,10 +354,20 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
+  String cardWasDueSelf(String when) {
+    return 'era prevista $when';
+  }
+
+  @override
   String get cardMissed => 'Dose mancata';
 
   @override
   String cardMissedWasDue(String when, String duration) {
+    return 'era prevista $when, $duration fa';
+  }
+
+  @override
+  String cardMissedWasDueSelf(String when, String duration) {
     return 'era prevista $when, $duration fa';
   }
 
@@ -327,8 +383,18 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
+  String reminderDueAtSelf(String medication, String time) {
+    return '$medication: da prendere alle $time';
+  }
+
+  @override
   String reminderDueNow(String medication) {
     return '$medication: da dare ora';
+  }
+
+  @override
+  String reminderDueNowSelf(String medication) {
+    return '$medication: da prendere ora';
   }
 
   @override
@@ -339,6 +405,11 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String reminderAvailable(String medication) {
     return '$medication: si può dare di nuovo';
+  }
+
+  @override
+  String reminderAvailableSelf(String medication) {
+    return '$medication: si può prendere di nuovo';
   }
 
   @override
@@ -374,6 +445,9 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get actionMarkGiven => 'Segna come data';
+
+  @override
+  String get actionMarkGivenSelf => 'Segna come presa';
 
   @override
   String get actionSkip => 'Salta';
@@ -494,7 +568,15 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
+  String summaryLastGivenSelf(String value) {
+    return 'Ultima dose: $value';
+  }
+
+  @override
   String get summaryNotYet => 'Non ancora';
+
+  @override
+  String get summaryNotYetSelf => 'Non ancora';
 
   @override
   String summaryStatus(String value) {
@@ -645,6 +727,11 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
+  String lastGivenSelf(String when) {
+    return 'Ultima dose $when';
+  }
+
+  @override
   String lastGivenBy(String when, String name) {
     return 'Ultima dose $when, data da $name';
   }
@@ -654,6 +741,9 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get give => 'Dai la dose';
+
+  @override
+  String get giveSelf => 'Prendi la dose';
 
   @override
   String supplyLeft(String amount) {
@@ -705,6 +795,15 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
+  String earlyMessageAvailableSelf(
+    String medication,
+    String when,
+    String duration,
+  ) {
+    return '$medication si potrà prendere di nuovo $when, tra $duration. Registrare comunque una dose adesso?';
+  }
+
+  @override
   String get notYet => 'Non ancora';
 
   @override
@@ -714,7 +813,13 @@ class AppLocalizationsIt extends AppLocalizations {
   String get dayGiven => 'Giorno in cui è stata data';
 
   @override
+  String get dayGivenSelf => 'Giorno in cui è stata presa';
+
+  @override
   String get timeGiven => 'Ora in cui è stata data';
+
+  @override
+  String get timeGivenSelf => 'Ora in cui è stata presa';
 
   @override
   String get timeInFuture => 'Quell\'ora non è ancora arrivata.';
@@ -730,6 +835,11 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
+  String giveMedicationSelf(String medication) {
+    return 'Prendi $medication';
+  }
+
+  @override
   String get originalStays =>
       'La voce originale resta nello storico, segnata come corretta.';
 
@@ -742,6 +852,11 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String givenWhen(String when) {
     return 'Dose data $when';
+  }
+
+  @override
+  String givenWhenSelf(String when) {
+    return 'Dose presa $when';
   }
 
   @override
@@ -781,7 +896,13 @@ class AppLocalizationsIt extends AppLocalizations {
   String get deleteEntrySkippedHint => 'La dose torna da dare';
 
   @override
+  String get deleteEntrySkippedHintSelf => 'La dose torna da prendere';
+
+  @override
   String get deleteEntryHint => 'Solo per una dose mai data';
+
+  @override
+  String get deleteEntryHintSelf => 'Solo per una dose mai presa';
 
   @override
   String get deleteEntryTitle => 'Eliminare questa voce?';
@@ -794,6 +915,11 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String deleteDoseMessage(String medication, String dateTime) {
     return '$medication, $dateTime. Usa questa opzione solo se la dose non è mai stata data; per sistemarne l\'orario, correggila. Vengono eliminate anche le sue eventuali correzioni.';
+  }
+
+  @override
+  String deleteDoseMessageSelf(String medication, String dateTime) {
+    return '$medication, $dateTime. Usa questa opzione solo se la dose non è mai stata presa; per sistemarne l\'orario, correggila. Vengono eliminate anche le sue eventuali correzioni.';
   }
 
   @override
@@ -868,6 +994,10 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get errorDosesStillToGive => 'Indica quante dosi restano da dare.';
+
+  @override
+  String get errorDosesStillToGiveSelf =>
+      'Indica quante dosi restano da prendere.';
 
   @override
   String get errorCourseDoses => 'Indica quante dosi prevede il ciclo.';
@@ -1001,11 +1131,18 @@ class AppLocalizationsIt extends AppLocalizations {
   String get intervalHint => 'Calcolato dall\'ultima dose data.';
 
   @override
+  String get intervalHintSelf => 'Calcolato dall\'ultima dose presa.';
+
+  @override
   String get atLeastApart => 'Almeno questo tempo tra una dose e l\'altra';
 
   @override
   String get asNeededHint =>
       'Mai «da dare»: Nexpill mostra quando si può dare di nuovo.';
+
+  @override
+  String get asNeededHintSelf =>
+      'Mai «da prendere»: Nexpill mostra quando si può prendere di nuovo.';
 
   @override
   String get addTime => 'Aggiungi orario';
@@ -1020,6 +1157,10 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get onceHint =>
       'Una sola dose. Appena viene data o saltata è terminata, e resta nello storico.';
+
+  @override
+  String get onceHintSelf =>
+      'Una sola dose. Appena viene presa o saltata è terminata, e resta nello storico.';
 
   @override
   String get dayOfDose => 'Giorno della dose';
@@ -1050,6 +1191,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get dosesStillToGive => 'Dosi ancora da dare';
 
   @override
+  String get dosesStillToGiveSelf => 'Dosi ancora da prendere';
+
+  @override
   String get numberOfDoses => 'Numero di dosi';
 
   @override
@@ -1060,6 +1204,10 @@ class AppLocalizationsIt extends AppLocalizations {
       'I promemoria si fermano quando viene data l\'ultima.';
 
   @override
+  String get courseDosesHintSelf =>
+      'I promemoria si fermano quando viene presa l\'ultima.';
+
+  @override
   String courseDosesGivenHint(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -1067,6 +1215,18 @@ class AppLocalizationsIt extends AppLocalizations {
       other:
           '$count dosi date finora. I promemoria si fermano quando viene data l\'ultima.',
       one: '1 dose data finora. I promemoria si fermano quando viene data l\'ultima.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String courseDosesGivenHintSelf(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count dosi prese finora. I promemoria si fermano quando viene presa l\'ultima.',
+      one: '1 dose presa finora. I promemoria si fermano quando viene presa l\'ultima.',
     );
     return '$_temp0';
   }
@@ -1112,8 +1272,15 @@ class AppLocalizationsIt extends AppLocalizations {
   String get remindAsNeededHint => 'Quando si può dare di nuovo.';
 
   @override
+  String get remindAsNeededHintSelf => 'Quando si può prendere di nuovo.';
+
+  @override
   String get remindHint =>
       'Quando una dose è da dare, e di nuovo finché è in ritardo.';
+
+  @override
+  String get remindHintSelf =>
+      'Quando una dose è da prendere, e di nuovo finché è in ritardo.';
 
   @override
   String get headsUp => 'Preavviso prima della dose';
@@ -1140,6 +1307,10 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get ringLikeAlarmHint =>
       'Il suono della sveglia, che si ripete finché non segni la dose come data o non posticipi il promemoria.';
+
+  @override
+  String get ringLikeAlarmHintSelf =>
+      'Il suono della sveglia, che si ripete finché non segni la dose come presa o non posticipi il promemoria.';
 
   @override
   String get trackSupply => 'Tieni il conto di quanto ne resta';
@@ -1181,8 +1352,16 @@ class AppLocalizationsIt extends AppLocalizations {
   String get nothingToGiveNow => 'Niente da dare ora';
 
   @override
+  String get nothingToGiveNowSelf => 'Niente da prendere ora';
+
+  @override
   String moreDueNow(int count) {
     return '+ altri $count da dare ora';
+  }
+
+  @override
+  String moreDueNowSelf(int count) {
+    return '+ altri $count da prendere ora';
   }
 
   @override
@@ -1322,7 +1501,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get addYourFirst =>
-      'Aggiungi il primo e Nexpill terrà traccia di quando si può dare ogni dose.';
+      'Aggiungi il primo e Nexpill terrà traccia di quando si può prendere ogni dose.';
 
   @override
   String addPersonsFirst(String name) {
@@ -1625,6 +1804,10 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get comingUpOnTime =>
       'Presuppone che ogni dose venga data in orario. Una dose in ritardo può spostare le successive.';
+
+  @override
+  String get comingUpOnTimeSelf =>
+      'Presuppone che ogni dose venga presa in orario. Una dose in ritardo può spostare le successive.';
 
   @override
   String get comingUpNothing => 'Niente in programma in questo periodo.';

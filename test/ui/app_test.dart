@@ -129,10 +129,18 @@ void main() {
     await tester.enterText(find.widgetWithText(TextFormField, 'Name'), 'Amoxicillin');
     await tester.tap(find.text('Save'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Give'));
+
+    // Your own doses are taken, not given, and nobody gives them to you.
+    expect(find.text('Not taken yet'), findsOneWidget);
+    expect(find.text('Give'), findsNothing);
+    await tester.tap(find.text('Take'));
     await tester.pumpAndSettle();
+    expect(find.text('Take Amoxicillin'), findsOneWidget);
+    expect(find.text('Given by'), findsNothing);
     await tester.tap(find.text('Log dose'));
     await tester.pumpAndSettle();
+    expect(find.textContaining('Last taken'), findsOneWidget);
+    expect(find.textContaining('Last given'), findsNothing);
     expect(notifications.lastPlan!.notifications.first.body, startsWith('For you · '));
 
     // Someone added later can't also be you; you're listed first.
@@ -165,7 +173,7 @@ void main() {
         find.widgetWithText(TextFormField, 'Nombre'), 'Amoxicilina');
     await tester.tap(find.text('Guardar'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Dar'));
+    await tester.tap(find.text('Tomar'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Registrar dosis'));
     await tester.pumpAndSettle();
@@ -391,7 +399,8 @@ void main() {
       home: Builder(
         builder: (context) => TextButton(
           onPressed: () =>
-              showGiveDoseSheet(context, medication: m, correcting: correcting),
+              showGiveDoseSheet(context,
+                  medication: m, self: false, correcting: correcting),
           child: const Text('open'),
         ),
       ),
@@ -413,6 +422,37 @@ void main() {
     await tester.tap(find.text('open'));
     await tester.pumpAndSettle();
     expect(givenBy(), '');
+  });
+
+  testWidgets('your own dose has no "Given by", unless one is already there',
+      (tester) async {
+    SharedPreferences.setMockInitialValues({'last_given_by': 'Pat'});
+    final m = sampleCare(DateTime.now()).medications.first;
+    DoseEvent? correcting;
+    await tester.pumpWidget(MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      home: Builder(
+        builder: (context) => TextButton(
+          onPressed: () => showGiveDoseSheet(context,
+              medication: m, self: true, correcting: correcting),
+          child: const Text('open'),
+        ),
+      ),
+    ));
+
+    await tester.tap(find.text('open'));
+    await tester.pumpAndSettle();
+    expect(find.text('Take ${m.name}'), findsOneWidget);
+    expect(find.text('Given by'), findsNothing);
+    Navigator.pop(tester.element(find.text('Log dose')));
+    await tester.pumpAndSettle();
+
+    // Logged before they became "Me", say: the name can still be corrected.
+    correcting = DoseEvent(
+        id: 'd', medicationId: m.id, givenAt: DateTime.now(), givenBy: 'Jo');
+    await tester.tap(find.text('open'));
+    await tester.pumpAndSettle();
+    expect(find.widgetWithText(TextField, 'Given by'), findsOneWidget);
   });
 
   testWidgets('Settings shows restored people without reopening', (tester) async {

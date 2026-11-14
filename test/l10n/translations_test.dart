@@ -49,6 +49,25 @@ void main() {
     });
   }
 
+  // What's said about giving a dose has a twin for the phone's owner, who
+  // takes it: the same message, so the same blanks, in every language.
+  test('every …Self message is a twin of the one it\'s named for', () {
+    final twins = [for (final k in keys) if (k.endsWith('Self')) k];
+    expect(twins, isNotEmpty);
+    for (final code in codes) {
+      final messages = arb(code);
+      for (final k in twins) {
+        final base = k.substring(0, k.length - 'Self'.length);
+        expect(keys, contains(base), reason: k);
+        expect(blanks(messages[k] as String), blanks(messages[base] as String),
+            reason: '$code $k');
+        expect(_plural(messages[k] as String)?.$2.keys,
+            _plural(messages[base] as String)?.$2.keys,
+            reason: '$code $k');
+      }
+    }
+  });
+
   // Each language's plural rule decides which form a count gets, and they
   // differ: French puts 0 with 1, Russian puts 21 with 1. A form written
   // for exactly one ("1 dose left", "its only dose") would then say the
@@ -133,6 +152,14 @@ void main() {
       expect(whenText(DateTime(2026, 6, 11, 8), now), 'mañana a las 8:00');
       expect(whenText(DateTime(2026, 6, 14, 8), now), 'el 14 jun a las 8:00');
       expect(dayHeading(DateTime(2026, 6, 9), now), 'Ayer');
+    });
+
+    test('your own dose is taken, not given', () {
+      const yours = DoseWords(self: true), theirs = DoseWords(self: false);
+      expect((yours.give, theirs.give), ('Tomar', 'Dar'));
+      expect(yours.statusNotGiven, 'Aún no se ha tomado');
+      // Spanish doesn't speak of giving here, so both say the same.
+      expect(yours.statusDueNow, theirs.statusDueNow);
     });
 
     test('plurals', () {

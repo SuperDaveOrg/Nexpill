@@ -84,8 +84,12 @@ void main() {
       doses: [DoseEvent(id: 'd', medicationId: 'm', givenAt: DateTime.utc(2026))],
     );
     expect(doseHistoryCsv(care).split('\r\n')[1], contains(',You,Drops,'));
-    expect(patientSummary(care, care.patients.single, now: now),
-        startsWith('Medication summary\n'));
+    final summary = patientSummary(care, care.patients.single, now: now);
+    expect(summary, startsWith('Medication summary\n'));
+    // Your own doses are taken; the CSV's columns stay as they are.
+    expect(summary, contains('Last taken: '));
+    expect(summary, isNot(contains('given')));
+    expect(doseHistoryCsv(care).split('\r\n')[0], contains('Given at'));
     expect(patientSummaryFileName(care.patients.single, DateTime(2026, 6, 10)),
         'nexpill-summary-2026-06-10.txt');
   });

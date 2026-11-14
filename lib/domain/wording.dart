@@ -29,6 +29,112 @@ Future<void> useLanguage(Locale locale) async {
   await initializeDateFormatting(strings.localeName);
 }
 
+/// The words for giving a dose. The phone's owner, tracking their own
+/// medications, takes one instead: "Give" and "Not given yet" become "Take"
+/// and "Not taken yet". Every such phrase is here, so a screen, an export or
+/// a reminder only has to say whose dose it is.
+class DoseWords {
+  const DoseWords({required this.self});
+
+  /// For [p]'s doses.
+  DoseWords.of(Patient p) : self = p.isSelf;
+
+  /// Whether the dose is the reader's own.
+  final bool self;
+
+  String get statusNotGiven =>
+      self ? strings.statusNotGivenSelf : strings.statusNotGiven;
+  String get statusCanGiveNow =>
+      self ? strings.statusCanGiveNowSelf : strings.statusCanGiveNow;
+  String get statusDueNow =>
+      self ? strings.statusDueNowSelf : strings.statusDueNow;
+  String get actionMarkGiven =>
+      self ? strings.actionMarkGivenSelf : strings.actionMarkGiven;
+  String get summaryNotYet =>
+      self ? strings.summaryNotYetSelf : strings.summaryNotYet;
+  String get give => self ? strings.giveSelf : strings.give;
+  String get dayGiven => self ? strings.dayGivenSelf : strings.dayGiven;
+  String get timeGiven => self ? strings.timeGivenSelf : strings.timeGiven;
+  String get deleteEntrySkippedHint =>
+      self ? strings.deleteEntrySkippedHintSelf : strings.deleteEntrySkippedHint;
+  String get deleteEntryHint =>
+      self ? strings.deleteEntryHintSelf : strings.deleteEntryHint;
+  String get errorDosesStillToGive =>
+      self ? strings.errorDosesStillToGiveSelf : strings.errorDosesStillToGive;
+  String get dosesStillToGive =>
+      self ? strings.dosesStillToGiveSelf : strings.dosesStillToGive;
+  String get intervalHint =>
+      self ? strings.intervalHintSelf : strings.intervalHint;
+  String get asNeededHint =>
+      self ? strings.asNeededHintSelf : strings.asNeededHint;
+  String get onceHint => self ? strings.onceHintSelf : strings.onceHint;
+  String get courseDosesHint =>
+      self ? strings.courseDosesHintSelf : strings.courseDosesHint;
+  String get remindAsNeededHint =>
+      self ? strings.remindAsNeededHintSelf : strings.remindAsNeededHint;
+  String get remindHint => self ? strings.remindHintSelf : strings.remindHint;
+  String get ringLikeAlarmHint =>
+      self ? strings.ringLikeAlarmHintSelf : strings.ringLikeAlarmHint;
+  String get nothingToGiveNow =>
+      self ? strings.nothingToGiveNowSelf : strings.nothingToGiveNow;
+  String get comingUpOnTime =>
+      self ? strings.comingUpOnTimeSelf : strings.comingUpOnTime;
+  String statusMissed(String duration) => self
+      ? strings.statusMissedSelf(duration)
+      : strings.statusMissed(duration);
+  String courseFinishedDoses(int count) => self
+      ? strings.courseFinishedDosesSelf(count)
+      : strings.courseFinishedDoses(count);
+  String courseDosesSoFar(int total, int given) => self
+      ? strings.courseDosesSoFarSelf(total, given)
+      : strings.courseDosesSoFar(total, given);
+  String cardAvailableFrom(String when) => self
+      ? strings.cardAvailableFromSelf(when)
+      : strings.cardAvailableFrom(when);
+  String cardDueIn(String duration) => self
+      ? strings.cardDueInSelf(duration)
+      : strings.cardDueIn(duration);
+  String cardWasDue(String when) => self
+      ? strings.cardWasDueSelf(when)
+      : strings.cardWasDue(when);
+  String cardMissedWasDue(String when, String duration) => self
+      ? strings.cardMissedWasDueSelf(when, duration)
+      : strings.cardMissedWasDue(when, duration);
+  String reminderDueAt(String medication, String time) => self
+      ? strings.reminderDueAtSelf(medication, time)
+      : strings.reminderDueAt(medication, time);
+  String reminderDueNow(String medication) => self
+      ? strings.reminderDueNowSelf(medication)
+      : strings.reminderDueNow(medication);
+  String reminderAvailable(String medication) => self
+      ? strings.reminderAvailableSelf(medication)
+      : strings.reminderAvailable(medication);
+  String summaryLastGiven(String value) => self
+      ? strings.summaryLastGivenSelf(value)
+      : strings.summaryLastGiven(value);
+  String lastGiven(String when) => self
+      ? strings.lastGivenSelf(when)
+      : strings.lastGiven(when);
+  String earlyMessageAvailable(String medication, String when, String duration) => self
+      ? strings.earlyMessageAvailableSelf(medication, when, duration)
+      : strings.earlyMessageAvailable(medication, when, duration);
+  String giveMedication(String medication) => self
+      ? strings.giveMedicationSelf(medication)
+      : strings.giveMedication(medication);
+  String givenWhen(String when) => self
+      ? strings.givenWhenSelf(when)
+      : strings.givenWhen(when);
+  String deleteDoseMessage(String medication, String dateTime) => self
+      ? strings.deleteDoseMessageSelf(medication, dateTime)
+      : strings.deleteDoseMessage(medication, dateTime);
+  String courseDosesGivenHint(int count) => self
+      ? strings.courseDosesGivenHintSelf(count)
+      : strings.courseDosesGivenHint(count);
+  String moreDueNow(int count) => self
+      ? strings.moreDueNowSelf(count)
+      : strings.moreDueNow(count);
+}
+
 /// "8 hours", "4 hours 45 minutes", "30 minutes", "1 minute".
 String durationText(int minutes) {
   final h = minutes ~/ 60;
@@ -132,20 +238,22 @@ String scheduleShortText(MedicationSchedule schedule, DateTime now) {
 }
 
 /// One line saying where a medication stands, e.g. "Due at 2:30 PM" or
-/// "Overdue by 1 hour 5 minutes".
-String statusText(MedicationStatus status) {
+/// "Overdue by 1 hour 5 minutes". With [self], as said to the phone's owner
+/// about their own dose.
+String statusText(MedicationStatus status, {bool self = false}) {
+  final words = DoseWords(self: self);
   final s = status.schedule;
   return switch (status.label) {
-    MedicationStatusLabel.neverTaken => strings.statusNotGiven,
-    MedicationStatusLabel.availablePrn => strings.statusCanGiveNow,
-    MedicationStatusLabel.eligibleNow => strings.statusDueNow,
+    MedicationStatusLabel.neverTaken => words.statusNotGiven,
+    MedicationStatusLabel.availablePrn => words.statusCanGiveNow,
+    MedicationStatusLabel.eligibleNow => words.statusDueNow,
     MedicationStatusLabel.dueSoon ||
     MedicationStatusLabel.tooEarly =>
       strings.statusNextAt(clockText(s.nextEligibleAt)),
     MedicationStatusLabel.overdue =>
       strings.statusOverdueBy(durationText(s.overdueByMinutes ?? 0)),
     MedicationStatusLabel.missed =>
-      strings.statusMissed(durationText(s.overdueByMinutes ?? 0)),
+      words.statusMissed(durationText(s.overdueByMinutes ?? 0)),
     MedicationStatusLabel.finished => strings.statusFinished,
   };
 }
@@ -209,21 +317,25 @@ String dayHeading(DateTime day, DateTime now) {
 
 /// Why a finished medication has nothing more due: "Taper finished",
 /// "Course finished: last day was Jun 14, 2026", "Course finished: all 5
-/// doses given", "Single dose logged".
-String finishedText(Medication m) => switch (m.course) {
+/// doses given", "Single dose logged". With [self], "all 5 doses taken".
+String finishedText(Medication m, {bool self = false}) => switch (m.course) {
       _ when m.schedule is OnceSchedule => strings.singleDoseFinished,
       EndsAfterDay(:final lastDay) =>
         strings.courseFinishedLastDay(dateText(lastDay)),
-      EndsAfterDoses(:final doses) => strings.courseFinishedDoses(doses),
+      EndsAfterDoses(:final doses) =>
+        DoseWords(self: self).courseFinishedDoses(doses),
       null => strings.taperFinished,
     };
 
 /// How long [m]'s course runs, for a summary: "Last day Jun 14, 2026" or
-/// "5 doses, 2 given so far". Null for a medication that carries on.
-String? courseText(Medication m, Iterable<DoseEvent> doses) => switch (m.course) {
+/// "5 doses, 2 given so far" ("taken", with [self]). Null for a medication
+/// that carries on.
+String? courseText(Medication m, Iterable<DoseEvent> doses,
+        {bool self = false}) =>
+    switch (m.course) {
       EndsAfterDay(:final lastDay) => strings.courseLastDay(dateText(lastDay)),
-      EndsAfterDoses(doses: final total) =>
-        strings.courseDosesSoFar(total, effectiveDoses(m.id, doses).length),
+      EndsAfterDoses(doses: final total) => DoseWords(self: self)
+          .courseDosesSoFar(total, effectiveDoses(m.id, doses).length),
       null => null,
     };
 
@@ -238,9 +350,12 @@ String? courseShortText(Medication m, Iterable<DoseEvent> doses) =>
     };
 
 /// What a medication card says, in two lines: the one thing to know
-/// ("Due in 8 min", "Overdue 25 min"), and when that is.
+/// ("Due in 8 min", "Overdue 25 min"), and when that is. With [self], as
+/// said to the phone's owner about their own dose.
 (String headline, String detail) cardText(
-    MedicationStatus status, Medication medication, DateTime now) {
+    MedicationStatus status, Medication medication, DateTime now,
+    {bool self = false}) {
+  final words = DoseWords(self: self);
   final schedule = medication.schedule;
   final s = status.schedule;
   final next = whenText(s.nextEligibleAt, now);
@@ -248,23 +363,23 @@ String? courseShortText(Medication m, Iterable<DoseEvent> doses) =>
   final until = shortDurationText(status.minutesUntilEligible);
   return switch (status.label) {
     MedicationStatusLabel.neverTaken => s.eligibleNow
-        ? (strings.statusNotGiven, strings.statusCanGiveNow)
-        : (strings.statusNotGiven, strings.cardFirstDue(next)),
+        ? (words.statusNotGiven, words.statusCanGiveNow)
+        : (words.statusNotGiven, strings.cardFirstDue(next)),
     MedicationStatusLabel.availablePrn =>
-      (strings.statusCanGiveNow, strings.cardAsNeeded),
+      (words.statusCanGiveNow, strings.cardAsNeeded),
     MedicationStatusLabel.tooEarly => schedule is PrnSchedule
-        ? (strings.cardAvailableFrom(next), strings.cardIn(until))
+        ? (words.cardAvailableFrom(next), strings.cardIn(until))
         : (strings.cardNextDose(next), strings.cardIn(until)),
     MedicationStatusLabel.dueSoon =>
-      (strings.cardDueIn(until), strings.cardAt(next)),
+      (words.cardDueIn(until), strings.cardAt(next)),
     MedicationStatusLabel.eligibleNow =>
-      (strings.statusDueNow, strings.cardSince(next)),
+      (words.statusDueNow, strings.cardSince(next)),
     MedicationStatusLabel.overdue =>
-      (strings.cardOverdue(late), strings.cardWasDue(next)),
+      (strings.cardOverdue(late), words.cardWasDue(next)),
     MedicationStatusLabel.missed =>
-      (strings.cardMissed, strings.cardMissedWasDue(next, late)),
+      (strings.cardMissed, words.cardMissedWasDue(next, late)),
     MedicationStatusLabel.finished =>
-      (strings.statusFinished, finishedText(medication)),
+      (strings.statusFinished, finishedText(medication, self: self)),
   };
 }
 

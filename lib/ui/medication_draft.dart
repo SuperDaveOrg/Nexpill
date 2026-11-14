@@ -157,8 +157,9 @@ class MedicationDraft {
     if (!remindersTouched) remindersOn = k != ScheduleKind.prn;
   }
 
-  /// What's wrong, field by field; empty when it can be saved.
-  Map<String, String> validate() {
+  /// What's wrong, field by field; empty when it can be saved. With [self]
+  /// it's worded for the phone's owner's own medication.
+  Map<String, String> validate({bool self = false}) {
     final errors = <String, String>{};
     if (name.trim().isEmpty) errors['name'] = strings.errorName;
     if (dose.trim().isEmpty) errors['dose'] = strings.errorDose;
@@ -180,7 +181,7 @@ class MedicationDraft {
       // Once doses have been given, 0 left means the course is complete.
       if (left == null || left < (givenSoFar > 0 ? 0 : 1)) {
         errors['course'] = givenSoFar > 0
-            ? strings.errorDosesStillToGive
+            ? DoseWords(self: self).errorDosesStillToGive
             : strings.errorCourseDoses;
       }
     }

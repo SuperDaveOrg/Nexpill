@@ -38,6 +38,7 @@ class _ForecastScreenState extends State<ForecastScreen> {
       listenable: widget.store,
       builder: (context, _) {
         final theme = Theme.of(context);
+        final words = DoseWords.of(widget.patient);
         final now = widget.store.now;
         final forecast = forecastDoses(widget.store.care, widget.patient.id,
             from: now, until: now.add(_window));
@@ -74,7 +75,7 @@ class _ForecastScreenState extends State<ForecastScreen> {
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(24, 12, 24, 0),
-                child: Text(context.l.comingUpOnTime,
+                child: Text(words.comingUpOnTime,
                     style: theme.textTheme.bodySmall),
               ),
               if (forecast.doses.isEmpty)
@@ -86,7 +87,7 @@ class _ForecastScreenState extends State<ForecastScreen> {
                 ),
               if (dueNow.isNotEmpty)
                 Section(
-                  title: context.l.statusDueNow,
+                  title: words.statusDueNow,
                   children: [_TimeRow(doses: dueNow)],
                 ),
               for (final (day, doses) in _byDay(later))

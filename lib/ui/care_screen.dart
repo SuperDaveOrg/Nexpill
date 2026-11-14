@@ -74,16 +74,22 @@ class _CareScreenState extends State<CareScreen> with WidgetsBindingObserver {
   void _push(Widget screen) =>
       Navigator.push(context, MaterialPageRoute(builder: (_) => screen));
 
-  Future<void> _give(Medication m) async {
+  Future<void> _give(Patient patient, Medication m) async {
     // Whether it's early is judged from the doses actually given: a skip
     // moves the schedule on, but giving the dose after all isn't early.
     final given = [for (final d in _store.care.doses) if (!d.skipped) d];
     final status = computeMedicationStatus(m, given, _store.now);
-    if (!await confirmEarlyDose(context, m, status, _store.now)) return;
+    if (!await confirmEarlyDose(context, m, status, _store.now,
+        self: patient.isSelf)) {
+      return;
+    }
     if (!mounted) return;
-    final entry = await showGiveDoseSheet(context, medication: m);
+    final entry = await showGiveDoseSheet(context,
+        medication: m, self: patient.isSelf);
     if (entry == null) return;
-    await Preferences.setLastGivenBy(entry.givenBy);
+    // Their own dose asks for no name, and mustn't forget the one in use
+    // for everyone else's.
+    if (!patient.isSelf) await Preferences.setLastGivenBy(entry.givenBy);
     final dose = await _store.change((repo) => repo.logDose(
           m.id,
           givenAt: entry.givenAt,
@@ -376,7 +382,7 @@ class _CareScreenState extends State<CareScreen> with WidgetsBindingObserver {
                   Text(
                       meds.isEmpty
                           ? context.l.noMedicationsYet
-                          : context.l.nothingToGiveNow,
+                          : DoseWords.of(patient).nothingToGiveNow,
                       style: theme.textTheme.titleLarge),
                   const SizedBox(height: 6),
                   Text(
@@ -406,8 +412,9 @@ class _CareScreenState extends State<CareScreen> with WidgetsBindingObserver {
                 inventory: computeInventoryStatus(m, care.doses, care.refills),
                 course: courseShortText(m, care.doses),
                 now: now,
+                forSelf: patient.isSelf,
                 lastGivenBy: latestDose(m.id, care.doses)?.givenBy,
-                onGive: () => _give(m),
+                onGive: () => _give(patient, m),
                 // The dose due now, or the next one before it's due.
                 onSkip: m.schedule is PrnSchedule
                     ? null
@@ -444,7 +451,7 @@ class _CareScreenState extends State<CareScreen> with WidgetsBindingObserver {
                     for (final m in finished)
                       ListTile(
                         title: Text(m.name),
-                        subtitle: Text(finishedText(m)),
+                        subtitle: Text(finishedText(m, self: patient.isSelf)),
                         onTap: () => _push(MedicationEditor(
                             store: _store, patient: patient, existing: m)),
                       ),
