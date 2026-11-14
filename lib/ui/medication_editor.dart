@@ -40,16 +40,17 @@ class _MedicationEditorState extends State<MedicationEditor> {
               effectiveDoses(widget.existing!.id, widget.store.care.doses).length,
           refilledSoFar:
               refillTotal(widget.existing!.id, widget.store.care.refills));
+  late final _words = DoseWords.of(widget.patient);
   Map<String, String> _errors = {};
   bool _saving = false;
 
   void _update(VoidCallback change) => setState(() {
         change();
-        if (_errors.isNotEmpty) _errors = _d.validate();
+        if (_errors.isNotEmpty) _errors = _d.validate(self: _words.self);
       });
 
   Future<void> _save() async {
-    final errors = _d.validate();
+    final errors = _d.validate(self: _words.self);
     if (errors.isNotEmpty) {
       setState(() => _errors = errors);
       return;
@@ -206,7 +207,7 @@ class _MedicationEditorState extends State<MedicationEditor> {
                   minutes: _d.everyMinutes,
                   onChanged: (v) => _update(() => _d.everyMinutes = v),
                 ),
-                _hint(theme, l.intervalHint),
+                _hint(theme, _words.intervalHint),
               ],
             ScheduleKind.prn => [
                 Text(l.atLeastApart, style: theme.textTheme.titleSmall),
@@ -215,7 +216,7 @@ class _MedicationEditorState extends State<MedicationEditor> {
                   minutes: _d.prnMinutes,
                   onChanged: (v) => _update(() => _d.prnMinutes = v),
                 ),
-                _hint(theme, l.asNeededHint),
+                _hint(theme, _words.asNeededHint),
               ],
             ScheduleKind.fixedTimes => [
                 Wrap(
@@ -254,7 +255,7 @@ class _MedicationEditorState extends State<MedicationEditor> {
                     ),
                   ],
                 ),
-                _hint(theme, l.onceHint),
+                _hint(theme, _words.onceHint),
               ],
           },
           if (_errors['schedule'] != null)
@@ -352,13 +353,15 @@ class _MedicationEditorState extends State<MedicationEditor> {
                 _hint(theme, l.courseLastDayHint),
               ],
             CourseKind.doses => [
-                _text(given > 0 ? l.dosesStillToGive : l.numberOfDoses,
+                _text(given > 0 ? _words.dosesStillToGive : l.numberOfDoses,
                     _d.dosesLeft, (v) => _d.dosesLeft = v,
                     error: _errors['course'],
                     hint: l.dosesHint,
                     keyboard: TextInputType.number),
                 _hint(theme,
-                    given > 0 ? l.courseDosesGivenHint(given) : l.courseDosesHint),
+                    given > 0
+                        ? _words.courseDosesGivenHint(given)
+                        : _words.courseDosesHint),
               ],
           },
         ],
@@ -472,7 +475,7 @@ class _MedicationEditorState extends State<MedicationEditor> {
     return [
       SwitchListTile(
         title: Text(l.remindMe),
-        subtitle: Text(prn ? l.remindAsNeededHint : l.remindHint),
+        subtitle: Text(prn ? _words.remindAsNeededHint : _words.remindHint),
         value: _d.remindersOn,
         onChanged: (v) => _update(() {
           _d.remindersOn = v;
@@ -515,7 +518,7 @@ class _MedicationEditorState extends State<MedicationEditor> {
         if (_d.alarmAvailable)
           SwitchListTile(
             title: Text(l.ringLikeAlarm),
-            subtitle: Text(l.ringLikeAlarmHint),
+            subtitle: Text(_words.ringLikeAlarmHint),
             value: _d.alarm,
             onChanged: (v) => _update(() => _d.alarm = v),
           ),

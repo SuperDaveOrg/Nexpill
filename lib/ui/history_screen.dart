@@ -49,6 +49,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
   Future<void> _open(DoseEvent dose, {required bool replaced}) async {
     final medication = widget.store.care.medication(dose.medicationId);
     if (medication == null) return;
+    final words = DoseWords.of(widget.patient);
     final choice = await showModalBottomSheet<String>(
       context: context,
       builder: (context) => SafeArea(
@@ -65,8 +66,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 color: Theme.of(context).colorScheme.error),
             title: Text(context.l.deleteEntry),
             subtitle: Text(dose.skipped
-                ? context.l.deleteEntrySkippedHint
-                : context.l.deleteEntryHint),
+                ? words.deleteEntrySkippedHint
+                : words.deleteEntryHint),
             onTap: () => Navigator.pop(context, 'delete'),
           ),
         ]),
@@ -76,7 +77,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
     switch (choice) {
       case 'correct':
         final entry = await showGiveDoseSheet(context,
-            medication: medication, correcting: dose);
+            medication: medication,
+            self: widget.patient.isSelf,
+            correcting: dose);
         if (entry == null) return;
         await widget.store.change((repo) => repo.correctDose(
               dose,
@@ -92,7 +95,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
           message: dose.skipped
               ? context.l.deleteSkippedMessage(
                   medication.name, dateTimeText(dose.givenAt))
-              : context.l.deleteDoseMessage(
+              : words.deleteDoseMessage(
                   medication.name, dateTimeText(dose.givenAt)),
           action: context.l.delete,
         );

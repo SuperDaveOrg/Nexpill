@@ -29,8 +29,9 @@ Future<bool> confirmEarlyDose(
   BuildContext context,
   Medication medication,
   MedicationStatus status,
-  DateTime now,
-) async {
+  DateTime now, {
+  required bool self,
+}) async {
   if (status.schedule.eligibleNow) return true;
   final minutes = status.minutesUntilEligible;
   final prn = medication.schedule is PrnSchedule;
@@ -40,7 +41,8 @@ Future<bool> confirmEarlyDose(
     context,
     title: l.earlyTitle,
     message: prn
-        ? l.earlyMessageAvailable(medication.name, when, durationText(minutes))
+        ? DoseWords(self: self)
+            .earlyMessageAvailable(medication.name, when, durationText(minutes))
         : l.earlyMessageDue(medication.name, when, durationText(minutes)),
     cancel: l.notYet,
     action: l.logItNow,
@@ -48,23 +50,29 @@ Future<bool> confirmEarlyDose(
 }
 
 /// Logs a dose — or, given [correcting], corrects one. Opens on "now" with
-/// the usual dose filled in, so the common case is one tap.
+/// the usual dose filled in, so the common case is one tap. With [self] the
+/// dose is the phone's owner's own: taken, with no "Given by" to fill in.
 Future<DoseEntry?> showGiveDoseSheet(
   BuildContext context, {
   required Medication medication,
+  required bool self,
   DoseEvent? correcting,
 }) async {
   // A correction starts from what was logged, even a blank "Given by";
-  // only a new dose offers the last name used.
+  // only a new dose offers the last name used. Nobody else gives the
+  // phone's owner their own.
   final givenBy = correcting != null
       ? correcting.givenBy
-      : await Preferences.lastGivenBy();
+      : self
+          ? null
+          : await Preferences.lastGivenBy();
   if (!context.mounted) return null;
   return showModalBottomSheet<DoseEntry>(
     context: context,
     isScrollControlled: true,
     builder: (_) => _GiveDoseSheet(
       medication: medication,
+      self: self,
       correcting: correcting,
       givenBy: givenBy,
     ),
@@ -74,11 +82,13 @@ Future<DoseEntry?> showGiveDoseSheet(
 class _GiveDoseSheet extends StatefulWidget {
   const _GiveDoseSheet({
     required this.medication,
+    required this.self,
     required this.correcting,
     required this.givenBy,
   });
 
   final Medication medication;
+  final bool self;
   final DoseEvent? correcting;
   final String? givenBy;
 
@@ -91,6 +101,12 @@ class _GiveDoseSheetState extends State<_GiveDoseSheet> {
       text: widget.correcting?.doseText ?? widget.medication.defaultDoseText);
   late final _givenBy = TextEditingController(text: widget.givenBy ?? '');
   late final _notes = TextEditingController(text: widget.correcting?.notes ?? '');
+  late final _words = DoseWords(self: widget.self);
+
+  /// "Given by" is left out for the phone's owner's own dose, unless the
+  /// entry being corrected already names someone.
+  late final _askGivenBy =
+      !widget.self || (widget.givenBy ?? '').isNotEmpty;
 
   /// Null means "now", worked out when saved.
   late DateTime? _at = widget.correcting?.givenAt.toLocal();
@@ -112,13 +128,13 @@ class _GiveDoseSheetState extends State<_GiveDoseSheet> {
       initialDate: start,
       firstDate: now.subtract(const Duration(days: 60)),
       lastDate: now,
-      helpText: context.l.dayGiven,
+      helpText: _words.dayGiven,
     );
     if (day == null || !mounted) return;
     final time = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.fromDateTime(start),
-      helpText: context.l.timeGiven,
+      helpText: _words.timeGiven,
     );
     if (time == null) return;
     setState(() {
@@ -167,7 +183,7 @@ class _GiveDoseSheetState extends State<_GiveDoseSheet> {
               Text(
                 correcting
                     ? l.correctEntry(widget.medication.name)
-                    : l.giveMedication(widget.medication.name),
+                    : _words.giveMedication(widget.medication.name),
                 style: theme.textTheme.titleLarge,
               ),
               if (correcting)
@@ -198,7 +214,7 @@ class _GiveDoseSheetState extends State<_GiveDoseSheet> {
                 ListTile(
                   contentPadding: EdgeInsets.zero,
                   leading: const Icon(Icons.schedule),
-                  title: Text(l.givenWhen(whenText(at, DateTime.now()))),
+                  title: Text(_words.givenWhen(whenText(at, DateTime.now()))),
                   trailing:
                       TextButton(onPressed: _pickTime, child: Text(l.change)),
                 ),
@@ -212,13 +228,15 @@ class _GiveDoseSheetState extends State<_GiveDoseSheet> {
                 decoration: InputDecoration(labelText: l.dose),
                 textCapitalization: TextCapitalization.sentences,
               ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: _givenBy,
-                decoration:
-                    InputDecoration(labelText: l.givenBy, hintText: l.optional),
-                textCapitalization: TextCapitalization.words,
-              ),
+              if (_askGivenBy) ...[
+                const SizedBox(height: 12),
+                TextField(
+                  controller: _givenBy,
+                  decoration: InputDecoration(
+                      labelText: l.givenBy, hintText: l.optional),
+                  textCapitalization: TextCapitalization.words,
+                ),
+              ],
               const SizedBox(height: 12),
               TextField(
                 controller: _notes,

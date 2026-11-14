@@ -36,10 +36,11 @@ class NotificationService {
     bool withActions = true,
     bool canSkip = false,
     int snoozeMinutes = defaultSnoozeMinutes,
+    DoseWords words = const DoseWords(self: false),
   }) {
     final style = multiline ? const BigTextStyleInformation('') : null;
     final actions = withActions
-        ? [_given, if (canSkip) _skip, _snooze(snoozeMinutes)]
+        ? [_given(words), if (canSkip) _skip, _snooze(snoozeMinutes)]
         : null;
     if (rings) {
       return AndroidNotificationDetails(
@@ -85,8 +86,9 @@ class NotificationService {
   static const _icon = 'ic_stat_nexpill';
 
   // In the language on screen when the reminder was planned.
-  static AndroidNotificationAction get _given =>
-      AndroidNotificationAction(actionGiven, strings.actionMarkGiven);
+  // "Mark taken" on the phone's owner's own reminders.
+  static AndroidNotificationAction _given(DoseWords words) =>
+      AndroidNotificationAction(actionGiven, words.actionMarkGiven);
   static AndroidNotificationAction get _skip =>
       AndroidNotificationAction(actionSkip, strings.actionSkip);
   static AndroidNotificationAction _snooze(int minutes) =>
@@ -221,7 +223,8 @@ class NotificationService {
             tag: tag.encode(),
             multiline: n.items.length > 1,
             canSkip: n.canSkip,
-            snoozeMinutes: tag.snoozeMinutes),
+            snoozeMinutes: tag.snoozeMinutes,
+            words: DoseWords.of(n.patient)),
       ),
       androidScheduleMode: n.rings
           ? AndroidScheduleMode.alarmClock

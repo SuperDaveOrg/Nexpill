@@ -240,17 +240,35 @@ abstract class AppLocalizations {
   /// **'Not given yet'**
   String get statusNotGiven;
 
+  /// statusNotGiven, as said to the phone's owner about their own medication ('Me'): they take the dose rather than give it. In a language where statusNotGiven doesn't speak of giving, repeat it unchanged. About statusNotGiven: Card status: no dose of this medication has been logged yet.
+  ///
+  /// In en, this message translates to:
+  /// **'Not taken yet'**
+  String get statusNotGivenSelf;
+
   /// Card status for an as-needed medication: the minimum gap has passed, so a dose is allowed now. Allowed, never required.
   ///
   /// In en, this message translates to:
   /// **'Can be given now'**
   String get statusCanGiveNow;
 
+  /// statusCanGiveNow, as said to the phone's owner about their own medication ('Me'): they take the dose rather than give it. In a language where statusCanGiveNow doesn't speak of giving, repeat it unchanged. About statusCanGiveNow: Card status for an as-needed medication: the minimum gap has passed, so a dose is allowed now. Allowed, never required.
+  ///
+  /// In en, this message translates to:
+  /// **'Can be taken now'**
+  String get statusCanGiveNowSelf;
+
   /// Card status, also used in reminders: the dose should be given now.
   ///
   /// In en, this message translates to:
   /// **'Due now'**
   String get statusDueNow;
+
+  /// statusDueNow, as said to the phone's owner about their own medication ('Me'): they take the dose rather than give it. In a language where statusDueNow doesn't speak of giving, repeat it unchanged. About statusDueNow: Card status, also used in reminders: the dose should be given now.
+  ///
+  /// In en, this message translates to:
+  /// **'Due now'**
+  String get statusDueNowSelf;
 
   /// Card status: the next dose is at {time}; giving it before then would be too early.
   ///
@@ -269,6 +287,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Missed: was due {duration} ago'**
   String statusMissed(String duration);
+
+  /// statusMissed, as said to the phone's owner about their own medication ('Me'): they take the dose rather than give it. In a language where statusMissed doesn't speak of giving, repeat it unchanged. About statusMissed: Card status: so late that the next dose is nearly due. Keep it distinct from overdue.
+  ///
+  /// In en, this message translates to:
+  /// **'Missed: was due {duration} ago'**
+  String statusMissedSelf(String duration);
 
   /// Card status: the course or single dose is complete; nothing more to give.
   ///
@@ -372,6 +396,12 @@ abstract class AppLocalizations {
   /// **'{count, plural, =1{Course finished: its 1 dose given} other{Course finished: all {count} doses given}}'**
   String courseFinishedDoses(int count);
 
+  /// courseFinishedDoses, as said to the phone's owner about their own medication ('Me'): they take the dose rather than give it. In a language where courseFinishedDoses doesn't speak of giving, repeat it unchanged. About courseFinishedDoses: Card detail under 'Finished' and summary status: the course ended because all its {count} doses have been given.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Course finished: its 1 dose taken} other{Course finished: all {count} doses taken}}'**
+  String courseFinishedDosesSelf(int count);
+
   /// Course line in the exported medication summary: the course runs through {date}, its last day.
   ///
   /// In en, this message translates to:
@@ -383,6 +413,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{total, plural, =1{1 dose, {given} given so far} other{{total} doses, {given} given so far}}'**
   String courseDosesSoFar(int total, Object given);
+
+  /// courseDosesSoFar, as said to the phone's owner about their own medication ('Me'): they take the dose rather than give it. In a language where courseDosesSoFar doesn't speak of giving, repeat it unchanged. About courseDosesSoFar: Course line in the exported medication summary: the course is {total} doses long and {given} of them have been given. Only {total} chooses the plural form; {given} is a number.
+  ///
+  /// In en, this message translates to:
+  /// **'{total, plural, =1{1 dose, {given} taken so far} other{{total} doses, {given} taken so far}}'**
+  String courseDosesSoFarSelf(int total, Object given);
 
   /// On the medication card after the schedule, e.g. '1 tablet · Every 8 hours · last day Jun 14': the course runs through {date} (month and day).
   ///
@@ -414,6 +450,12 @@ abstract class AppLocalizations {
   /// **'Next dose from {when}'**
   String cardAvailableFrom(String when);
 
+  /// cardAvailableFrom, as said to the phone's owner about their own medication ('Me'): they take the dose rather than give it. In a language where cardAvailableFrom doesn't speak of giving, repeat it unchanged. About cardAvailableFrom: Card headline for an as-needed medication still inside its minimum gap: a dose is allowed again from {when}.
+  ///
+  /// In en, this message translates to:
+  /// **'Next dose from {when}'**
+  String cardAvailableFromSelf(String when);
+
   /// Card headline: the next dose is due {when}; giving it now would be too early.
   ///
   /// In en, this message translates to:
@@ -431,6 +473,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Due in {duration}'**
   String cardDueIn(String duration);
+
+  /// cardDueIn, as said to the phone's owner about their own medication ('Me'): they take the dose rather than give it. In a language where cardDueIn doesn't speak of giving, repeat it unchanged. About cardDueIn: Card headline: not yet; the dose becomes due in {duration}.
+  ///
+  /// In en, this message translates to:
+  /// **'Due in {duration}'**
+  String cardDueInSelf(String duration);
 
   /// Card detail line under 'Due in…': the time it becomes due.
   ///
@@ -456,6 +504,12 @@ abstract class AppLocalizations {
   /// **'was due {when}'**
   String cardWasDue(String when);
 
+  /// cardWasDue, as said to the phone's owner about their own medication ('Me'): they take the dose rather than give it. In a language where cardWasDue doesn't speak of giving, repeat it unchanged. About cardWasDue: Card detail line under 'Overdue…'.
+  ///
+  /// In en, this message translates to:
+  /// **'was due {when}'**
+  String cardWasDueSelf(String when);
+
   /// Card headline: so late that the next dose is nearly due. Keep it distinct from overdue.
   ///
   /// In en, this message translates to:
@@ -467,6 +521,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'was due {when}, {duration} ago'**
   String cardMissedWasDue(String when, String duration);
+
+  /// cardMissedWasDue, as said to the phone's owner about their own medication ('Me'): they take the dose rather than give it. In a language where cardMissedWasDue doesn't speak of giving, repeat it unchanged. About cardMissedWasDue: Card detail line under 'Missed'.
+  ///
+  /// In en, this message translates to:
+  /// **'was due {when}, {duration} ago'**
+  String cardMissedWasDueSelf(String when, String duration);
 
   /// The phone's owner where a name would stand alone, when they haven't given one: the home screen title, the People list, the Patient column of the exported history. Capitalised.
   ///
@@ -486,11 +546,23 @@ abstract class AppLocalizations {
   /// **'{medication} due at {time}'**
   String reminderDueAt(String medication, String time);
 
+  /// reminderDueAt, as said to the phone's owner about their own medication ('Me'): they take the dose rather than give it. In a language where reminderDueAt doesn't speak of giving, repeat it unchanged. About reminderDueAt: Reminder notification title, read half-asleep: keep it short. {medication} is a name typed by the user.
+  ///
+  /// In en, this message translates to:
+  /// **'{medication} due at {time}'**
+  String reminderDueAtSelf(String medication, String time);
+
   /// Reminder notification title: the dose should be given now.
   ///
   /// In en, this message translates to:
   /// **'{medication} due now'**
   String reminderDueNow(String medication);
+
+  /// reminderDueNow, as said to the phone's owner about their own medication ('Me'): they take the dose rather than give it. In a language where reminderDueNow doesn't speak of giving, repeat it unchanged. About reminderDueNow: Reminder notification title: the dose should be given now.
+  ///
+  /// In en, this message translates to:
+  /// **'{medication} due now'**
+  String reminderDueNowSelf(String medication);
 
   /// Reminder notification title: the dose was due at {time} and hasn't been given.
   ///
@@ -503,6 +575,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{medication} can be given again'**
   String reminderAvailable(String medication);
+
+  /// reminderAvailable, as said to the phone's owner about their own medication ('Me'): they take the dose rather than give it. In a language where reminderAvailable doesn't speak of giving, repeat it unchanged. About reminderAvailable: Reminder notification title for an as-needed medication: a dose is allowed again. Allowed, never required.
+  ///
+  /// In en, this message translates to:
+  /// **'{medication} can be taken again'**
+  String reminderAvailableSelf(String medication);
 
   /// Reminder notification title when several medications for one person fall due at the same minute: {count} is 2 or more, {person} a name typed by the user or personYouAfterFor. The body then lists each medication.
   ///
@@ -557,6 +635,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Mark given'**
   String get actionMarkGiven;
+
+  /// actionMarkGiven, as said to the phone's owner about their own medication ('Me'): they take the dose rather than give it. In a language where actionMarkGiven doesn't speak of giving, repeat it unchanged. About actionMarkGiven: Button on a reminder notification: logs the dose as given now, without opening the app.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark taken'**
+  String get actionMarkGivenSelf;
 
   /// Button on a reminder notification: deliberately not giving this dose; the schedule carries on.
   ///
@@ -750,11 +834,23 @@ abstract class AppLocalizations {
   /// **'Last given: {value}'**
   String summaryLastGiven(String value);
 
+  /// summaryLastGiven, as said to the phone's owner about their own medication ('Me'): they take the dose rather than give it. In a language where summaryLastGiven doesn't speak of giving, repeat it unchanged. About summaryLastGiven: Line under a medication in the exported summary: {value} is a date and time, or summaryNotYet.
+  ///
+  /// In en, this message translates to:
+  /// **'Last taken: {value}'**
+  String summaryLastGivenSelf(String value);
+
   /// Fills summaryLastGiven when no dose has been given yet: 'Last given: Not yet'.
   ///
   /// In en, this message translates to:
   /// **'Not yet'**
   String get summaryNotYet;
+
+  /// summaryNotYet, as said to the phone's owner about their own medication ('Me'): they take the dose rather than give it. In a language where summaryNotYet doesn't speak of giving, repeat it unchanged. About summaryNotYet: Fills summaryLastGiven when no dose has been given yet: 'Last given: Not yet'.
+  ///
+  /// In en, this message translates to:
+  /// **'Not yet'**
+  String get summaryNotYetSelf;
 
   /// Line under a medication in the exported summary: {value} is one of the status… messages ('Due now', 'Overdue by 1 hour') or a finished text.
   ///
@@ -954,6 +1050,12 @@ abstract class AppLocalizations {
   /// **'Last given {when}'**
   String lastGiven(String when);
 
+  /// lastGiven, as said to the phone's owner about their own medication ('Me'): they take the dose rather than give it. In a language where lastGiven doesn't speak of giving, repeat it unchanged. About lastGiven: Line on the medication card: when the last dose was given. {when} is one of the when… messages.
+  ///
+  /// In en, this message translates to:
+  /// **'Last taken {when}'**
+  String lastGivenSelf(String when);
+
   /// Line on the medication card: the last dose was given {when} (one of the when… messages) by {name}, as typed when logging it.
   ///
   /// In en, this message translates to:
@@ -971,6 +1073,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Give'**
   String get give;
+
+  /// give, as said to the phone's owner about their own medication ('Me'): they take the dose rather than give it. In a language where give doesn't speak of giving, repeat it unchanged. About give: The main button on a medication card: opens the sheet to log a dose. Keep it short.
+  ///
+  /// In en, this message translates to:
+  /// **'Take'**
+  String get giveSelf;
 
   /// Supply line on the medication card: {amount} is a quantity with its unit, e.g. '12 tablets'.
   ///
@@ -1038,6 +1146,16 @@ abstract class AppLocalizations {
   /// **'{medication} can next be given {when}, in {duration}. Log a dose now anyway?'**
   String earlyMessageAvailable(String medication, String when, String duration);
 
+  /// earlyMessageAvailable, as said to the phone's owner about their own medication ('Me'): they take the dose rather than give it. In a language where earlyMessageAvailable doesn't speak of giving, repeat it unchanged. About earlyMessageAvailable: Body of the early-dose dialog for an as-needed medication: a dose is allowed again {when} (one of the when… messages), in {duration}. {medication} is a name typed by the user.
+  ///
+  /// In en, this message translates to:
+  /// **'{medication} can next be taken {when}, in {duration}. Log a dose now anyway?'**
+  String earlyMessageAvailableSelf(
+    String medication,
+    String when,
+    String duration,
+  );
+
   /// Button in the early-dose dialog: don't log a dose.
   ///
   /// In en, this message translates to:
@@ -1056,11 +1174,23 @@ abstract class AppLocalizations {
   /// **'Day it was given'**
   String get dayGiven;
 
+  /// dayGiven, as said to the phone's owner about their own medication ('Me'): they take the dose rather than give it. In a language where dayGiven doesn't speak of giving, repeat it unchanged. About dayGiven: Title of the date picker when logging a dose that was given earlier.
+  ///
+  /// In en, this message translates to:
+  /// **'Day it was taken'**
+  String get dayGivenSelf;
+
   /// Title of the time picker when logging a dose that was given earlier.
   ///
   /// In en, this message translates to:
   /// **'Time it was given'**
   String get timeGiven;
+
+  /// timeGiven, as said to the phone's owner about their own medication ('Me'): they take the dose rather than give it. In a language where timeGiven doesn't speak of giving, repeat it unchanged. About timeGiven: Title of the time picker when logging a dose that was given earlier.
+  ///
+  /// In en, this message translates to:
+  /// **'Time it was taken'**
+  String get timeGivenSelf;
 
   /// Error in the give-dose sheet when the chosen time is later than now.
   ///
@@ -1079,6 +1209,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Give {medication}'**
   String giveMedication(String medication);
+
+  /// giveMedication, as said to the phone's owner about their own medication ('Me'): they take the dose rather than give it. In a language where giveMedication doesn't speak of giving, repeat it unchanged. About giveMedication: Title of the sheet for logging a dose: {medication} is a name typed by the user.
+  ///
+  /// In en, this message translates to:
+  /// **'Take {medication}'**
+  String giveMedicationSelf(String medication);
 
   /// Note under the title of the correction sheet: the entry being corrected stays in history.
   ///
@@ -1103,6 +1239,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Given {when}'**
   String givenWhen(String when);
+
+  /// givenWhen, as said to the phone's owner about their own medication ('Me'): they take the dose rather than give it. In a language where givenWhen doesn't speak of giving, repeat it unchanged. About givenWhen: In the give-dose sheet after picking an earlier time: {when} is one of the when… messages.
+  ///
+  /// In en, this message translates to:
+  /// **'Taken {when}'**
+  String givenWhenSelf(String when);
 
   /// Button beside the picked time in the give-dose sheet: pick a different one.
   ///
@@ -1176,11 +1318,23 @@ abstract class AppLocalizations {
   /// **'The dose becomes due again'**
   String get deleteEntrySkippedHint;
 
+  /// deleteEntrySkippedHint, as said to the phone's owner about their own medication ('Me'): they take the dose rather than give it. In a language where deleteEntrySkippedHint doesn't speak of giving, repeat it unchanged. About deleteEntrySkippedHint: Subtitle under 'Delete entry' for a skipped dose: without the skip, the dose is due again.
+  ///
+  /// In en, this message translates to:
+  /// **'The dose becomes due again'**
+  String get deleteEntrySkippedHintSelf;
+
   /// Subtitle under 'Delete entry' for a given dose.
   ///
   /// In en, this message translates to:
   /// **'Only for a dose that was never given'**
   String get deleteEntryHint;
+
+  /// deleteEntryHint, as said to the phone's owner about their own medication ('Me'): they take the dose rather than give it. In a language where deleteEntryHint doesn't speak of giving, repeat it unchanged. About deleteEntryHint: Subtitle under 'Delete entry' for a given dose.
+  ///
+  /// In en, this message translates to:
+  /// **'Only for a dose that was never taken'**
+  String get deleteEntryHintSelf;
 
   /// Title of the confirmation before a history entry is deleted.
   ///
@@ -1199,6 +1353,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{medication}, {dateTime}. Use this only if the dose was never given; to fix its time, correct it instead. Any corrections of it go too.'**
   String deleteDoseMessage(String medication, String dateTime);
+
+  /// deleteDoseMessage, as said to the phone's owner about their own medication ('Me'): they take the dose rather than give it. In a language where deleteDoseMessage doesn't speak of giving, repeat it unchanged. About deleteDoseMessage: Body of the delete confirmation for a given dose. {medication} is a name typed by the user, {dateTime} when it was given.
+  ///
+  /// In en, this message translates to:
+  /// **'{medication}, {dateTime}. Use this only if the dose was never taken; to fix its time, correct it instead. Any corrections of it go too.'**
+  String deleteDoseMessageSelf(String medication, String dateTime);
 
   /// Body of the delete confirmation for a refill in dose history. {medication} is a name typed by the user, {dateTime} when it was logged, {amount} the quantity added with its unit.
   ///
@@ -1313,6 +1473,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Enter how many doses are still to give.'**
   String get errorDosesStillToGive;
+
+  /// errorDosesStillToGive, as said to the phone's owner about their own medication ('Me'): they take the dose rather than give it. In a language where errorDosesStillToGive doesn't speak of giving, repeat it unchanged. About errorDosesStillToGive: Validation error under the 'Doses still to give' field of a course some of whose doses have been given.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter how many doses are still to take.'**
+  String get errorDosesStillToGiveSelf;
 
   /// Validation error under the 'Number of doses' field of a new course.
   ///
@@ -1560,6 +1726,12 @@ abstract class AppLocalizations {
   /// **'Counted from the last dose given.'**
   String get intervalHint;
 
+  /// intervalHint, as said to the phone's owner about their own medication ('Me'): they take the dose rather than give it. In a language where intervalHint doesn't speak of giving, repeat it unchanged. About intervalHint: Hint under the interval duration field.
+  ///
+  /// In en, this message translates to:
+  /// **'Counted from the last dose taken.'**
+  String get intervalHintSelf;
+
   /// Heading over the duration field for an as-needed schedule: the minimum gap between doses.
   ///
   /// In en, this message translates to:
@@ -1571,6 +1743,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Never \"due\" — Nexpill shows when it can be given again.'**
   String get asNeededHint;
+
+  /// asNeededHint, as said to the phone's owner about their own medication ('Me'): they take the dose rather than give it. In a language where asNeededHint doesn't speak of giving, repeat it unchanged. About asNeededHint: Hint under the as-needed gap. 'due' is the status word: an as-needed dose is allowed, never required, so the app never calls it due.
+  ///
+  /// In en, this message translates to:
+  /// **'Never \"due\" — Nexpill shows when it can be taken again.'**
+  String get asNeededHintSelf;
 
   /// Chip in the set-times schedule that opens the time picker to add a time.
   ///
@@ -1595,6 +1773,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'A single dose. Once it\'s given or skipped it\'s finished, and stays in history.'**
   String get onceHint;
+
+  /// onceHint, as said to the phone's owner about their own medication ('Me'): they take the dose rather than give it. In a language where onceHint doesn't speak of giving, repeat it unchanged. About onceHint: Hint under the single dose's date and time.
+  ///
+  /// In en, this message translates to:
+  /// **'A single dose. Once it\'s taken or skipped it\'s finished, and stays in history.'**
+  String get onceHintSelf;
 
   /// Title of the date picker for a single dose.
   ///
@@ -1644,6 +1828,12 @@ abstract class AppLocalizations {
   /// **'Doses still to give'**
   String get dosesStillToGive;
 
+  /// dosesStillToGive, as said to the phone's owner about their own medication ('Me'): they take the dose rather than give it. In a language where dosesStillToGive doesn't speak of giving, repeat it unchanged. About dosesStillToGive: Label of the number field for a course of doses when some have already been given.
+  ///
+  /// In en, this message translates to:
+  /// **'Doses still to take'**
+  String get dosesStillToGiveSelf;
+
   /// Label of the number field for a new course of doses.
   ///
   /// In en, this message translates to:
@@ -1662,11 +1852,23 @@ abstract class AppLocalizations {
   /// **'Reminders stop once the last one is given.'**
   String get courseDosesHint;
 
+  /// courseDosesHint, as said to the phone's owner about their own medication ('Me'): they take the dose rather than give it. In a language where courseDosesHint doesn't speak of giving, repeat it unchanged. About courseDosesHint: Hint under the number of doses of a new course.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminders stop once the last one is taken.'**
+  String get courseDosesHintSelf;
+
   /// Hint under 'Doses still to give' when {count} doses of the course have already been given.
   ///
   /// In en, this message translates to:
   /// **'{count, plural, =1{1 dose given so far. Reminders stop once the last one is given.} other{{count} doses given so far. Reminders stop once the last one is given.}}'**
   String courseDosesGivenHint(int count);
+
+  /// courseDosesGivenHint, as said to the phone's owner about their own medication ('Me'): they take the dose rather than give it. In a language where courseDosesGivenHint doesn't speak of giving, repeat it unchanged. About courseDosesGivenHint: Hint under 'Doses still to give' when {count} doses of the course have already been given.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 dose taken so far. Reminders stop once the last one is taken.} other{{count} doses taken so far. Reminders stop once the last one is taken.}}'**
+  String courseDosesGivenHintSelf(int count);
 
   /// Title of the date picker for the course's last day.
   ///
@@ -1734,11 +1936,23 @@ abstract class AppLocalizations {
   /// **'When it can be given again.'**
   String get remindAsNeededHint;
 
+  /// remindAsNeededHint, as said to the phone's owner about their own medication ('Me'): they take the dose rather than give it. In a language where remindAsNeededHint doesn't speak of giving, repeat it unchanged. About remindAsNeededHint: Subtitle of the Remind me switch for an as-needed medication: it reminds when a dose is allowed again.
+  ///
+  /// In en, this message translates to:
+  /// **'When it can be taken again.'**
+  String get remindAsNeededHintSelf;
+
   /// Subtitle of the Remind me switch for a scheduled medication.
   ///
   /// In en, this message translates to:
   /// **'When a dose is due, and again while it\'s overdue.'**
   String get remindHint;
+
+  /// remindHint, as said to the phone's owner about their own medication ('Me'): they take the dose rather than give it. In a language where remindHint doesn't speak of giving, repeat it unchanged. About remindHint: Subtitle of the Remind me switch for a scheduled medication.
+  ///
+  /// In en, this message translates to:
+  /// **'When a dose is due, and again while it\'s overdue.'**
+  String get remindHintSelf;
 
   /// Reminder setting: a reminder some minutes before the dose is due. Choices: None, 10 min, 15 min.
   ///
@@ -1781,6 +1995,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The alarm sound, repeating until you mark it given or snooze it.'**
   String get ringLikeAlarmHint;
+
+  /// ringLikeAlarmHint, as said to the phone's owner about their own medication ('Me'): they take the dose rather than give it. In a language where ringLikeAlarmHint doesn't speak of giving, repeat it unchanged. About ringLikeAlarmHint: Subtitle of the Ring like an alarm switch.
+  ///
+  /// In en, this message translates to:
+  /// **'The alarm sound, repeating until you mark it taken or snooze it.'**
+  String get ringLikeAlarmHintSelf;
 
   /// Switch in the editor's Supply section: count down how much is left with each dose.
   ///
@@ -1860,11 +2080,23 @@ abstract class AppLocalizations {
   /// **'Nothing to give now'**
   String get nothingToGiveNow;
 
+  /// nothingToGiveNow, as said to the phone's owner about their own medication ('Me'): they take the dose rather than give it. In a language where nothingToGiveNow doesn't speak of giving, repeat it unchanged. About nothingToGiveNow: Heading on a person's home screen, and under their name on the Everyone screen, when every medication has finished or been stopped.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing to take now'**
+  String get nothingToGiveNowSelf;
+
   /// On the Everyone screen under the person's first medication: {count} more of their medications are also due or overdue now.
   ///
   /// In en, this message translates to:
   /// **'+ {count} more due now'**
   String moreDueNow(int count);
+
+  /// moreDueNow, as said to the phone's owner about their own medication ('Me'): they take the dose rather than give it. In a language where moreDueNow doesn't speak of giving, repeat it unchanged. About moreDueNow: On the Everyone screen under the person's first medication: {count} more of their medications are also due or overdue now.
+  ///
+  /// In en, this message translates to:
+  /// **'+ {count} more due now'**
+  String moreDueNowSelf(int count);
 
   /// Under a person on the Everyone screen whose reminders are all off, and the button in the skip message that turns a medication's reminders off.
   ///
@@ -2049,7 +2281,7 @@ abstract class AppLocalizations {
   /// Text under 'No medications yet' on the phone's owner's own screen.
   ///
   /// In en, this message translates to:
-  /// **'Add your first one, and Nexpill will keep track of when each dose can be given.'**
+  /// **'Add your first one, and Nexpill will keep track of when each dose can be taken.'**
   String get addYourFirst;
 
   /// Text under 'No medications yet' on someone else's screen: {name} is their name typed by the user.
@@ -2543,6 +2775,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Assumes each dose is given on time. A late dose can move the ones after it.'**
   String get comingUpOnTime;
+
+  /// comingUpOnTime, as said to the phone's owner about their own medication ('Me'): they take the dose rather than give it. In a language where comingUpOnTime doesn't speak of giving, repeat it unchanged. About comingUpOnTime: Note at the top of the Coming up screen: the times shown are a projection.
+  ///
+  /// In en, this message translates to:
+  /// **'Assumes each dose is taken on time. A late dose can move the ones after it.'**
+  String get comingUpOnTimeSelf;
 
   /// On the Coming up screen, when no doses fall in the chosen 12 hours, 24 hours, 3 days or 7 days.
   ///

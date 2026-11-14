@@ -12,6 +12,9 @@ String patientSummary(CareSnapshot care, Patient patient, {required DateTime now
       if (m.active) m,
   ];
 
+  final words = DoseWords.of(patient);
+  final self = patient.isSelf;
+
   final lines = <String>[
     // The phone's owner may have no name to put here.
     patient.hasName
@@ -36,13 +39,15 @@ String patientSummary(CareSnapshot care, Patient patient, {required DateTime now
         if (m.purpose != null) strings.summaryPurpose(m.purpose!),
         strings.summaryDose(m.defaultDoseText),
         strings.summarySchedule(scheduleText(m.schedule)),
-        if (courseText(m, care.doses) case final course?)
+        if (courseText(m, care.doses, self: self) case final course?)
           strings.summaryCourse(course),
         if (m.instructions != null) strings.summaryInstructions(m.instructions!),
-        strings.summaryLastGiven(
-            last == null ? strings.summaryNotYet : dateTimeText(last)),
+        words.summaryLastGiven(
+            last == null ? words.summaryNotYet : dateTimeText(last)),
         if (last != null || finished)
-          strings.summaryStatus(finished ? finishedText(m) : statusText(status)),
+          strings.summaryStatus(finished
+              ? finishedText(m, self: self)
+              : statusText(status, self: self)),
         strings.summaryReminders(remindersText(m.reminders)),
         if (inventory.configured)
           strings.summaryRemaining(switch (inventory.level) {

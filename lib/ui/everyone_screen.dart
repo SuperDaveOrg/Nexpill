@@ -126,7 +126,7 @@ class _PersonCard extends StatelessWidget {
                   if (active.isEmpty)
                     Text(meds.isEmpty
                             ? context.l.noMedicationsYet
-                            : context.l.nothingToGiveNow,
+                            : DoseWords.of(patient).nothingToGiveNow,
                         style: muted)
                   else ...[
                     _next(context, active.first.$1, active.first.$2,
@@ -135,7 +135,7 @@ class _PersonCard extends StatelessWidget {
                     if (alsoDue > 0)
                       Padding(
                         padding: const EdgeInsets.only(top: 4),
-                        child: Text(context.l.moreDueNow(alsoDue),
+                        child: Text(DoseWords.of(patient).moreDueNow(alsoDue),
                             style: theme.textTheme.bodyMedium),
                       ),
                   ],
@@ -160,7 +160,8 @@ class _PersonCard extends StatelessWidget {
   Widget _next(
       BuildContext context, Medication m, MedicationStatus status, Color accent) {
     final theme = Theme.of(context);
-    final (headline, detail) = cardText(status, m, store.now);
+    final (headline, detail) =
+        cardText(status, m, store.now, self: patient.isSelf);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

@@ -122,10 +122,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get statusNotGiven => 'Not given yet';
 
   @override
+  String get statusNotGivenSelf => 'Not taken yet';
+
+  @override
   String get statusCanGiveNow => 'Can be given now';
 
   @override
+  String get statusCanGiveNowSelf => 'Can be taken now';
+
+  @override
   String get statusDueNow => 'Due now';
+
+  @override
+  String get statusDueNowSelf => 'Due now';
 
   @override
   String statusNextAt(String time) {
@@ -139,6 +148,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String statusMissed(String duration) {
+    return 'Missed: was due $duration ago';
+  }
+
+  @override
+  String statusMissedSelf(String duration) {
     return 'Missed: was due $duration ago';
   }
 
@@ -228,6 +242,17 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String courseFinishedDosesSelf(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Course finished: all $count doses taken',
+      one: 'Course finished: its 1 dose taken',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String courseLastDay(String date) {
     return 'Last day $date';
   }
@@ -239,6 +264,17 @@ class AppLocalizationsEn extends AppLocalizations {
       locale: localeName,
       other: '$total doses, $given given so far',
       one: '1 dose, $given given so far',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String courseDosesSoFarSelf(int total, Object given) {
+    String _temp0 = intl.Intl.pluralLogic(
+      total,
+      locale: localeName,
+      other: '$total doses, $given taken so far',
+      one: '1 dose, $given taken so far',
     );
     return '$_temp0';
   }
@@ -273,6 +309,11 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String cardAvailableFromSelf(String when) {
+    return 'Next dose from $when';
+  }
+
+  @override
   String cardNextDose(String when) {
     return 'Next dose $when';
   }
@@ -284,6 +325,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String cardDueIn(String duration) {
+    return 'Due in $duration';
+  }
+
+  @override
+  String cardDueInSelf(String duration) {
     return 'Due in $duration';
   }
 
@@ -308,10 +354,20 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String cardWasDueSelf(String when) {
+    return 'was due $when';
+  }
+
+  @override
   String get cardMissed => 'Missed';
 
   @override
   String cardMissedWasDue(String when, String duration) {
+    return 'was due $when, $duration ago';
+  }
+
+  @override
+  String cardMissedWasDueSelf(String when, String duration) {
     return 'was due $when, $duration ago';
   }
 
@@ -327,7 +383,17 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String reminderDueAtSelf(String medication, String time) {
+    return '$medication due at $time';
+  }
+
+  @override
   String reminderDueNow(String medication) {
+    return '$medication due now';
+  }
+
+  @override
+  String reminderDueNowSelf(String medication) {
     return '$medication due now';
   }
 
@@ -339,6 +405,11 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String reminderAvailable(String medication) {
     return '$medication can be given again';
+  }
+
+  @override
+  String reminderAvailableSelf(String medication) {
+    return '$medication can be taken again';
   }
 
   @override
@@ -374,6 +445,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get actionMarkGiven => 'Mark given';
+
+  @override
+  String get actionMarkGivenSelf => 'Mark taken';
 
   @override
   String get actionSkip => 'Skip';
@@ -493,7 +567,15 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String summaryLastGivenSelf(String value) {
+    return 'Last taken: $value';
+  }
+
+  @override
   String get summaryNotYet => 'Not yet';
+
+  @override
+  String get summaryNotYetSelf => 'Not yet';
 
   @override
   String summaryStatus(String value) {
@@ -641,6 +723,11 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String lastGivenSelf(String when) {
+    return 'Last taken $when';
+  }
+
+  @override
   String lastGivenBy(String when, String name) {
     return 'Last given $when by $name';
   }
@@ -650,6 +737,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get give => 'Give';
+
+  @override
+  String get giveSelf => 'Take';
 
   @override
   String supplyLeft(String amount) {
@@ -701,6 +791,15 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String earlyMessageAvailableSelf(
+    String medication,
+    String when,
+    String duration,
+  ) {
+    return '$medication can next be taken $when, in $duration. Log a dose now anyway?';
+  }
+
+  @override
   String get notYet => 'Not yet';
 
   @override
@@ -710,7 +809,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dayGiven => 'Day it was given';
 
   @override
+  String get dayGivenSelf => 'Day it was taken';
+
+  @override
   String get timeGiven => 'Time it was given';
+
+  @override
+  String get timeGivenSelf => 'Time it was taken';
 
   @override
   String get timeInFuture => 'That time hasn\'t happened yet.';
@@ -726,6 +831,11 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String giveMedicationSelf(String medication) {
+    return 'Take $medication';
+  }
+
+  @override
   String get originalStays =>
       'The original stays in history, marked as corrected.';
 
@@ -738,6 +848,11 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String givenWhen(String when) {
     return 'Given $when';
+  }
+
+  @override
+  String givenWhenSelf(String when) {
+    return 'Taken $when';
   }
 
   @override
@@ -777,7 +892,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get deleteEntrySkippedHint => 'The dose becomes due again';
 
   @override
+  String get deleteEntrySkippedHintSelf => 'The dose becomes due again';
+
+  @override
   String get deleteEntryHint => 'Only for a dose that was never given';
+
+  @override
+  String get deleteEntryHintSelf => 'Only for a dose that was never taken';
 
   @override
   String get deleteEntryTitle => 'Delete this entry?';
@@ -790,6 +911,11 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String deleteDoseMessage(String medication, String dateTime) {
     return '$medication, $dateTime. Use this only if the dose was never given; to fix its time, correct it instead. Any corrections of it go too.';
+  }
+
+  @override
+  String deleteDoseMessageSelf(String medication, String dateTime) {
+    return '$medication, $dateTime. Use this only if the dose was never taken; to fix its time, correct it instead. Any corrections of it go too.';
   }
 
   @override
@@ -862,6 +988,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get errorDosesStillToGive => 'Enter how many doses are still to give.';
+
+  @override
+  String get errorDosesStillToGiveSelf =>
+      'Enter how many doses are still to take.';
 
   @override
   String get errorCourseDoses => 'Enter how many doses the course has.';
@@ -995,11 +1125,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get intervalHint => 'Counted from the last dose given.';
 
   @override
+  String get intervalHintSelf => 'Counted from the last dose taken.';
+
+  @override
   String get atLeastApart => 'At least this long apart';
 
   @override
   String get asNeededHint =>
       'Never \"due\" — Nexpill shows when it can be given again.';
+
+  @override
+  String get asNeededHintSelf =>
+      'Never \"due\" — Nexpill shows when it can be taken again.';
 
   @override
   String get addTime => 'Add time';
@@ -1013,6 +1150,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get onceHint =>
       'A single dose. Once it\'s given or skipped it\'s finished, and stays in history.';
+
+  @override
+  String get onceHintSelf =>
+      'A single dose. Once it\'s taken or skipped it\'s finished, and stays in history.';
 
   @override
   String get dayOfDose => 'Day of the dose';
@@ -1043,6 +1184,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dosesStillToGive => 'Doses still to give';
 
   @override
+  String get dosesStillToGiveSelf => 'Doses still to take';
+
+  @override
   String get numberOfDoses => 'Number of doses';
 
   @override
@@ -1052,6 +1196,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get courseDosesHint => 'Reminders stop once the last one is given.';
 
   @override
+  String get courseDosesHintSelf =>
+      'Reminders stop once the last one is taken.';
+
+  @override
   String courseDosesGivenHint(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -1059,6 +1207,18 @@ class AppLocalizationsEn extends AppLocalizations {
       other:
           '$count doses given so far. Reminders stop once the last one is given.',
       one: '1 dose given so far. Reminders stop once the last one is given.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String courseDosesGivenHintSelf(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count doses taken so far. Reminders stop once the last one is taken.',
+      one: '1 dose taken so far. Reminders stop once the last one is taken.',
     );
     return '$_temp0';
   }
@@ -1104,7 +1264,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get remindAsNeededHint => 'When it can be given again.';
 
   @override
+  String get remindAsNeededHintSelf => 'When it can be taken again.';
+
+  @override
   String get remindHint => 'When a dose is due, and again while it\'s overdue.';
+
+  @override
+  String get remindHintSelf =>
+      'When a dose is due, and again while it\'s overdue.';
 
   @override
   String get headsUp => 'Heads-up before it\'s due';
@@ -1131,6 +1298,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get ringLikeAlarmHint =>
       'The alarm sound, repeating until you mark it given or snooze it.';
+
+  @override
+  String get ringLikeAlarmHintSelf =>
+      'The alarm sound, repeating until you mark it taken or snooze it.';
 
   @override
   String get trackSupply => 'Track how much is left';
@@ -1172,7 +1343,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get nothingToGiveNow => 'Nothing to give now';
 
   @override
+  String get nothingToGiveNowSelf => 'Nothing to take now';
+
+  @override
   String moreDueNow(int count) {
+    return '+ $count more due now';
+  }
+
+  @override
+  String moreDueNowSelf(int count) {
     return '+ $count more due now';
   }
 
@@ -1313,7 +1492,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get addYourFirst =>
-      'Add your first one, and Nexpill will keep track of when each dose can be given.';
+      'Add your first one, and Nexpill will keep track of when each dose can be taken.';
 
   @override
   String addPersonsFirst(String name) {
@@ -1613,6 +1792,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get comingUpOnTime =>
       'Assumes each dose is given on time. A late dose can move the ones after it.';
+
+  @override
+  String get comingUpOnTimeSelf =>
+      'Assumes each dose is taken on time. A late dose can move the ones after it.';
 
   @override
   String get comingUpNothing => 'Nothing scheduled in this time.';

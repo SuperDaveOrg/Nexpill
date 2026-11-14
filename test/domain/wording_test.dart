@@ -83,6 +83,43 @@ void main() {
     });
   });
 
+  group('for the phone\'s owner, a dose is taken, not given', () {
+    test('on the card', () {
+      final m = med(const IntervalSchedule(480));
+      expect(cardText(computeMedicationStatus(m, [], now), m, now, self: true),
+          ('Not taken yet', 'Can be taken now'));
+      expect(cardText(computeMedicationStatus(m, [], now), m, now),
+          ('Not given yet', 'Can be given now'));
+      final prn = med(const PrnSchedule(240));
+      final doses = [at(DateTime(2026, 6, 10, 6))];
+      expect(statusText(computeMedicationStatus(prn, doses, now), self: true),
+          'Can be taken now');
+    });
+
+    test('in a course', () {
+      final m = Medication(
+          id: 'm',
+          patientId: 'p',
+          name: 'M',
+          defaultDoseText: '1',
+          schedule: const IntervalSchedule(480),
+          reminders: const ReminderSettings(enabled: true),
+          course: const EndsAfterDoses(4));
+      final doses = [at(DateTime(2026, 6, 10, 6))];
+      expect(courseText(m, doses, self: true), '4 doses, 1 taken so far');
+      expect(finishedText(m, self: true), 'Course finished: all 4 doses taken');
+    });
+
+    test('and everywhere else it\'s said', () {
+      const yours = DoseWords(self: true), theirs = DoseWords(self: false);
+      expect((yours.give, theirs.give), ('Take', 'Give'));
+      expect((yours.actionMarkGiven, theirs.actionMarkGiven),
+          ('Mark taken', 'Mark given'));
+      expect(yours.reminderAvailable('Ibuprofen'), 'Ibuprofen can be taken again');
+      expect(yours.nothingToGiveNow, 'Nothing to take now');
+    });
+  });
+
   group('a course', () {
     Medication course(CourseEnd c) => Medication(
         id: 'm',
