@@ -50,6 +50,18 @@ From the PWA roadmap, still wanted:
   refusal should restart the interval, or leave the dose due, needs input.
 - **"Given by" on each dose.** Already in the model; needs a field on the
   give-dose action, and a place in history and exports.
+- **Dose amount on each logged dose, and per fixed time.** A medication
+  taken in different amounts at different times ("1 tablet at 8:00, 2 at
+  20:00") now needs a copy per amount, which splits its history and leaves
+  each copy's stock count wrong. First, record the amount given on every
+  dose and show it in history and the CSV, so the audit trail says how
+  much was given. Then let each fixed time carry its own amount, with the
+  medication's as the default, counted from stock dose by dose. Needs a
+  migration and a new `nexpillBackup` version.
+- **Longer intervals in words.** "Every 120 hours" could read "Every 5
+  days", but German and French phrase days differently from hours ("seit 2
+  Tagen", "tous les 5 jours"), so it needs whole-phrase messages for days
+  rather than another unit inside the existing ones.
 - **Timeline / calendar view** for spotting missed windows.
 - **Notes per dose and per medication** for handovers between caregivers.
 - **Structured doctor-visit export** (PDF).

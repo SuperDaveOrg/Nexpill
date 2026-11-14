@@ -718,6 +718,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get couldNotSave => 'Не удалось сохранить файл.';
 
   @override
+  String get days => 'Дни';
+
+  @override
   String get hours => 'Часы';
 
   @override

@@ -693,6 +693,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get couldNotSave => 'Die Datei konnte nicht gespeichert werden.';
 
   @override
+  String get days => 'Tage';
+
+  @override
   String get hours => 'Stunden';
 
   @override
