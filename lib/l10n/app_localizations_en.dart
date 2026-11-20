@@ -1829,4 +1829,29 @@ class AppLocalizationsEn extends AppLocalizations {
   String comingUpDosesOf(String doses, String dose) {
     return '$doses of $dose';
   }
+
+  @override
+  String get doseWhichTitle => 'Which dose is this?';
+
+  @override
+  String get doseWhichHint =>
+      'It\'s between two set times, so Nexpill can\'t tell. The next dose is due after the one you choose.';
+
+  @override
+  String doseDueLate(String when) {
+    return 'Due $when, late';
+  }
+
+  @override
+  String doseDueEarly(String when) {
+    return 'Due $when, early';
+  }
+
+  @override
+  String get doseWhichError => 'Choose which dose this is.';
+
+  @override
+  String historyDoseFor(String time) {
+    return 'the $time dose';
+  }
 }

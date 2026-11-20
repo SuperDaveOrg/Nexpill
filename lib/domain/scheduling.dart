@@ -156,9 +156,11 @@ DateTime _nextEligibleAt(
 
 /// The slot the medication is due at.
 ///
-/// Each dose counts for the slot nearest to when it was given, so with slots
-/// at 08:00, 12:00 and 20:00 a dose at 07:50 or 08:20 is the 08:00 dose.
-/// The medication is then due at the slot after that one — unless a later
+/// Each dose counts for the slot it was logged for ([DoseEvent.countsFor]):
+/// the one its reminder was about, or the one chosen when it was logged
+/// between two. A dose that doesn't say counts for the slot nearest to when
+/// it was given, so with slots at 08:00, 12:00 and 20:00 a dose at 07:50 or
+/// 08:20 is the 08:00 dose. The medication is then due at the slot after that one — unless a later
 /// slot has already come round without a dose, in which case it's due (and
 /// overdue) from that slot. A missed slot is never made up: once the next
 /// dose is given, the one before is simply gone.
@@ -170,15 +172,83 @@ DateTime _fixedDue(List<ClockTime> times, DoseEvent? latest, DateTime now) {
   final current = _latestSlot(times, now);
   if (latest == null) return current;
 
-  final given = latest.givenAt;
-  final slots = _slotsAround(times, given);
-  // The last slot at or before the dose, or the one after if that's nearer.
-  // Exactly halfway counts for the later slot.
-  var i = slots.lastIndexWhere((slot) => !slot.isAfter(given));
-  if (slots[i + 1].difference(given) <= given.difference(slots[i])) i++;
-  final next = slots[i + 1];
+  // The first slot after the one it counts for, rather than a slot matched
+  // exactly: the times may have been edited since it was logged, or the
+  // phone's time zone changed.
+  final next = _slotAfter(
+      times, latest.countsFor ?? _nearestSlot(times, latest.givenAt));
 
   return next.isAfter(current) ? next : current;
+}
+
+/// The slot nearest to [given]: the last one at or before it, or the one
+/// after if that's nearer. Exactly halfway counts for the later slot.
+DateTime _nearestSlot(List<ClockTime> times, DateTime given) {
+  final slots = _slotsAround(times, given);
+  final i = slots.lastIndexWhere((slot) => !slot.isAfter(given));
+  return slots[i + 1].difference(given) <= given.difference(slots[i])
+      ? slots[i + 1]
+      : slots[i];
+}
+
+/// The set time [dose] of [medication] was logged for, if that's worth
+/// saying in its history: when it isn't simply the nearest to when the dose
+/// was given. Null otherwise, and for any schedule but set times.
+DateTime? statedSetTime(Medication medication, DoseEvent dose) {
+  final schedule = medication.schedule;
+  final countsFor = dose.countsFor;
+  if (schedule is! FixedTimesSchedule ||
+      schedule.times.isEmpty ||
+      countsFor == null ||
+      dose.skipped) {
+    return null;
+  }
+  return _nearestSlot(schedule.times, dose.givenAt).isAtSameMomentAs(countsFor)
+      ? null
+      : countsFor;
+}
+
+/// The first slot after [at].
+DateTime _slotAfter(List<ClockTime> times, DateTime at) =>
+    _slotsAround(times, at).firstWhere((slot) => slot.isAfter(at));
+
+/// The two set times a dose of [medication] given at [at] could be for, when
+/// only whoever is logging it can say: the one that's due, [late], and the
+/// one after it, [early]. That's a dose given while a time is still due but
+/// at least halfway to the next, so 08:00's at 11:48 when the next is 15:00.
+/// It might be the morning's dose, hours late, or the afternoon's, taken
+/// early, and guessing wrong either drops a reminder or repeats one.
+///
+/// Null when there's no doubt: nearer the time that's due, it's that one;
+/// with nothing due, it's early, and logging it already asked. Null too for
+/// any schedule but set times, and once the medication has finished.
+///
+/// [doseEvents] is the history the dose would join; for a correction, the
+/// history without the entry being corrected (see [withoutEntry]). Leave
+/// skips out, as when judging whether a dose is early: a dose given after
+/// all for a time that was skipped is still that time's.
+({DateTime late, DateTime early})? setTimesInDoubt(
+    Medication medication, Iterable<DoseEvent> doseEvents, DateTime at) {
+  final schedule = medication.schedule;
+  if (schedule is! FixedTimesSchedule || schedule.times.isEmpty) return null;
+  final s = calculateSchedule(medication, doseEvents, at);
+  if (s.finished || !s.eligibleNow) return null;
+  final due = s.nextEligibleAt;
+  final next = _slotAfter(schedule.times, due);
+  if (next.difference(at) > at.difference(due)) return null;
+  return (late: due, early: next);
+}
+
+/// The set time a dose of [medication] counts for when it's marked given at
+/// [now] from a reminder about the dose due at [remindedFor]: that one, or
+/// if a later time has come round since, the one due now, as a missed time
+/// is never made up. Null for any schedule but set times.
+DateTime? reminderDoseCountsFor(Medication medication,
+    Iterable<DoseEvent> doseEvents, DateTime remindedFor, DateTime now) {
+  if (medication.schedule is! FixedTimesSchedule) return null;
+  final s = calculateSchedule(medication, doseEvents, now);
+  final dueNow = !s.finished && s.eligibleNow ? s.nextEligibleAt : null;
+  return dueNow != null && dueNow.isAfter(remindedFor) ? dueNow : remindedFor;
 }
 
 /// The most recent slot at or before [now], looking back into yesterday

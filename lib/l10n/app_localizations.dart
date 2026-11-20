@@ -2823,6 +2823,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{doses} of {dose}'**
   String comingUpDosesOf(String doses, String dose);
+
+  /// Heading in the give-dose sheet for a medication at set times, when the dose is being logged between two times and could be for either: the earlier one, late, or the later one, early. Followed by doseWhichHint and the two choices, doseDueLate and doseDueEarly.
+  ///
+  /// In en, this message translates to:
+  /// **'Which dose is this?'**
+  String get doseWhichTitle;
+
+  /// Under doseWhichTitle: why the question is asked and what the answer changes. 'Set times' as in kindFixedTimes.
+  ///
+  /// In en, this message translates to:
+  /// **'It\'s between two set times, so Nexpill can\'t tell. The next dose is due after the one you choose.'**
+  String get doseWhichHint;
+
+  /// Choice under doseWhichTitle: this is the dose that was due {when} (one of the when… messages, e.g. '8:00 AM' or 'yesterday at 10:00 PM'), being given late. Starts the label, so capitalised.
+  ///
+  /// In en, this message translates to:
+  /// **'Due {when}, late'**
+  String doseDueLate(String when);
+
+  /// Choice under doseWhichTitle: this is the dose that's due {when} (one of the when… messages, e.g. '3:00 PM' or 'tomorrow at 8:00 AM'), being given early. Starts the label, so capitalised.
+  ///
+  /// In en, this message translates to:
+  /// **'Due {when}, early'**
+  String doseDueEarly(String when);
+
+  /// Error in the give-dose sheet when saving without answering doseWhichTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose which dose this is.'**
+  String get doseWhichError;
+
+  /// In a history entry's detail line, after the dose amount, for a medication at set times: which time's dose this was, when it was logged far from that time, e.g. '1 tablet · the 8:00 AM dose' on an entry logged at 11:48. {time} is a clock time.
+  ///
+  /// In en, this message translates to:
+  /// **'the {time} dose'**
+  String historyDoseFor(String time);
 }
 
 class _AppLocalizationsDelegate

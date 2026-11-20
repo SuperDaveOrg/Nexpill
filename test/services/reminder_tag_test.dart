@@ -51,6 +51,16 @@ void main() {
     });
   });
 
+  test('the tag carries which dose each medication\'s reminder was about', () {
+    final due = {'drops': DateTime.utc(2026, 6, 10, 6), 'amox': DateTime.utc(2026, 6, 10, 2)};
+    final back = ReminderTag.tryParse(
+        ReminderTag(tag.at, const ['drops', 'amox'], dueAt: due).encode())!;
+    expect(back.dueAt, due);
+    // One scheduled before that was kept.
+    expect(ReminderTag.tryParse(ReminderTag(tag.at, const ['drops']).encode())!.dueAt,
+        isEmpty);
+  });
+
   group('Snooze on a reminder', () {
     final until = DateTime.utc(2026, 6, 10, 12, 30);
 

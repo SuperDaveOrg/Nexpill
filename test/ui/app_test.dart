@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nexpill/data/sample_data.dart';
+import 'package:nexpill/domain/dates.dart';
 import 'package:nexpill/domain/wording.dart';
 import 'package:nexpill/l10n/app_localizations.dart';
 import 'package:nexpill/models/care_snapshot.dart';
@@ -400,7 +401,10 @@ void main() {
         builder: (context) => TextButton(
           onPressed: () =>
               showGiveDoseSheet(context,
-                  medication: m, self: false, correcting: correcting),
+                  medication: m,
+                  self: false,
+                  doses: const [],
+                  correcting: correcting),
           child: const Text('open'),
         ),
       ),
@@ -434,7 +438,10 @@ void main() {
       home: Builder(
         builder: (context) => TextButton(
           onPressed: () => showGiveDoseSheet(context,
-              medication: m, self: true, correcting: correcting),
+              medication: m,
+              self: true,
+              doses: const [],
+              correcting: correcting),
           child: const Text('open'),
         ),
       ),
@@ -453,6 +460,60 @@ void main() {
     await tester.tap(find.text('open'));
     await tester.pumpAndSettle();
     expect(find.widgetWithText(TextField, 'Given by'), findsOneWidget);
+  });
+
+  testWidgets('at set times, a dose between two of them says which it\'s for',
+      (tester) async {
+    SharedPreferences.setMockInitialValues({});
+    // Due five hours ago and never given, with the next an hour away.
+    final now = DateTime.now();
+    ClockTime clock(DateTime t) => ClockTime(t.hour, t.minute);
+    final late = now.subtract(const Duration(hours: 5));
+    Medication at(List<DateTime> times) => Medication(
+        id: 'm',
+        patientId: 'p',
+        name: 'Drops',
+        defaultDoseText: '1',
+        schedule: FixedTimesSchedule([for (final t in times) clock(t)]),
+        reminders: const ReminderSettings(enabled: true));
+    var m = at([late, now.add(const Duration(hours: 1))]);
+    DoseEntry? entry;
+    await tester.pumpWidget(MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      home: Builder(
+        builder: (context) => TextButton(
+          onPressed: () async => entry =
+              await showGiveDoseSheet(context,
+                  medication: m, self: false, doses: const []),
+          child: const Text('open'),
+        ),
+      ),
+    ));
+
+    await tester.tap(find.text('open'));
+    await tester.pumpAndSettle();
+    expect(find.text('Which dose is this?'), findsOneWidget);
+    // It can't be logged without an answer.
+    await tester.tap(find.text('Log dose'));
+    await tester.pumpAndSettle();
+    expect(find.text('Choose which dose this is.'), findsOneWidget);
+    await tester.tap(find.textContaining(', late'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Log dose'));
+    await tester.pumpAndSettle();
+    final slot = entry!.countsFor!.toLocal();
+    expect((slot.hour, slot.minute), (late.hour, late.minute));
+    expect(slot.isBefore(now), isTrue);
+
+    // Nearer the time that's due, there's nothing to ask.
+    m = at([now.subtract(const Duration(hours: 1)), now.add(const Duration(hours: 5))]);
+    entry = null;
+    await tester.tap(find.text('open'));
+    await tester.pumpAndSettle();
+    expect(find.text('Which dose is this?'), findsNothing);
+    await tester.tap(find.text('Log dose'));
+    await tester.pumpAndSettle();
+    expect(entry!.countsFor, isNull);
   });
 
   testWidgets('Settings shows restored people without reopening', (tester) async {

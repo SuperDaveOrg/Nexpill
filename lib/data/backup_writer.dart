@@ -18,8 +18,9 @@ import 'package:nexpill/models/refill.dart';
 ///
 /// Version 2 added `course`, version 3 skipped doses, version 4 the phone's
 /// owner, who may have no name, version 5 the single-dose schedule, version 6
-/// refills. Files of every earlier version still restore.
-const backupFormatVersion = 6;
+/// refills, version 7 the set time a dose counts for. Files of every earlier
+/// version still restore.
+const backupFormatVersion = 7;
 /// The suggested file name for a backup taken on [day].
 String backupFileName(DateTime day) => 'nexpill-backup-${isoDate(day)}.json';
 
@@ -129,6 +130,7 @@ Map<String, Object?> _encodeMedication(
           'notes': ?d.notes,
           'corrects': ?d.supersedesId,
           if (d.skipped) 'skipped': true,
+          if (d.countsFor case final at?) 'countsFor': _instant(at),
         },
     ],
     if (refillsInOrder.isNotEmpty)

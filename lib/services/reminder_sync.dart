@@ -3,6 +3,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import 'package:nexpill/data/care_repository.dart';
 import 'package:nexpill/domain/reminder_planner.dart';
+import 'package:nexpill/domain/scheduling.dart';
 import 'package:nexpill/domain/wording.dart';
 import 'package:nexpill/services/notification_service.dart';
 import 'package:nexpill/services/preferences.dart';
@@ -46,10 +47,19 @@ Future<void> onReminderAction(NotificationResponse response) async {
 
   switch (response.actionId) {
     case NotificationService.actionGiven:
+      final care = await repository.snapshot();
       for (final id in tag.medicationIds) {
-        if (await repository.medication(id) != null) {
-          await repository.logDose(id, givenAt: now);
-        }
+        final m = care.medication(id);
+        if (m == null) continue;
+        // The dose the reminder was about, not whichever is nearest now.
+        final remindedFor = tag.dueAt[id];
+        await repository.logDose(
+          id,
+          givenAt: now,
+          countsFor: remindedFor == null
+              ? null
+              : reminderDoseCountsFor(m, care.doses, remindedFor, now),
+        );
       }
     case NotificationService.actionSkip:
       final skips = tag.dosesToSkip(await repository.snapshot(), now);

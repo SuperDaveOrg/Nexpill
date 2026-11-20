@@ -451,5 +451,11 @@
   "comingUpDoses": "{count, plural, one{{count} доза} few{{count} дозы} many{{count} доз} other{{count} дозы}}",
   "comingUpNoSetTime": "Без точного времени",
   "comingUpFromFirstDose": "{schedule}, отсчёт от первой дозы",
-  "comingUpDosesOf": "{doses} по {dose}"
+  "comingUpDosesOf": "{doses} по {dose}",
+  "doseWhichTitle": "Какая это доза?",
+  "doseWhichHint": "Она между двумя заданными временами, поэтому Nexpill не может определить сам. Следующая доза будет после выбранной.",
+  "doseDueLate": "Доза на {when}, с опозданием",
+  "doseDueEarly": "Доза на {when}, заранее",
+  "doseWhichError": "Выберите, какая это доза.",
+  "historyDoseFor": "доза на {time}"
 }

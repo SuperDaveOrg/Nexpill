@@ -180,6 +180,7 @@ void main() {
     await db.execute('ALTER TABLE patients DROP COLUMN is_self');
     await db.execute('ALTER TABLE medications DROP COLUMN once_at');
     await db.execute('DROP TABLE refills');
+    await db.execute('ALTER TABLE dose_events DROP COLUMN counts_for');
     await db.insert('patients', sam.toRow()..remove('is_self'));
     await db.setVersion(4);
     await v4.close();
@@ -206,6 +207,7 @@ void main() {
     // Back to version 5's medications table.
     await db.execute('ALTER TABLE medications DROP COLUMN once_at');
     await db.execute('DROP TABLE refills');
+    await db.execute('ALTER TABLE dose_events DROP COLUMN counts_for');
     await db.insert('patients', sam.toRow());
     await db.insert('medications',
         med('a', const IntervalSchedule(480)).toRow()..remove('once_at'));
@@ -227,6 +229,7 @@ void main() {
     final db = await v6.database;
     // Back to version 6, which had no refills.
     await db.execute('DROP TABLE refills');
+    await db.execute('ALTER TABLE dose_events DROP COLUMN counts_for');
     await db.insert('patients', sam.toRow());
     await db.insert('medications', med('a', const IntervalSchedule(480)).toRow());
     await db.setVersion(6);
@@ -237,6 +240,33 @@ void main() {
     expect((await upgradedRepo.snapshot()).refills, isEmpty);
     await upgradedRepo.logRefill('a', 30);
     expect((await upgradedRepo.snapshot()).refills.single.amount, 30);
+    await upgraded.close();
+  });
+
+  test('a version 7 database upgrades, and then stores which time a dose was for',
+      () async {
+    final path = '${dir.path}/v7.db';
+    final v7 = NexpillDatabase(path: path, factory: databaseFactoryFfi);
+    final db = await v7.database;
+    // Back to version 7's doses table.
+    await db.execute('ALTER TABLE dose_events DROP COLUMN counts_for');
+    await db.insert('patients', sam.toRow());
+    await db.insert('medications', med('a', const IntervalSchedule(480)).toRow());
+    await db.setVersion(7);
+    await v7.close();
+
+    final upgraded = NexpillDatabase(path: path, factory: databaseFactoryFfi);
+    final upgradedRepo = CareRepository(db: upgraded);
+    final eight = DateTime.utc(2026, 6, 10, 8);
+    final dose = await upgradedRepo.logDose('a',
+        givenAt: DateTime.utc(2026, 6, 10, 11, 48), countsFor: eight);
+    await upgradedRepo.logDose('a', givenAt: DateTime.utc(2026, 6, 9));
+    final fix = await upgradedRepo.correctDose(dose,
+        givenAt: DateTime.utc(2026, 6, 10, 11, 50), countsFor: eight);
+    final doses = {for (final d in (await upgradedRepo.snapshot()).doses) d.id: d};
+    expect(doses[dose.id]!.countsFor, eight);
+    expect(doses[fix.id]!.countsFor, eight);
+    expect(doses.values.where((d) => d.countsFor == null), hasLength(1));
     await upgraded.close();
   });
 

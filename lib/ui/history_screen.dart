@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:nexpill/domain/dates.dart';
+import 'package:nexpill/domain/scheduling.dart';
 import 'package:nexpill/domain/wording.dart';
 import 'package:nexpill/export/dose_history_csv.dart';
 import 'package:nexpill/export/file_names.dart';
@@ -79,6 +80,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
         final entry = await showGiveDoseSheet(context,
             medication: medication,
             self: widget.patient.isSelf,
+            doses: widget.store.care.doses,
             correcting: dose);
         if (entry == null) return;
         await widget.store.change((repo) => repo.correctDose(
@@ -87,6 +89,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
               doseText: entry.doseText,
               givenBy: entry.givenBy,
               notes: entry.notes,
+              countsFor: entry.countsFor,
             ));
       case 'delete':
         final ok = await confirmAction(
@@ -226,8 +229,13 @@ class _HistoryScreenState extends State<HistoryScreen> {
       );
 
   Widget _entry(ThemeData theme, DoseEvent d, String name, {required bool replaced}) {
+    final medication = widget.store.care.medication(d.medicationId);
     final details = [
       ?d.doseText,
+      // Which set time it was for, when that isn't plain from the time.
+      if (medication != null)
+        if (statedSetTime(medication, d) case final slot?)
+          context.l.historyDoseFor(clockText(slot)),
       if (d.givenBy != null) context.l.historyBy(d.givenBy!),
       if (d.isCorrection) context.l.historyCorrection,
       if (replaced) context.l.historyCorrected,

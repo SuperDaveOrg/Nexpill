@@ -10,6 +10,18 @@ List<DoseEvent> effectiveEntries(
   return [for (final e in mine) if (!replaced.contains(e.id)) e];
 }
 
+/// [events] as they were before [entry] was logged, for working out what a
+/// correction of it would mean: without it, and without anything it
+/// replaced, which would otherwise count again.
+List<DoseEvent> withoutEntry(Iterable<DoseEvent> events, DoseEvent entry) {
+  final byId = {for (final e in events) e.id: e};
+  final gone = <String>{};
+  for (DoseEvent? e = entry; e != null && gone.add(e.id);) {
+    e = byId[e.supersedesId];
+  }
+  return [for (final e in events) if (!gone.contains(e.id)) e];
+}
+
 /// The doses of [medicationId] that still count and were given, not skipped.
 List<DoseEvent> effectiveDoses(
         String medicationId, Iterable<DoseEvent> events) =>

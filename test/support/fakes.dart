@@ -79,7 +79,11 @@ class InMemoryCareRepository implements CareRepository {
 
   @override
   Future<DoseEvent> logDose(String medicationId,
-      {DateTime? givenAt, String? doseText, String? givenBy, String? notes}) async {
+      {DateTime? givenAt,
+      String? doseText,
+      String? givenBy,
+      String? notes,
+      DateTime? countsFor}) async {
     final d = DoseEvent(
       id: newId(),
       medicationId: medicationId,
@@ -87,6 +91,7 @@ class InMemoryCareRepository implements CareRepository {
       doseText: doseText,
       givenBy: givenBy,
       notes: notes,
+      countsFor: countsFor?.toUtc(),
     );
     return _doses[d.id] = d;
   }
@@ -100,7 +105,11 @@ class InMemoryCareRepository implements CareRepository {
 
   @override
   Future<DoseEvent> correctDose(DoseEvent original,
-      {required DateTime givenAt, String? doseText, String? givenBy, String? notes}) async {
+      {required DateTime givenAt,
+      String? doseText,
+      String? givenBy,
+      String? notes,
+      DateTime? countsFor}) async {
     final d = DoseEvent(
       id: newId(),
       medicationId: original.medicationId,
@@ -108,6 +117,7 @@ class InMemoryCareRepository implements CareRepository {
       doseText: doseText,
       givenBy: givenBy,
       notes: notes,
+      countsFor: countsFor?.toUtc(),
       supersedesId: original.id,
     );
     return _doses[d.id] = d;

@@ -151,7 +151,8 @@ class NotificationService {
     }
 
     for (final n in plan.notifications) {
-      final tag = ReminderTag(n.at, n.medicationIds, snoozeMinutes: n.snoozeMinutes);
+      final tag = ReminderTag(n.at, n.medicationIds,
+          snoozeMinutes: n.snoozeMinutes, dueAt: n.dueAt);
       await _schedule(_plannedId(n), n, tag);
     }
 
@@ -205,7 +206,7 @@ class NotificationService {
     }
 
     final tag = ReminderTag(since, n.medicationIds,
-        snoozeMinutes: n.snoozeMinutes, until: n.at);
+        snoozeMinutes: n.snoozeMinutes, until: n.at, dueAt: n.dueAt);
     final id = ReminderTag(since, n.medicationIds).encode();
     await _schedule(_snoozeBase + (_hash(id) & 0x0fffffff), n, tag);
   }
@@ -287,6 +288,7 @@ class ReminderTag {
     this.medicationIds, {
     this.snoozeMinutes = defaultSnoozeMinutes,
     this.until,
+    this.dueAt = const {},
   });
 
   final DateTime at;
@@ -298,11 +300,21 @@ class ReminderTag {
   /// When this snooze ends, if it is one.
   final DateTime? until;
 
+  /// The dose each medication's reminder is about, by medication id, so
+  /// "Mark given" can say which dose was given. Empty on a tag made only to
+  /// ask [stillDue], and on anything scheduled before this was kept.
+  final Map<String, DateTime> dueAt;
+
   String encode() => jsonEncode({
         'at': at.millisecondsSinceEpoch,
         'm': medicationIds,
         's': snoozeMinutes,
         if (until != null) 'u': until!.millisecondsSinceEpoch,
+        if (dueAt.isNotEmpty)
+          'd': {
+            for (final MapEntry(:key, :value) in dueAt.entries)
+              key: value.millisecondsSinceEpoch,
+          },
       });
 
   static ReminderTag? tryParse(String? s) {
@@ -318,6 +330,11 @@ class ReminderTag {
         until: switch (j['u']) {
           final int ms => DateTime.fromMillisecondsSinceEpoch(ms, isUtc: true),
           _ => null,
+        },
+        dueAt: {
+          if (j['d'] case final Map<String, dynamic> due)
+            for (final MapEntry(:key, :value) in due.entries)
+              key: DateTime.fromMillisecondsSinceEpoch(value as int, isUtc: true),
         },
       );
     } catch (_) {
