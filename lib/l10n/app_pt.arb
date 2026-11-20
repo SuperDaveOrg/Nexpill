@@ -451,5 +451,11 @@
   "comingUpDoses": "{count, plural, one{{count} dose} other{{count} doses}}",
   "comingUpNoSetTime": "Sem hora fixa",
   "comingUpFromFirstDose": "{schedule}, a contar da primeira dose",
-  "comingUpDosesOf": "{doses} de {dose}"
+  "comingUpDosesOf": "{doses} de {dose}",
+  "doseWhichTitle": "Que dose é esta?",
+  "doseWhichHint": "Está entre duas horas fixas, por isso o Nexpill não consegue saber. A dose seguinte fica prevista para depois da que escolher.",
+  "doseDueLate": "Prevista para {when}, em atraso",
+  "doseDueEarly": "Prevista para {when}, antes da hora",
+  "doseWhichError": "Escolha que dose é esta.",
+  "historyDoseFor": "a dose das {time}"
 }

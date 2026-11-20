@@ -178,6 +178,104 @@ void main() {
           DateTime(2026, 3, 28, 20));
     });
 
+    group('a dose that says which time it was for', () {
+      // As reported: 08:00, 15:00 and 22:00, with the morning's dose marked
+      // given from its reminder at 11:48, nearer to 15:00 than to 08:00.
+      const three = FixedTimesSchedule(
+          [ClockTime(8, 0), ClockTime(15, 0), ClockTime(22, 0)]);
+      final lastNight = DoseEvent(
+          id: 'dose-0', medicationId: 'med-1', givenAt: DateTime(2026, 3, 27, 22));
+      final late = DateTime(2026, 3, 28, 11, 48);
+      DoseEvent logged({DateTime? countsFor}) => DoseEvent(
+          id: 'dose-1', medicationId: 'med-1', givenAt: late, countsFor: countsFor);
+      DateTime next(DoseEvent d) =>
+          calculateSchedule(med(three), [lastNight, d], DateTime(2026, 3, 28, 12))
+              .nextEligibleAt;
+
+      test('counts for that time, however late', () {
+        expect(next(logged(countsFor: DateTime(2026, 3, 28, 8))),
+            DateTime(2026, 3, 28, 15));
+      });
+
+      test('or however early', () {
+        expect(next(logged(countsFor: DateTime(2026, 3, 28, 15))),
+            DateTime(2026, 3, 28, 22));
+      });
+
+      test('one that doesn\'t say still counts for the nearest', () {
+        expect(next(logged()), DateTime(2026, 3, 28, 22));
+      });
+
+      test('a time missed since is still never made up', () {
+        final r = calculateSchedule(
+            med(three),
+            [lastNight, logged(countsFor: DateTime(2026, 3, 28, 8))],
+            DateTime(2026, 3, 28, 22, 30));
+        expect(r.nextEligibleAt, DateTime(2026, 3, 28, 22));
+      });
+
+      test('logging asks which, from halfway to the next time', () {
+        ({DateTime late, DateTime early})? doubt(DateTime at,
+                [List<DoseEvent> doses = const []]) =>
+            setTimesInDoubt(med(three), [lastNight, ...doses], at);
+        final asked = (late: DateTime(2026, 3, 28, 8), early: DateTime(2026, 3, 28, 15));
+        expect(doubt(late), asked);
+        expect(doubt(DateTime(2026, 3, 28, 11, 30)), asked, reason: 'halfway');
+        expect(doubt(DateTime(2026, 3, 28, 11, 29)), isNull, reason: 'nearer 08:00');
+        expect(doubt(DateTime(2026, 3, 28, 8, 20)), isNull);
+        // With the morning's given, one at noon can only be early.
+        final morning = DoseEvent(
+            id: 'dose-1', medicationId: 'med-1', givenAt: DateTime(2026, 3, 28, 8, 5));
+        expect(doubt(DateTime(2026, 3, 28, 12), [morning]), isNull);
+        // Last night's missed, and nearly time for this morning's.
+        expect(setTimesInDoubt(med(three), [], DateTime(2026, 3, 28, 7, 50)),
+            (late: DateTime(2026, 3, 27, 22), early: DateTime(2026, 3, 28, 8)));
+        expect(setTimesInDoubt(med(const IntervalSchedule(480)), [lastNight], late),
+            isNull);
+      });
+
+      test('Mark given on a reminder counts for the dose it was about', () {
+        DateTime? countsFor(DateTime remindedFor, DateTime now) =>
+            reminderDoseCountsFor(med(three), [lastNight], remindedFor, now);
+        final eight = DateTime(2026, 3, 28, 8), three_ = DateTime(2026, 3, 28, 15);
+        expect(countsFor(eight, late), eight);
+        // A heads-up for 15:00, with the morning's never given.
+        expect(countsFor(three_, DateTime(2026, 3, 28, 14, 50)), three_);
+        // An old reminder left in the shade: 08:00 is gone by then.
+        expect(countsFor(eight, DateTime(2026, 3, 28, 15, 10)), three_);
+        expect(
+            reminderDoseCountsFor(
+                med(const IntervalSchedule(480)), [lastNight], eight, late),
+            isNull);
+      });
+
+      test('history says so only when the time alone wouldn\'t', () {
+        final eight = DateTime(2026, 3, 28, 8);
+        expect(statedSetTime(med(three), logged(countsFor: eight)), eight);
+        expect(statedSetTime(med(three), logged()), isNull);
+        expect(
+            statedSetTime(
+                med(three),
+                DoseEvent(
+                    id: 'd',
+                    medicationId: 'med-1',
+                    givenAt: DateTime(2026, 3, 28, 8, 10),
+                    countsFor: eight)),
+            isNull);
+      });
+
+      test('a correction is judged without what it corrects', () {
+        final first = logged();
+        final fix = DoseEvent(
+            id: 'dose-2',
+            medicationId: 'med-1',
+            givenAt: DateTime(2026, 3, 28, 11, 50),
+            supersedesId: first.id);
+        expect([for (final d in withoutEntry([lastNight, first, fix], fix)) d.id],
+            ['dose-0']);
+      });
+    });
+
     test('last night\'s dose makes this morning\'s the next one', () {
       expect(due([givenAt(DateTime(2026, 3, 27, 20, 5))], DateTime(2026, 3, 28, 7)),
           DateTime(2026, 3, 28, 8));

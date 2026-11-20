@@ -1903,4 +1903,29 @@ class AppLocalizationsRu extends AppLocalizations {
   String comingUpDosesOf(String doses, String dose) {
     return '$doses по $dose';
   }
+
+  @override
+  String get doseWhichTitle => 'Какая это доза?';
+
+  @override
+  String get doseWhichHint =>
+      'Она между двумя заданными временами, поэтому Nexpill не может определить сам. Следующая доза будет после выбранной.';
+
+  @override
+  String doseDueLate(String when) {
+    return 'Доза на $when, с опозданием';
+  }
+
+  @override
+  String doseDueEarly(String when) {
+    return 'Доза на $when, заранее';
+  }
+
+  @override
+  String get doseWhichError => 'Выберите, какая это доза.';
+
+  @override
+  String historyDoseFor(String time) {
+    return 'доза на $time';
+  }
 }

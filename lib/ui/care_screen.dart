@@ -85,7 +85,7 @@ class _CareScreenState extends State<CareScreen> with WidgetsBindingObserver {
     }
     if (!mounted) return;
     final entry = await showGiveDoseSheet(context,
-        medication: m, self: patient.isSelf);
+        medication: m, self: patient.isSelf, doses: _store.care.doses);
     if (entry == null) return;
     // Their own dose asks for no name, and mustn't forget the one in use
     // for everyone else's.
@@ -96,6 +96,7 @@ class _CareScreenState extends State<CareScreen> with WidgetsBindingObserver {
           doseText: entry.doseText,
           givenBy: entry.givenBy,
           notes: entry.notes,
+          countsFor: entry.countsFor,
         ));
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(

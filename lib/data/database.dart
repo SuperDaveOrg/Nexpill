@@ -15,7 +15,7 @@ class NexpillDatabase {
   static final NexpillDatabase instance = NexpillDatabase();
 
   static const _fileName = 'nexpill.db';
-  static const version = 7;
+  static const version = 8;
 
   final String? _path;
   final DatabaseFactory? _factory;
@@ -161,6 +161,11 @@ class NexpillDatabase {
       ''');
       await db.execute(
           'CREATE INDEX idx_refills_medication ON refills(medication_id, refilled_at)');
+    }
+    if (oldVersion < 8) {
+      // The set time a dose was for, where that was said, as UTC
+      // milliseconds; null leaves it to the timing engine.
+      await db.execute('ALTER TABLE dose_events ADD COLUMN counts_for INTEGER');
     }
   }
 

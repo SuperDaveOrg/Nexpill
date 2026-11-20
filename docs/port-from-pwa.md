@@ -186,6 +186,21 @@ the PWA.
    slot after that — unless a later slot has since come round ungiven, which
    is then due and overdue until the one after it arrives. Missed slots are
    never made up; only the latest dose matters, as for intervals.
+
+   **Changed again (issue #54): a dose says which slot it was for.** Nearest
+   was a guess, and wrong for a late dose: with slots at 08:00, 15:00 and
+   22:00, the morning's dose marked given from its reminder at 11:48 is
+   nearer 15:00, so it counted as the afternoon's taken early and the 15:00
+   reminder never came. Now a dose can record the slot it counts for
+   (`DoseEvent.countsFor`), and the next is due at the slot after that:
+   - "Mark given" on a reminder records the dose that reminder was about,
+     or, if a later slot has come round since, the one due by then.
+   - Logged in the app while a slot is still due but at least halfway to
+     the next, the dose could be either, so the sheet asks which and won't
+     save without an answer. Nearer the slot that's due, it's that one, as
+     before; with nothing due it's early, which already asks first.
+   - A dose that doesn't say, including every one logged before this,
+     still counts for the nearest slot, so no history changes its meaning.
 2. **Taper steps begin at local midnight.** The PWA used UTC midnight, so a
    step "from 5 June" began at 8 pm on 4 June in New York. The golden taper
    cases still run where local time is UTC (as in CI), where both agree.

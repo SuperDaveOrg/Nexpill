@@ -11,7 +11,7 @@ in one step: a file with a problem anywhere is refused whole.
 
 ## Versioning
 
-`nexpillBackup` is the format version, currently **6**. Adding an optional
+`nexpillBackup` is the format version, currently **7**. Adding an optional
 field doesn't change it. Changing what a field means, or adding a required
 one, needs a new version, a section here, and a reader that still accepts the
 old versions. Nexpill refuses a file whose version it doesn't know.
@@ -30,6 +30,7 @@ older app refuses the file instead of half-restoring it.
 | 4 | Adds the patient's optional `self`, for the phone's owner, whose `name` may then be absent. Without the version change, an older Nexpill would refuse a file with a nameless patient for the wrong reason, or forget who the owner is. A version 3 file is read as version 4 with no owner. |
 | 5 | Adds the `once` schedule type, a single dose at a set time. Without the version change, an older Nexpill would refuse the file as having an unknown schedule type, rather than saying it needs updating. A version 4 file is read as version 5 unchanged. |
 | 6 | Adds the medication's optional `refills`. Without the version change, an older Nexpill would drop them and restore less supply than there is. A version 5 file is read as version 6 with no refills. |
+| 7 | Adds the dose's optional `countsFor`. Without the version change, an older Nexpill would drop it and count a late dose for the wrong time, skipping the reminder after it. A version 6 file is read as version 7 with no dose saying which time it was for. |
 
 ## Example
 
@@ -181,6 +182,7 @@ one is there, whichever ends first applies.
 | `notes` | string, optional | |
 | `corrects` | string, optional | The `id` of a dose of the same medication that this one replaces. The replaced dose stays in history but no longer counts. A correction can itself be corrected. |
 | `skipped` | boolean, optional | `true` for a dose deliberately not given; `givenAt` is then when it was due. Default `false`. |
+| `countsFor` | instant, optional | For a `fixedTimes` medication, the time this dose was for, where that was said: by the reminder it was marked given from, or by whoever logged it between two times. The medication is next due at its first time after this instant. Absent, the dose counts for the time nearest to `givenAt`, halfway going to the later one. Other schedule types ignore it. |
 
 A skipped dose moves the medication on as if it had been given on time:
 a `fixedTimes` one to its next time, an `interval` or `taper` one to an

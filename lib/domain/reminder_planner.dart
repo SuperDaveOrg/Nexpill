@@ -308,6 +308,10 @@ class PlannedNotification {
 
   List<String> get medicationIds => [for (final i in items) i.medication.id];
 
+  /// The dose each medication's reminder is about, by medication id.
+  Map<String, DateTime> get dueAt =>
+      {for (final i in items) i.medication.id: i.dueAt};
+
   String get title => items.length == 1
       ? items.single.text(DoseWords.of(patient))
       : strings.reminderManyFor(items.length, personInSentence(patient));

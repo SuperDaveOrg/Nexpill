@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:nexpill/data/backup.dart';
 import 'package:nexpill/data/sample_data.dart';
 import 'package:nexpill/models/care_snapshot.dart';
+import 'package:nexpill/models/dose_event.dart';
 import 'package:nexpill/models/medication.dart';
 import 'package:nexpill/models/patient.dart';
 
@@ -99,10 +100,32 @@ void main() {
         ('sample-r1', 'sample-acet', 20.0, sample.refills.single.refilledAt));
   });
 
-  test('writes version 6, and still restores versions 5, 4, 3 and 2', () {
+  test('which set time a dose was for survives, and is left out when unsaid', () {
+    final first = sample.doses.first;
+    final eight = DateTime.utc(2026, 6, 10, 8);
+    final care = CareSnapshot(
+      patients: sample.patients,
+      medications: sample.medications,
+      refills: sample.refills,
+      doses: [
+        DoseEvent(
+            id: first.id,
+            medicationId: first.medicationId,
+            givenAt: first.givenAt,
+            countsFor: eight),
+        ...sample.doses.skip(1),
+      ],
+    );
+    final text = encodeBackup(care, exportedAt: DateTime.utc(2026, 6, 10, 12));
+    expect('"countsFor"'.allMatches(text), hasLength(1));
+    final back = decodeBackup(text).doses.firstWhere((d) => d.id == first.id);
+    expect(back.countsFor, eight);
+  });
+
+  test('writes version 7, and still restores versions 6, 5, 4, 3 and 2', () {
     final json = sampleJson();
-    expect(json['nexpillBackup'], 6);
-    for (final version in [5, 4, 3, 2]) {
+    expect(json['nexpillBackup'], 7);
+    for (final version in [6, 5, 4, 3, 2]) {
       json['nexpillBackup'] = version;
       final back = decodeBackup(jsonEncode(json));
       expect(back.medications.length, sample.medications.length);
@@ -174,7 +197,7 @@ void main() {
               (e) => e.message, 'message', contains('isn\'t a Nexpill backup'))));
     });
 
-    test('a newer format', () => refuses((j) => j['nexpillBackup'] = 7, 'newer version'));
+    test('a newer format', () => refuses((j) => j['nexpillBackup'] = 8, 'newer version'));
 
     test('a refill that adds nothing', () => refuses(
         (j) => firstMed(j)['refills'] = [

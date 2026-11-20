@@ -1852,4 +1852,29 @@ class AppLocalizationsPt extends AppLocalizations {
   String comingUpDosesOf(String doses, String dose) {
     return '$doses de $dose';
   }
+
+  @override
+  String get doseWhichTitle => 'Que dose é esta?';
+
+  @override
+  String get doseWhichHint =>
+      'Está entre duas horas fixas, por isso o Nexpill não consegue saber. A dose seguinte fica prevista para depois da que escolher.';
+
+  @override
+  String doseDueLate(String when) {
+    return 'Prevista para $when, em atraso';
+  }
+
+  @override
+  String doseDueEarly(String when) {
+    return 'Prevista para $when, antes da hora';
+  }
+
+  @override
+  String get doseWhichError => 'Escolha que dose é esta.';
+
+  @override
+  String historyDoseFor(String time) {
+    return 'a dose das $time';
+  }
 }

@@ -150,6 +150,7 @@ class CareRepository {
     String? doseText,
     String? givenBy,
     String? notes,
+    DateTime? countsFor,
   }) async {
     final dose = DoseEvent(
       id: newId(),
@@ -158,6 +159,7 @@ class CareRepository {
       doseText: doseText,
       givenBy: givenBy,
       notes: notes,
+      countsFor: countsFor?.toUtc(),
     );
     final db = await _db.database;
     await db.insert('dose_events', dose.toRow());
@@ -187,6 +189,7 @@ class CareRepository {
     String? doseText,
     String? givenBy,
     String? notes,
+    DateTime? countsFor,
   }) async {
     final correction = DoseEvent(
       id: newId(),
@@ -195,6 +198,7 @@ class CareRepository {
       doseText: doseText,
       givenBy: givenBy,
       notes: notes,
+      countsFor: countsFor?.toUtc(),
       supersedesId: original.id,
     );
     final db = await _db.database;

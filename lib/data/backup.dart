@@ -101,6 +101,7 @@ CareSnapshot decodeBackup(String text) {
           notes: d.optionalString('notes'),
           supersedesId: d.optionalString('corrects'),
           skipped: d.optionalBool('skipped') ?? false,
+          countsFor: d.optionalInstant('countsFor'),
         );
         doses.add(dose);
       }
@@ -253,6 +254,9 @@ class _Reader {
       (throw BackupFormatException(strings.backupBadDate(where, key)));
 
   DateTime? optionalDate(String key) => _json[key] == null ? null : date(key);
+
+  DateTime? optionalInstant(String key) =>
+      _json[key] == null ? null : instant(key);
 
   /// An ISO 8601 instant, which must say its offset: a bare local time would
   /// mean different moments on different phones.

@@ -15,6 +15,7 @@ class DoseEvent {
     this.notes,
     this.supersedesId,
     this.skipped = false,
+    this.countsFor,
   });
 
   final String id;
@@ -37,6 +38,12 @@ class DoseEvent {
   /// course.
   final bool skipped;
 
+  /// For a medication at set times, the time this dose was for, where that
+  /// was said: by the reminder it was marked given from, or by whoever
+  /// logged it between two times ("the 8:00 dose, late"). Null leaves it to
+  /// the timing engine, which takes the nearest. Other schedules ignore it.
+  final DateTime? countsFor;
+
   bool get isCorrection => supersedesId != null;
 
   /// Stored as UTC milliseconds, which sort correctly as plain integers.
@@ -49,6 +56,7 @@ class DoseEvent {
         'notes': notes,
         'supersedes_id': supersedesId,
         'skipped': skipped ? 1 : 0,
+        'counts_for': countsFor?.toUtc().millisecondsSinceEpoch,
       };
 
   factory DoseEvent.fromRow(Map<String, Object?> row) => DoseEvent(
@@ -61,5 +69,9 @@ class DoseEvent {
         notes: row['notes'] as String?,
         supersedesId: row['supersedes_id'] as String?,
         skipped: row['skipped'] == 1,
+        countsFor: switch (row['counts_for']) {
+          final int ms => DateTime.fromMillisecondsSinceEpoch(ms, isUtc: true),
+          _ => null,
+        },
       );
 }

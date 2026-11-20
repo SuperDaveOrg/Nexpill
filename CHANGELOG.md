@@ -9,6 +9,14 @@ turns that section into the release's own when it's cut.
 
 ## [Unreleased]
 
+### Fixed
+- At set times, a dose given late could silently cancel the next one. A
+  morning dose marked given nearer to the afternoon's time was counted as
+  the afternoon's taken early, so that reminder never came. "Mark given"
+  on a reminder now counts for the dose the reminder was about. Logging in
+  the app between two times asks which dose it is, and history shows the
+  answer. Backups are now format version 7; older backups still restore.
+
 ### Changed
 - Intervals can now be set in days as well as hours and minutes, up to 30
   days, for a medication taken every 5 days, say. The longest interval
