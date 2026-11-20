@@ -9,6 +9,8 @@ turns that section into the release's own when it's cut.
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-11-20
+
 ### Fixed
 - At set times, a dose given late could silently cancel the next one. A
   morning dose marked given nearer to the afternoon's time was counted as
@@ -21,8 +23,6 @@ turns that section into the release's own when it's cut.
 - Intervals can now be set in days as well as hours and minutes, up to 30
   days, for a medication taken every 5 days, say. The longest interval
   used to be 72 hours.
-
-### Changed
 - Your own medications are taken, not given. For "Me", Nexpill now says
   "Take", "Not taken yet", "Can be taken now" and "Last taken", and the
   reminder button reads "Mark taken", in every language. Logging your own

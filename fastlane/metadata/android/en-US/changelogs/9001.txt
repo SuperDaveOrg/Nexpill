@@ -1,0 +1,3 @@
+• Fixed: at set times, a dose marked given late could cancel the next reminder. "Mark given" on a reminder now counts for the dose it was about, and logging between two times asks which dose it is.
+• Intervals can now be set in days, up to 30, as well as hours and minutes.
+• Your own medications are "taken", not "given", and logging your own dose no longer asks who gave it.
