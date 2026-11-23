@@ -271,18 +271,21 @@ List<DateTime> _slotsAround(List<ClockTime> times, DateTime at) {
   ];
 }
 
+/// A taper is due the interval of the step in force after the last dose,
+/// whichever step that dose was given in. So across a change of step the gap
+/// between two doses is never longer than the new step's interval: counting
+/// the new step from its midnight instead left up to a day more, 50 hours
+/// from a 10:00 dose going into a 36-hour step.
 DateTime _taperDue(List<TaperRule> rules, DoseEvent? latest, DateTime now) {
   final rule = activeTaperRule(rules, now);
   if (rule == null) return now;
-  final start = _ruleBoundary(rule.startDate);
   final interval = Duration(minutes: rule.intervalMinutes);
 
   // Nothing given yet: due on the step's own rhythm, counted from its start.
-  if (latest == null) return _latestBeat(start, interval, now);
-
-  // A dose from before this step started doesn't hold the new step back.
-  final from = latest.givenAt.isAfter(start) ? latest.givenAt : start;
-  return from.add(interval);
+  if (latest == null) {
+    return _latestBeat(_ruleBoundary(rule.startDate), interval, now);
+  }
+  return latest.givenAt.add(interval);
 }
 
 /// A taper's steps in the order they run: by start date, and of two steps

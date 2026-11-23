@@ -120,12 +120,12 @@ void main() {
               intervalMinutes: 6 * 60),
           TaperRule(startDate: DateTime(2026, 6, 11), intervalMinutes: 12 * 60),
         ]));
-    // 15:00, 21:00, then the new step counts 12 hours from its start, not
-    // from the 03:00 the old step would have said.
+    // 15:00, 21:00, then the new step is in force: 12 hours from the 21:00
+    // dose, not the 03:00 the old step would have said.
     expect(
         read(forecast([m], [given('a', DateTime(2026, 6, 10, 9))],
             until: DateTime(2026, 6, 11, 18))),
-        ['10/15:00 a', '10/21:00 a', '11/12:00 a']);
+        ['10/15:00 a', '10/21:00 a', '11/09:00 a']);
   });
 
   test('a taper that ends stops the forecast', () {

@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:nexpill/domain/dates.dart';
+import 'package:nexpill/domain/dose_history.dart';
 import 'package:nexpill/domain/inventory.dart';
 import 'package:nexpill/domain/scheduling.dart';
 import 'package:nexpill/domain/status.dart';
@@ -98,6 +100,17 @@ String? _changedSincePwa(
   if (medication.schedule case TaperSchedule(:final rules)
       when taperFinished(rules, now)) {
     return 'a finished taper has nothing due (port-from-pwa.md, 5)';
+  }
+  // Change 6: a step counts from the last dose even if that was given before
+  // the step began, where the PWA counted from the step's start.
+  if (medication.schedule case TaperSchedule(:final rules)) {
+    final latest = latestDose(medication.id, doses);
+    final step = activeTaperRule(rules, now);
+    if (latest != null &&
+        step != null &&
+        latest.givenAt.isBefore(dateOnly(step.startDate))) {
+      return 'a taper step counts from the last dose (port-from-pwa.md, 6)';
+    }
   }
   return null;
 }

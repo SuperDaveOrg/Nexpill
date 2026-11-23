@@ -426,10 +426,32 @@ void main() {
       expect(before.nextEligibleAt, DateTime(2026, 3, 24, 16));
     });
 
-    test('a dose from before the step began doesn\'t hold it back', () {
+    test('a new step counts from the last dose, not from its own start', () {
       final r = calculateSchedule(
           med(taper), [dose('2026-03-24T22:00:00')], DateTime(2026, 3, 26));
-      expect(r.nextEligibleAt, DateTime(2026, 3, 25, 12));
+      expect(r.nextEligibleAt, DateTime(2026, 3, 25, 10));
+    });
+
+    test('going into a longer step, the gap is never more than its interval',
+        () {
+      final slowing = TaperSchedule([
+        TaperRule(
+            startDate: DateTime(2026, 3, 20),
+            endDate: DateTime(2026, 3, 25),
+            intervalMinutes: 24 * 60),
+        TaperRule(startDate: DateTime(2026, 3, 25), intervalMinutes: 36 * 60),
+      ]);
+      final doses = [dose('2026-03-24T10:00:00')];
+
+      // Still in the daily step: due a day on.
+      final before =
+          calculateSchedule(med(slowing), doses, DateTime(2026, 3, 24, 23, 59));
+      expect(before.nextEligibleAt, DateTime(2026, 3, 25, 10));
+
+      // In the 36-hour step: 36 hours from that dose, not from midnight,
+      // which made it 12:00 on the 26th, 50 hours on.
+      final after = calculateSchedule(med(slowing), doses, DateTime(2026, 3, 25));
+      expect(after.nextEligibleAt, DateTime(2026, 3, 25, 22));
     });
 
     test('finishes at local midnight on the last step\'s end date', () {

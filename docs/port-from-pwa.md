@@ -220,3 +220,15 @@ the PWA.
    later and kept reminding. Now, from midnight at the start of the last
    step's end date, it's finished: nothing is due, overdue or reminded, and
    the card says so. A taper whose last step is open-ended never finishes.
+6. **A taper step counts from the last dose.** The PWA, and Nexpill up to
+   0.9.0, counted a new step from its own midnight when the last dose was
+   given before it: "a dose from before the step doesn't hold it back". It
+   did the opposite. Going from every 24 hours to every 36, a dose at 10:00
+   on the old step's last day was followed by one at 12:00 two days later,
+   50 hours on, longer than either step asks for, and reported by someone
+   tapering for whom that gap was dangerous. Now the next dose is due the
+   interval of the step in force after the last dose, whichever step that
+   dose was given in: 22:00 the next day, 36 hours on. The due time still
+   moves at the midnight a step starts, from the old interval after the
+   last dose to the new one. A taper never given is unchanged: due on the
+   beat of the step in force, counted from its start.

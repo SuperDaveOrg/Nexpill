@@ -9,6 +9,15 @@ turns that section into the release's own when it's cut.
 
 ## [Unreleased]
 
+### Fixed
+- A taper could leave too long between doses when it moved to its next
+  step. The new step was counted from midnight on its first day instead of
+  from the last dose: going from every 24 hours to every 36, a dose at
+  10:00 was followed by one 50 hours later. The next dose is now due the
+  new step's interval after the last one, 36 hours in that example. If you
+  are on a taper, check the times under "Coming up" after updating.
+  Thanks to Nessie for the careful report.
+
 ## [0.9.0] - 2026-11-20
 
 ### Fixed
