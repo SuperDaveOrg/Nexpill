@@ -25,7 +25,8 @@ class DoseForecast {
   final List<ForecastDose> doses;
 
   /// Medications still in use that can't be given a time: as-needed ones,
-  /// and interval ones never given, which have nothing to count from.
+  /// and interval ones and tapers by doses never given, which have nothing
+  /// to count from.
   final List<Medication> withoutSetTime;
 }
 
@@ -51,8 +52,9 @@ DoseForecast forecastDoses(
   final withoutSetTime = <Medication>[];
   for (final m in care.medicationsFor(patientId)) {
     if (!m.active || calculateSchedule(m, care.doses, from).finished) continue;
-    final noStart = m.schedule is IntervalSchedule &&
-        latestEntry(m.id, care.doses) == null;
+    final noStart =
+        (m.schedule is IntervalSchedule || m.schedule is DoseTaperSchedule) &&
+            latestEntry(m.id, care.doses) == null;
     if (m.schedule is PrnSchedule || noStart) {
       withoutSetTime.add(m);
     } else {

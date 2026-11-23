@@ -9,6 +9,16 @@ turns that section into the release's own when it's cut.
 
 ## [Unreleased]
 
+### Added
+- A taper can be set by number of doses instead of dates: "every 24 hours
+  for 5 doses, then every 36 hours". Choose "By doses" under Taper. Each
+  step lasts for its doses however late or early they're given, and the
+  next dose is always the new step's interval after the last one. The card
+  shows how many doses of the step are left. Leave the last step's number
+  empty to carry on until stopped; with a number on every step, the taper
+  finishes at its last dose. Backups are now format version 8; older
+  backups still restore.
+
 ### Fixed
 - A taper could leave too long between doses when it moved to its next
   step. The new step was counted from midnight on its first day instead of

@@ -128,6 +128,29 @@ void main() {
         ['10/15:00 a', '10/21:00 a', '11/09:00 a']);
   });
 
+  test('a taper by doses changes interval after the step\'s doses', () {
+    final m = med(
+        'a',
+        const DoseTaperSchedule([
+          DoseTaperStep(doses: 3, intervalMinutes: 6 * 60),
+          DoseTaperStep(doses: 2, intervalMinutes: 12 * 60),
+        ]));
+    // One of the first step's three is given. Two more at 6 hours, then two
+    // at 12, and it's finished.
+    expect(
+        read(forecast([m], [given('a', DateTime(2026, 6, 10, 8))],
+            until: DateTime(2026, 6, 14))),
+        ['10/14:00 a', '10/20:00 a', '11/08:00 a', '11/20:00 a']);
+  });
+
+  test('a taper by doses never given has no time to show', () {
+    final m = med('a',
+        const DoseTaperSchedule([DoseTaperStep(intervalMinutes: 6 * 60)]));
+    final f = forecast([m], []);
+    expect(f.doses, isEmpty);
+    expect(f.withoutSetTime.single.id, 'a');
+  });
+
   test('a taper that ends stops the forecast', () {
     final m = med(
         'a',

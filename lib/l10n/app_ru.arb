@@ -457,5 +457,12 @@
   "doseDueLate": "Доза на {when}, с опозданием",
   "doseDueEarly": "Доза на {when}, заранее",
   "doseWhichError": "Выберите, какая это доза.",
-  "historyDoseFor": "доза на {time}"
+  "historyDoseFor": "доза на {time}",
+  "taperByDates": "По датам",
+  "taperByDoses": "По дозам",
+  "taperDosesHint": "Каждый этап длится указанное число доз, затем начинается следующий. Оставьте число для последнего этапа пустым, чтобы он продолжался до отмены.",
+  "errorStepDoses": "Для каждого этапа, кроме последнего, нужно число доз.",
+  "taperDoseStep": "{count, plural, one{{count} доза} few{{count} дозы} many{{count} доз} other{{count} дозы}}: раз в {duration}",
+  "taperDoseStepOpen": "затем раз в {duration}",
+  "taperShortDosesLeft": "{text}, ещё {count, plural, one{{count} доза} few{{count} дозы} many{{count} доз} other{{count} дозы}}"
 }

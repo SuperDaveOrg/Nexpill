@@ -1708,7 +1708,7 @@ abstract class AppLocalizations {
   /// **'As needed'**
   String get kindAsNeeded;
 
-  /// Schedule-kind chip in the editor: a taper, steps with dates and a different interval each.
+  /// Schedule-kind chip in the editor: a taper, steps with a different interval each, set by dates or by number of doses.
   ///
   /// In en, this message translates to:
   /// **'Taper'**
@@ -1924,7 +1924,7 @@ abstract class AppLocalizations {
   /// **'Add a step'**
   String get addStep;
 
-  /// Hint under the taper steps.
+  /// Hint under the steps of a taper set by dates (taperByDates).
   ///
   /// In en, this message translates to:
   /// **'Each step runs from midnight on its first day until midnight on its end day. The last step can be open-ended.'**
@@ -2859,6 +2859,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'the {time} dose'**
   String historyDoseFor(String time);
+
+  /// Choice at the top of the taper editor: each step runs between two calendar dates. The other choice is taperByDoses.
+  ///
+  /// In en, this message translates to:
+  /// **'By dates'**
+  String get taperByDates;
+
+  /// Choice at the top of the taper editor: each step lasts for a number of doses, with no dates. The other choice is taperByDates.
+  ///
+  /// In en, this message translates to:
+  /// **'By doses'**
+  String get taperByDoses;
+
+  /// Hint under the steps of a taper set by doses (taperByDoses).
+  ///
+  /// In en, this message translates to:
+  /// **'Each step lasts for its number of doses, then the next one begins. Leave the last step\'s number empty to carry on until stopped.'**
+  String get taperDosesHint;
+
+  /// Validation error in the taper editor, for a taper set by doses: a step's number of doses is missing or not a whole number above zero. Only the last step may leave it empty.
+  ///
+  /// In en, this message translates to:
+  /// **'Every step but the last needs a number of doses.'**
+  String get errorStepDoses;
+
+  /// One step in the summary of a taper set by doses: {count} doses, each {duration} after the one before, e.g. '5 doses: every 24 hours'. Steps are joined with semicolons.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 dose} other{{count} doses}}: every {duration}'**
+  String taperDoseStep(int count, String duration);
+
+  /// The last step in the summary of a taper set by doses, when it has no number of doses and carries on until stopped. Follows the taperDoseStep steps after a semicolon, e.g. '5 doses: every 24 hours; then every 36 hours'.
+  ///
+  /// In en, this message translates to:
+  /// **'then every {duration}'**
+  String taperDoseStepOpen(String duration);
+
+  /// Card schedule line for a taper set by doses: {text} is taperShortEvery, {count} how many doses of the current step are still to give, e.g. 'Taper: every 24 hours for 3 more doses'. taperShortThen may wrap it: '…, then every 36 hours'.
+  ///
+  /// In en, this message translates to:
+  /// **'{text} for {count, plural, =1{1 more dose} other{{count} more doses}}'**
+  String taperShortDosesLeft(String text, int count);
 }
 
 class _AppLocalizationsDelegate

@@ -17,6 +17,15 @@ class TaperStepDraft {
   int minutes;
 }
 
+/// One step of a taper by doses as it's being edited. [doses] is as typed;
+/// empty on the last step for one that carries on until stopped.
+class DoseStepDraft {
+  DoseStepDraft({this.doses = '', this.minutes = 8 * 60});
+
+  String doses;
+  int minutes;
+}
+
 /// The medication form's state: everything editable, kept for every
 /// schedule type at once so switching type and back loses nothing. Plain
 /// Dart, so its rules are tested without widgets.
@@ -27,7 +36,9 @@ class MedicationDraft {
         refilledSoFar = 0,
         courseLastDay = _aWeekFrom(today),
         onceAt = _nextHour(today),
-        taperSteps = [TaperStepDraft(start: dateOnly(today))];
+        taperDosesBefore = null,
+        taperSteps = [TaperStepDraft(start: dateOnly(today))],
+        doseSteps = [DoseStepDraft()];
 
   /// [givenSoFar] is how many of [m]'s doses count, so a course can be set
   /// as the doses still to give, and a supply as how much is left, with
@@ -60,7 +71,12 @@ class MedicationDraft {
           OnceSchedule(:final at) => at.toLocal(),
           _ => _nextHour(DateTime.now()),
         },
-        taperSteps = [] {
+        taperDosesBefore = switch (m.schedule) {
+          DoseTaperSchedule(:final dosesBefore) => dosesBefore,
+          _ => null,
+        },
+        taperSteps = [],
+        doseSteps = [] {
     switch (m.course) {
       case EndsAfterDay():
         courseKind = CourseKind.lastDay;
@@ -86,9 +102,21 @@ class MedicationDraft {
           for (final r in rules)
             TaperStepDraft(start: r.startDate, end: r.endDate, minutes: r.intervalMinutes),
         ]);
+      case DoseTaperSchedule(:final steps):
+        kind = ScheduleKind.taper;
+        taperByDoses = true;
+        doseSteps.addAll([
+          for (final s in steps)
+            DoseStepDraft(doses: '${s.doses ?? ''}', minutes: s.intervalMinutes),
+        ]);
       case OnceSchedule():
         kind = ScheduleKind.once;
     }
+    // Whichever kind of taper it isn't starts as a new one would.
+    if (taperSteps.isEmpty) {
+      taperSteps.add(TaperStepDraft(start: dateOnly(DateTime.now())));
+    }
+    if (doseSteps.isEmpty) doseSteps.add(DoseStepDraft());
   }
 
   final String? id;
@@ -106,6 +134,15 @@ class MedicationDraft {
   List<ClockTime> times = [const ClockTime(8, 0)];
   int prnMinutes = 4 * 60;
   final List<TaperStepDraft> taperSteps;
+
+  /// Whether the taper's steps are numbers of doses ([doseSteps]) rather
+  /// than dates ([taperSteps]).
+  bool taperByDoses = false;
+  final List<DoseStepDraft> doseSteps;
+
+  /// For a taper by doses already saved: how many doses came before it. A
+  /// taper newly set by doses starts counting from the doses given so far.
+  final int? taperDosesBefore;
 
   /// When a single dose is due, on the phone's clock.
   DateTime onceAt;
@@ -200,6 +237,18 @@ class MedicationDraft {
   }
 
   String? _taperError() {
+    if (taperByDoses) {
+      if (doseSteps.isEmpty) return strings.errorNoSteps;
+      for (final (i, s) in doseSteps.indexed) {
+        if (s.minutes < 1) return strings.errorStepInterval;
+        final doses = int.tryParse(s.doses.trim());
+        final open = s.doses.trim().isEmpty && i == doseSteps.length - 1;
+        if (!open && (doses == null || doses < 1)) {
+          return strings.errorStepDoses;
+        }
+      }
+      return null;
+    }
     if (taperSteps.isEmpty) return strings.errorNoSteps;
     final steps = [...taperSteps]..sort((a, b) => a.start.compareTo(b.start));
     for (final (i, s) in steps.indexed) {
@@ -233,6 +282,15 @@ class MedicationDraft {
         ScheduleKind.interval => IntervalSchedule(everyMinutes),
         ScheduleKind.fixedTimes => FixedTimesSchedule(times.toSet().toList()..sort()),
         ScheduleKind.prn => PrnSchedule(prnMinutes),
+        ScheduleKind.taper when taperByDoses => DoseTaperSchedule(
+            [
+              for (final s in doseSteps)
+                DoseTaperStep(
+                    doses: int.tryParse(s.doses.trim()),
+                    intervalMinutes: s.minutes),
+            ],
+            dosesBefore: taperDosesBefore ?? givenSoFar,
+          ),
         ScheduleKind.taper => TaperSchedule([
             for (final s in steps)
               TaperRule(

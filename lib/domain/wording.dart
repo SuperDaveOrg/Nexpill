@@ -186,7 +186,8 @@ String listText(List<String> items) => switch (items.length) {
 
 /// The schedule in a phrase: "Every 8 hours", "At 08:00 and 20:00",
 /// "As needed, at least 6 hours apart", "Once, Jun 10, 2026 2:30 PM", or
-/// the taper's steps.
+/// the taper's steps: "Jun 1, 2026 to Jun 7, 2026: every 8 hours; …" by
+/// dates, "5 doses: every 24 hours; then every 36 hours" by doses.
 String scheduleText(MedicationSchedule schedule) => switch (schedule) {
       IntervalSchedule(:final intervalMinutes) =>
         strings.scheduleEvery(durationText(intervalMinutes)),
@@ -205,17 +206,48 @@ String scheduleText(MedicationSchedule schedule) => switch (schedule) {
                             dateText(r.startDate), dateText(r.endDate!)),
                     durationText(r.intervalMinutes)),
             ].join('; '),
+      DoseTaperSchedule(:final steps) => steps.isEmpty
+          ? strings.taperNoSteps
+          : [
+              for (final (i, s) in steps.indexed)
+                switch (s.doses) {
+                  final doses? => strings.taperDoseStep(
+                      doses, durationText(s.intervalMinutes)),
+                  null when i == 0 =>
+                    strings.scheduleEvery(durationText(s.intervalMinutes)),
+                  null =>
+                    strings.taperDoseStepOpen(durationText(s.intervalMinutes)),
+                },
+            ].join('; '),
       OnceSchedule(:final at) => strings.scheduleOnce(dateTimeText(at)),
     };
 
 /// The schedule as it stands [now], short enough for a card: a taper shows
 /// the step the timing engine has in force and what comes next, not every
 /// step, and a single dose when it is, "Once, tomorrow at 3:00 PM".
-String scheduleShortText(MedicationSchedule schedule, DateTime now) {
+///
+/// A taper by doses needs [position], where it has got to: "Taper: every
+/// 24 hours for 3 more doses, then every 36 hours". Without it, every step.
+String scheduleShortText(MedicationSchedule schedule, DateTime now,
+    {DoseTaperPosition? position}) {
   if (schedule case OnceSchedule(:final at)) {
     return dateOnly(at.toLocal()) == dateOnly(now)
         ? strings.scheduleOnceToday(clockText(at))
         : strings.scheduleOnce(whenText(at, now));
+  }
+  if (schedule is DoseTaperSchedule && position != null) {
+    final step = position.step;
+    if (step == null) return strings.taperFinished;
+    var text = strings.taperShortEvery(durationText(step.intervalMinutes));
+    if (position.left case final left?) {
+      text = strings.taperShortDosesLeft(text, left);
+    }
+    final i = position.index! + 1;
+    if (i < schedule.steps.length) {
+      text = strings.taperShortThen(
+          text, durationText(schedule.steps[i].intervalMinutes));
+    }
+    return text;
   }
   if (schedule is! TaperSchedule || schedule.rules.isEmpty) {
     return scheduleText(schedule);

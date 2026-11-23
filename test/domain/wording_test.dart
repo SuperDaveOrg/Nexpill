@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nexpill/domain/dates.dart';
+import 'package:nexpill/domain/scheduling.dart';
 import 'package:nexpill/domain/status.dart';
 import 'package:nexpill/domain/wording.dart';
 import 'package:nexpill/models/dose_event.dart';
@@ -59,6 +60,49 @@ void main() {
           'Can be given now');
       expect(card(const PrnSchedule(240), [at(DateTime(2026, 6, 10, 12))]).$1,
           'Next dose from 4:00 PM');
+    });
+  });
+
+  group('taper by doses', () {
+    const taper = DoseTaperSchedule([
+      DoseTaperStep(doses: 5, intervalMinutes: 24 * 60),
+      DoseTaperStep(doses: 1, intervalMinutes: 36 * 60),
+      DoseTaperStep(intervalMinutes: 48 * 60),
+    ]);
+    String short(int given) => scheduleShortText(taper, now,
+        position: doseTaperPosition(taper, 'm', [
+          for (var i = 0; i < given; i++)
+            DoseEvent(
+                id: 'd$i',
+                medicationId: 'm',
+                givenAt: now.subtract(Duration(days: given - i))),
+        ]));
+
+    test('in full, step by step', () {
+      expect(scheduleText(taper),
+          '5 doses: every 24 hours; 1 dose: every 36 hours; then every 48 hours');
+      expect(
+          scheduleText(const DoseTaperSchedule(
+              [DoseTaperStep(intervalMinutes: 480)])),
+          'Every 8 hours');
+    });
+
+    test('on the card, the step in force, what\'s left of it and what\'s next',
+        () {
+      expect(short(0),
+          'Taper: every 24 hours for 5 more doses, then every 36 hours');
+      expect(short(4),
+          'Taper: every 24 hours for 1 more dose, then every 36 hours');
+      expect(short(5), 'Taper: every 36 hours for 1 more dose, then every 48 hours');
+      expect(short(6), 'Taper: every 48 hours');
+    });
+
+    test('finished once every step\'s doses are given', () {
+      const ending = DoseTaperSchedule([DoseTaperStep(doses: 1, intervalMinutes: 60)]);
+      expect(
+          scheduleShortText(ending, now,
+              position: doseTaperPosition(ending, 'm', [at(now)])),
+          'Taper finished');
     });
   });
 

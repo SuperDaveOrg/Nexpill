@@ -457,5 +457,12 @@
   "doseDueLate": "Fällig {when}, verspätet",
   "doseDueEarly": "Fällig {when}, vorzeitig",
   "doseWhichError": "Wähle aus, welche Dosis das ist.",
-  "historyDoseFor": "die Dosis von {time}"
+  "historyDoseFor": "die Dosis von {time}",
+  "taperByDates": "Nach Datum",
+  "taperByDoses": "Nach Dosen",
+  "taperDosesHint": "Jede Stufe dauert so viele Dosen wie angegeben, dann beginnt die nächste. Bleibt die Anzahl bei der letzten Stufe leer, läuft sie weiter, bis das Medikament beendet wird.",
+  "errorStepDoses": "Jede Stufe außer der letzten braucht eine Anzahl an Dosen.",
+  "taperDoseStep": "{count, plural, =1{1 Dosis} other{{count} Dosen}}: alle {duration}",
+  "taperDoseStepOpen": "dann alle {duration}",
+  "taperShortDosesLeft": "{text}, noch {count, plural, =1{1 Dosis} other{{count} Dosen}}"
 }
