@@ -9,6 +9,8 @@ turns that section into the release's own when it's cut.
 
 ## [Unreleased]
 
+## [0.10.0] - 2026-11-23
+
 ### Added
 - A taper can be set by number of doses instead of dates: "every 24 hours
   for 5 doses, then every 36 hours". Choose "By doses" under Taper. Each
