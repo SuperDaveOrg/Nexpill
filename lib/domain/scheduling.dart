@@ -271,21 +271,44 @@ List<DateTime> _slotsAround(List<ClockTime> times, DateTime at) {
   ];
 }
 
-/// A taper is due the interval of the step in force after the last dose,
-/// whichever step that dose was given in. So across a change of step the gap
-/// between two doses is never longer than the new step's interval: counting
-/// the new step from its midnight instead left up to a day more, 50 hours
-/// from a 10:00 dose going into a 36-hour step.
+/// When a taper is next due.
+///
+/// After a dose, it's that dose plus the interval of the step the next one
+/// falls in, which doesn't depend on [now]: start with the step the dose was
+/// given in, and if its interval carries the next dose to or past that
+/// step's end, the following step sets it instead, and so on. So from a
+/// daily step into a 36-hour one, a 10:00 dose on the daily step's last day
+/// is followed by one 36 hours on, and that is the answer before the new
+/// step starts as well as after.
+///
+/// A step never makes a dose due before the step's own first day: going
+/// into a shorter interval, or with a dose from before the taper began, the
+/// dose is due as that day begins if the interval alone would say sooner.
 DateTime _taperDue(List<TaperRule> rules, DoseEvent? latest, DateTime now) {
-  final rule = activeTaperRule(rules, now);
-  if (rule == null) return now;
-  final interval = Duration(minutes: rule.intervalMinutes);
+  if (rules.isEmpty) return now;
 
-  // Nothing given yet: due on the step's own rhythm, counted from its start.
+  // Nothing given yet: due on the rhythm of the step in force, counted from
+  // its start.
   if (latest == null) {
-    return _latestBeat(_ruleBoundary(rule.startDate), interval, now);
+    final rule = activeTaperRule(rules, now)!;
+    return _latestBeat(_ruleBoundary(rule.startDate),
+        Duration(minutes: rule.intervalMinutes), now);
   }
-  return latest.givenAt.add(interval);
+
+  final given = latest.givenAt;
+  final ordered = orderedTaperRules(rules);
+  for (var i = ordered.indexOf(activeTaperRule(rules, given)!);; i++) {
+    final step = ordered[i];
+    final start = _ruleBoundary(step.startDate);
+    final counted = given.add(Duration(minutes: step.intervalMinutes));
+    final due = counted.isBefore(start) ? start : counted;
+    final end = step.endDate;
+    if (end == null ||
+        due.isBefore(_ruleBoundary(end)) ||
+        i == ordered.length - 1) {
+      return due;
+    }
+  }
 }
 
 /// A taper's steps in the order they run: by start date, and of two steps

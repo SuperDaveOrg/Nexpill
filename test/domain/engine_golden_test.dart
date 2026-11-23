@@ -101,15 +101,22 @@ String? _changedSincePwa(
       when taperFinished(rules, now)) {
     return 'a finished taper has nothing due (port-from-pwa.md, 5)';
   }
-  // Change 6: a step counts from the last dose even if that was given before
-  // the step began, where the PWA counted from the step's start.
+  // Change 6: after a dose, a taper is due by the step the next dose falls
+  // in, where the PWA went by the step in force at the time of asking and
+  // counted from that step's start. The two agree only while the last dose
+  // and the one after it are both within the step in force.
   if (medication.schedule case TaperSchedule(:final rules)) {
     final latest = latestDose(medication.id, doses);
     final step = activeTaperRule(rules, now);
-    if (latest != null &&
-        step != null &&
-        latest.givenAt.isBefore(dateOnly(step.startDate))) {
-      return 'a taper step counts from the last dose (port-from-pwa.md, 6)';
+    if (latest != null && step != null) {
+      final end = step.endDate;
+      final next =
+          latest.givenAt.add(Duration(minutes: step.intervalMinutes));
+      if (latest.givenAt.isBefore(dateOnly(step.startDate)) ||
+          (end != null && !next.isBefore(dateOnly(end)))) {
+        return 'a taper is due by the step its next dose falls in '
+            '(port-from-pwa.md, 6)';
+      }
     }
   }
   return null;

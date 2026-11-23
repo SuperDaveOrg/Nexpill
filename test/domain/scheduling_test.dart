@@ -432,26 +432,76 @@ void main() {
       expect(r.nextEligibleAt, DateTime(2026, 3, 25, 10));
     });
 
-    test('going into a longer step, the gap is never more than its interval',
-        () {
-      final slowing = TaperSchedule([
-        TaperRule(
-            startDate: DateTime(2026, 3, 20),
-            endDate: DateTime(2026, 3, 25),
-            intervalMinutes: 24 * 60),
-        TaperRule(startDate: DateTime(2026, 3, 25), intervalMinutes: 36 * 60),
-      ]);
-      final doses = [dose('2026-03-24T10:00:00')];
+    group('going into the next step', () {
+      TaperSchedule steps(int firstHours, int thenHours) => TaperSchedule([
+            TaperRule(
+                startDate: DateTime(2026, 3, 20),
+                endDate: DateTime(2026, 3, 25),
+                intervalMinutes: firstHours * 60),
+            TaperRule(
+                startDate: DateTime(2026, 3, 25),
+                intervalMinutes: thenHours * 60),
+          ]);
+      DateTime due(TaperSchedule schedule, String given, DateTime asOf) =>
+          calculateSchedule(med(schedule), [dose(given)], asOf).nextEligibleAt;
 
-      // Still in the daily step: due a day on.
-      final before =
-          calculateSchedule(med(slowing), doses, DateTime(2026, 3, 24, 23, 59));
-      expect(before.nextEligibleAt, DateTime(2026, 3, 25, 10));
+      test('the gap is the new step\'s interval, and the same whenever asked',
+          () {
+        // Counting the 36-hour step from its midnight made this 12:00 on
+        // the 26th, 50 hours on. Counting by the step in force at the
+        // time of asking said 10:00 on the 25th until midnight, then moved.
+        for (final asOf in [
+          DateTime(2026, 3, 24, 11),
+          DateTime(2026, 3, 24, 23, 59),
+          DateTime(2026, 3, 25),
+          DateTime(2026, 3, 27),
+        ]) {
+          expect(due(steps(24, 36), '2026-03-24T10:00:00', asOf),
+              DateTime(2026, 3, 25, 22),
+              reason: 'asked at $asOf');
+        }
+      });
 
-      // In the 36-hour step: 36 hours from that dose, not from midnight,
-      // which made it 12:00 on the 26th, 50 hours on.
-      final after = calculateSchedule(med(slowing), doses, DateTime(2026, 3, 25));
-      expect(after.nextEligibleAt, DateTime(2026, 3, 25, 22));
+      test('a dose still due within the old step keeps the old interval', () {
+        // Due 10:00 on the 24th, the daily step's last day, and never
+        // given: it stays due then, however late it gets.
+        for (final asOf in [DateTime(2026, 3, 23, 12), DateTime(2026, 3, 26)]) {
+          expect(due(steps(24, 36), '2026-03-23T10:00:00', asOf),
+              DateTime(2026, 3, 24, 10));
+        }
+      });
+
+      test('a shorter interval isn\'t due before the new step begins', () {
+        // 36 hours would be 22:00 on the 25th, in the 12-hour step. Twelve
+        // hours would be 22:00 on the 24th, before that step starts.
+        for (final asOf in [DateTime(2026, 3, 24, 11), DateTime(2026, 3, 25, 1)]) {
+          expect(due(steps(36, 12), '2026-03-24T10:00:00', asOf),
+              DateTime(2026, 3, 25));
+        }
+        // Late enough in the old step, it's simply 12 hours on.
+        expect(due(steps(36, 12), '2026-03-24T20:00:00', DateTime(2026, 3, 24, 21)),
+            DateTime(2026, 3, 25, 8));
+      });
+
+      test('a dose from before the taper is due as it begins, or later', () {
+        expect(due(steps(24, 36), '2026-03-18T10:00:00', DateTime(2026, 3, 19)),
+            DateTime(2026, 3, 20));
+        expect(due(steps(24, 36), '2026-03-19T10:00:00', DateTime(2026, 3, 19, 12)),
+            DateTime(2026, 3, 20, 10));
+      });
+
+      test('across a gap between steps, nothing is due until the next begins',
+          () {
+        final gapped = TaperSchedule([
+          TaperRule(
+              startDate: DateTime(2026, 3, 20),
+              endDate: DateTime(2026, 3, 23),
+              intervalMinutes: 24 * 60),
+          TaperRule(startDate: DateTime(2026, 3, 25), intervalMinutes: 36 * 60),
+        ]);
+        expect(due(gapped, '2026-03-22T10:00:00', DateTime(2026, 3, 22, 12)),
+            DateTime(2026, 3, 25));
+      });
     });
 
     test('finishes at local midnight on the last step\'s end date', () {
