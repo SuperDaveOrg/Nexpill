@@ -212,9 +212,8 @@ void main() {
       final plan = const ReminderPlanner(horizon: Duration(hours: 30))
           .plan(care([m], [given('pred', DateTime(2026, 6, 10, 20))]), from: from);
       // Due 04:00 on the 11th on the old 8-hour step — but by then the
-      // 12-hour step has started, and a dose from before a step doesn't
-      // count toward it: due 12 hours from its start.
-      expect(summary(plan).take(2), ['11/12:00 dueNow:pred', '11/14:00 overdue:pred']);
+      // 12-hour step has started: due 12 hours from that dose.
+      expect(summary(plan).take(2), ['11/08:00 dueNow:pred', '11/10:00 overdue:pred']);
     });
 
     test('never given: due on each beat of the step', () {

@@ -1862,4 +1862,45 @@ class AppLocalizationsEs extends AppLocalizations {
   String historyDoseFor(String time) {
     return 'la dosis de las $time';
   }
+
+  @override
+  String get taperByDates => 'Por fechas';
+
+  @override
+  String get taperByDoses => 'Por dosis';
+
+  @override
+  String get taperDosesHint =>
+      'Cada paso dura el número de dosis indicado y luego empieza el siguiente. Deja vacío el número del último paso para que siga hasta que se detenga.';
+
+  @override
+  String get errorStepDoses =>
+      'Cada paso, salvo el último, necesita un número de dosis.';
+
+  @override
+  String taperDoseStep(int count, String duration) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count dosis',
+      one: '1 dosis',
+    );
+    return '$_temp0: cada $duration';
+  }
+
+  @override
+  String taperDoseStepOpen(String duration) {
+    return 'luego cada $duration';
+  }
+
+  @override
+  String taperShortDosesLeft(String text, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count dosis más',
+      one: '1 dosis más',
+    );
+    return '$text durante $_temp0';
+  }
 }

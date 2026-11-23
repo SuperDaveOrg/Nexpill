@@ -122,10 +122,10 @@ void main() {
     expect(back.countsFor, eight);
   });
 
-  test('writes version 7, and still restores versions 6, 5, 4, 3 and 2', () {
+  test('writes version 8, and still restores versions 7, 6, 5, 4, 3 and 2', () {
     final json = sampleJson();
-    expect(json['nexpillBackup'], 7);
-    for (final version in [6, 5, 4, 3, 2]) {
+    expect(json['nexpillBackup'], 8);
+    for (final version in [7, 6, 5, 4, 3, 2]) {
       json['nexpillBackup'] = version;
       final back = decodeBackup(jsonEncode(json));
       expect(back.medications.length, sample.medications.length);
@@ -165,6 +165,35 @@ void main() {
     expect(firstMed(again)['schedule'], {'type': 'once', 'at': '2026-06-11T13:00:00.000Z'});
   });
 
+  test('a taper by doses round-trips its steps and where it started', () {
+    final json = sampleJson();
+    final schedule = {
+      'type': 'taperByDoses',
+      'steps': [
+        {'doses': 5, 'everyMinutes': 1440},
+        {'everyMinutes': 2160},
+      ],
+      'dosesBefore': 3,
+    };
+    firstMed(json)['schedule'] = schedule;
+    final back = decodeBackup(jsonEncode(json));
+    final taper = back.medications
+        .map((m) => m.schedule)
+        .whereType<DoseTaperSchedule>()
+        .single;
+    expect([for (final s in taper.steps) (s.doses, s.intervalMinutes)],
+        [(5, 1440), (null, 2160)]);
+    expect(taper.dosesBefore, 3);
+    final again = jsonDecode(encodeBackup(back, exportedAt: now)) as Map<String, dynamic>;
+    expect(firstMed(again)['schedule'], schedule);
+
+    // Nothing before it: left out.
+    (firstMed(json)['schedule'] as Map).remove('dosesBefore');
+    final fresh = jsonDecode(encodeBackup(decodeBackup(jsonEncode(json)), exportedAt: now))
+        as Map<String, dynamic>;
+    expect((firstMed(fresh)['schedule'] as Map).containsKey('dosesBefore'), isFalse);
+  });
+
   test('still restores version 1', () {
     final json = sampleJson();
     json['nexpillBackup'] = 1;
@@ -197,7 +226,7 @@ void main() {
               (e) => e.message, 'message', contains('isn\'t a Nexpill backup'))));
     });
 
-    test('a newer format', () => refuses((j) => j['nexpillBackup'] = 8, 'newer version'));
+    test('a newer format', () => refuses((j) => j['nexpillBackup'] = 9, 'newer version'));
 
     test('a refill that adds nothing', () => refuses(
         (j) => firstMed(j)['refills'] = [
@@ -245,6 +274,23 @@ void main() {
           (drops['schedule'] as Map)['times'] = ['8am'];
         }, 'HH:mm'));
 
+    test('a taper by doses with a step in the middle that never ends', () => refuses(
+        (j) => firstMed(j)['schedule'] = {
+              'type': 'taperByDoses',
+              'steps': [
+                {'everyMinutes': 1440},
+                {'doses': 2, 'everyMinutes': 2160},
+              ],
+            },
+        'doses'));
+    test('a taper by doses with a step of no doses', () => refuses(
+        (j) => firstMed(j)['schedule'] = {
+              'type': 'taperByDoses',
+              'steps': [
+                {'doses': 0, 'everyMinutes': 1440},
+              ],
+            },
+        'doses'));
     test('a zero interval', () =>
         refuses((j) => (firstMed(j)['schedule'] as Map)['everyMinutes'] = 0, 'impossible'));
 

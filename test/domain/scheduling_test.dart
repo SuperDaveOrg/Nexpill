@@ -426,10 +426,82 @@ void main() {
       expect(before.nextEligibleAt, DateTime(2026, 3, 24, 16));
     });
 
-    test('a dose from before the step began doesn\'t hold it back', () {
+    test('a new step counts from the last dose, not from its own start', () {
       final r = calculateSchedule(
           med(taper), [dose('2026-03-24T22:00:00')], DateTime(2026, 3, 26));
-      expect(r.nextEligibleAt, DateTime(2026, 3, 25, 12));
+      expect(r.nextEligibleAt, DateTime(2026, 3, 25, 10));
+    });
+
+    group('going into the next step', () {
+      TaperSchedule steps(int firstHours, int thenHours) => TaperSchedule([
+            TaperRule(
+                startDate: DateTime(2026, 3, 20),
+                endDate: DateTime(2026, 3, 25),
+                intervalMinutes: firstHours * 60),
+            TaperRule(
+                startDate: DateTime(2026, 3, 25),
+                intervalMinutes: thenHours * 60),
+          ]);
+      DateTime due(TaperSchedule schedule, String given, DateTime asOf) =>
+          calculateSchedule(med(schedule), [dose(given)], asOf).nextEligibleAt;
+
+      test('the gap is the new step\'s interval, and the same whenever asked',
+          () {
+        // Counting the 36-hour step from its midnight made this 12:00 on
+        // the 26th, 50 hours on. Counting by the step in force at the
+        // time of asking said 10:00 on the 25th until midnight, then moved.
+        for (final asOf in [
+          DateTime(2026, 3, 24, 11),
+          DateTime(2026, 3, 24, 23, 59),
+          DateTime(2026, 3, 25),
+          DateTime(2026, 3, 27),
+        ]) {
+          expect(due(steps(24, 36), '2026-03-24T10:00:00', asOf),
+              DateTime(2026, 3, 25, 22),
+              reason: 'asked at $asOf');
+        }
+      });
+
+      test('a dose still due within the old step keeps the old interval', () {
+        // Due 10:00 on the 24th, the daily step's last day, and never
+        // given: it stays due then, however late it gets.
+        for (final asOf in [DateTime(2026, 3, 23, 12), DateTime(2026, 3, 26)]) {
+          expect(due(steps(24, 36), '2026-03-23T10:00:00', asOf),
+              DateTime(2026, 3, 24, 10));
+        }
+      });
+
+      test('a shorter interval isn\'t due before the new step begins', () {
+        // 36 hours would be 22:00 on the 25th, in the 12-hour step. Twelve
+        // hours would be 22:00 on the 24th, before that step starts.
+        for (final asOf in [DateTime(2026, 3, 24, 11), DateTime(2026, 3, 25, 1)]) {
+          expect(due(steps(36, 12), '2026-03-24T10:00:00', asOf),
+              DateTime(2026, 3, 25));
+        }
+        // Late enough in the old step, it's simply 12 hours on.
+        expect(due(steps(36, 12), '2026-03-24T20:00:00', DateTime(2026, 3, 24, 21)),
+            DateTime(2026, 3, 25, 8));
+      });
+
+      test('a dose from before the taper is due as it begins, or later', () {
+        expect(due(steps(24, 36), '2026-03-18T10:00:00', DateTime(2026, 3, 19)),
+            DateTime(2026, 3, 20));
+        expect(due(steps(24, 36), '2026-03-19T10:00:00', DateTime(2026, 3, 19, 12)),
+            DateTime(2026, 3, 20, 10));
+      });
+
+      test('across a gap between steps, nothing is due until the next begins',
+          () {
+        final gapped = TaperSchedule([
+          TaperRule(
+              startDate: DateTime(2026, 3, 20),
+              endDate: DateTime(2026, 3, 23),
+              intervalMinutes: 24 * 60),
+          TaperRule(startDate: DateTime(2026, 3, 25), intervalMinutes: 36 * 60),
+        ]);
+        expect(due(gapped, '2026-03-22T10:00:00', DateTime(2026, 3, 22, 12)),
+            DateTime(2026, 3, 25));
+      });
     });
 
     test('finishes at local midnight on the last step\'s end date', () {
@@ -459,6 +531,126 @@ void main() {
     test('with an open-ended last step never finishes', () {
       final r = calculateSchedule(med(taper), [], DateTime(2027, 1, 1));
       expect(r.finished, isFalse);
+    });
+  });
+
+  group('taper by doses', () {
+    // Daily for two doses, then every 36 hours.
+    const slowing = DoseTaperSchedule([
+      DoseTaperStep(doses: 2, intervalMinutes: 24 * 60),
+      DoseTaperStep(intervalMinutes: 36 * 60),
+    ]);
+    final asOf = DateTime(2026, 3, 28, 12);
+    DateTime due(MedicationSchedule s, List<DoseEvent> doses) =>
+        calculateSchedule(med(s), doses, asOf).nextEligibleAt;
+
+    test('never given, can be given straight away', () {
+      final r = calculateSchedule(med(slowing), [], asOf);
+      expect(r.nextEligibleAt, asOf);
+      expect(r.eligibleNow, isTrue);
+      expect(r.finished, isFalse);
+    });
+
+    test('a dose is due the interval of the step it is in after the last', () {
+      // The second dose is still the daily step's.
+      expect(due(slowing, [dose('2026-03-24T10:00:00', id: 'a')]),
+          DateTime(2026, 3, 25, 10));
+      // The third is the 36-hour step's first: 36 hours on, whatever the
+      // time of day the second was given.
+      expect(
+          due(slowing, [
+            dose('2026-03-24T10:00:00', id: 'a'),
+            dose('2026-03-25T10:00:00', id: 'b'),
+          ]),
+          DateTime(2026, 3, 26, 22));
+      expect(
+          due(slowing, [
+            dose('2026-03-24T10:00:00', id: 'a'),
+            dose('2026-03-25T10:00:00', id: 'b'),
+            dose('2026-03-26T23:15:00', id: 'c'),
+          ]),
+          DateTime(2026, 3, 28, 11, 15));
+    });
+
+    test('a late dose doesn\'t shorten the step: it lasts its doses', () {
+      // Two days late with the second dose; the step still changes after
+      // it, not on any date.
+      expect(
+          due(slowing, [
+            dose('2026-03-24T10:00:00', id: 'a'),
+            dose('2026-03-27T10:00:00', id: 'b'),
+          ]),
+          DateTime(2026, 3, 28, 22));
+    });
+
+    test('a correction counts once, and a skip not at all', () {
+      final first = dose('2026-03-24T10:00:00', id: 'a');
+      final fixed = dose('2026-03-24T09:00:00', id: 'b', corrects: 'a');
+      expect(due(slowing, [first, fixed]), DateTime(2026, 3, 25, 9));
+
+      // The second dose skipped: the next is due a day after the skip,
+      // and is still the daily step's second dose.
+      final skip = DoseEvent(
+          id: 's',
+          medicationId: 'med-1',
+          givenAt: DateTime(2026, 3, 25, 9),
+          skipped: true);
+      expect(due(slowing, [first, fixed, skip]), DateTime(2026, 3, 26, 9));
+      expect(doseTaperPosition(slowing, 'med-1', [first, fixed, skip]).left, 1);
+    });
+
+    test('doses from before the taper was set aren\'t part of it', () {
+      const later = DoseTaperSchedule([
+        DoseTaperStep(doses: 2, intervalMinutes: 24 * 60),
+        DoseTaperStep(intervalMinutes: 36 * 60),
+      ], dosesBefore: 2);
+      final before = [
+        dose('2026-03-22T10:00:00', id: 'a'),
+        dose('2026-03-23T10:00:00', id: 'b'),
+      ];
+      // The taper's first dose counts from the last one before it.
+      expect(due(later, before), DateTime(2026, 3, 24, 10));
+      expect(doseTaperPosition(later, 'med-1', before).left, 2);
+      expect(
+          due(later, [
+            ...before,
+            dose('2026-03-24T10:00:00', id: 'c'),
+            dose('2026-03-25T10:00:00', id: 'd'),
+          ]),
+          DateTime(2026, 3, 26, 22));
+    });
+
+    test('with a number on every step, finishes at its last dose', () {
+      const ending = DoseTaperSchedule([
+        DoseTaperStep(doses: 1, intervalMinutes: 24 * 60),
+        DoseTaperStep(doses: 2, intervalMinutes: 36 * 60),
+      ]);
+      final two = [
+        dose('2026-03-24T10:00:00', id: 'a'),
+        dose('2026-03-25T22:00:00', id: 'b'),
+      ];
+      final going = calculateSchedule(med(ending), two, asOf);
+      expect(going.finished, isFalse);
+      expect(going.nextEligibleAt, DateTime(2026, 3, 27, 10));
+
+      final done = calculateSchedule(
+          med(ending), [...two, dose('2026-03-27T10:30:00', id: 'c')], asOf);
+      expect(done.finished, isTrue);
+      expect(done.nextEligibleAt, DateTime(2026, 3, 27, 10, 30));
+      expect(done.reminderAt, isNull);
+      expect(slowing.totalDoses, isNull, reason: 'open-ended never finishes');
+    });
+
+    test('is missed by the interval of the step the dose is in', () {
+      final doses = [
+        dose('2026-03-24T10:00:00', id: 'a'),
+        dose('2026-03-25T10:00:00', id: 'b'),
+      ];
+      // Due 22:00 on the 26th; half of 36 hours is 18.
+      MedicationStatusLabel label(DateTime t) =>
+          computeMedicationStatus(med(slowing), doses, t).label;
+      expect(label(DateTime(2026, 3, 27, 15, 59)), MedicationStatusLabel.overdue);
+      expect(label(DateTime(2026, 3, 27, 16)), MedicationStatusLabel.missed);
     });
   });
 

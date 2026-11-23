@@ -90,6 +90,64 @@ void main() {
     });
   });
 
+  group('taper by doses', () {
+    MedicationDraft taper(List<DoseStepDraft> steps) => named()
+      ..setKind(ScheduleKind.taper)
+      ..taperByDoses = true
+      ..doseSteps.replaceRange(0, 1, steps);
+
+    test('builds its steps in the order listed, the last open-ended', () {
+      final d = taper([
+        DoseStepDraft(doses: '5', minutes: 1440),
+        DoseStepDraft(doses: ' 3 ', minutes: 2160),
+        DoseStepDraft(minutes: 2880),
+      ]);
+      expect(d.validate(), isEmpty);
+      final s = d.build(() => 'x').schedule as DoseTaperSchedule;
+      expect([for (final step in s.steps) '$step'], ['5:1440', '3:2160', ':2880']);
+      expect(s.dosesBefore, 0);
+    });
+
+    test('every step but the last needs a number of doses', () {
+      for (final doses in ['', '0', '-2', '1.5', 'x']) {
+        final d = taper([
+          DoseStepDraft(doses: doses, minutes: 1440),
+          DoseStepDraft(minutes: 2160),
+        ]);
+        expect(d.validate()['schedule'], contains('number of doses'),
+            reason: '"$doses"');
+      }
+      expect(taper([DoseStepDraft(doses: '0')]).validate()['schedule'],
+          contains('number of doses'));
+      expect(taper([DoseStepDraft(minutes: 0)]).validate()['schedule'],
+          contains('interval'));
+    });
+
+    test('set on a medication already given, starts counting from now', () {
+      final m = named().build(() => 'id');
+      final d = MedicationDraft.of(m, givenSoFar: 7)
+        ..setKind(ScheduleKind.taper)
+        ..taperByDoses = true
+        ..doseSteps.single.doses = '4';
+      expect((d.build(() => 'id').schedule as DoseTaperSchedule).dosesBefore, 7);
+    });
+
+    test('edited part-way through, keeps its place', () {
+      final m = (named()
+            ..setKind(ScheduleKind.taper)
+            ..taperByDoses = true
+            ..doseSteps.single.doses = '4')
+          .build(() => 'id');
+      final again = MedicationDraft.of(m, givenSoFar: 3);
+      expect(again.taperByDoses, isTrue);
+      expect(again.doseSteps.single.doses, '4');
+      again.doseSteps.add(DoseStepDraft(minutes: 720));
+      final s = again.build(() => 'id').schedule as DoseTaperSchedule;
+      expect(s.dosesBefore, 0, reason: 'not restarted by the 3 since given');
+      expect(s.steps, hasLength(2));
+    });
+  });
+
   test('supply needs an amount left and a positive amount per dose', () {
     final d = named()..trackSupply = true;
     expect(d.validate().keys, ['supply']);

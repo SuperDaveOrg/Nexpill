@@ -11,7 +11,7 @@ in one step: a file with a problem anywhere is refused whole.
 
 ## Versioning
 
-`nexpillBackup` is the format version, currently **7**. Adding an optional
+`nexpillBackup` is the format version, currently **8**. Adding an optional
 field doesn't change it. Changing what a field means, or adding a required
 one, needs a new version, a section here, and a reader that still accepts the
 old versions. Nexpill refuses a file whose version it doesn't know.
@@ -31,6 +31,7 @@ older app refuses the file instead of half-restoring it.
 | 5 | Adds the `once` schedule type, a single dose at a set time. Without the version change, an older Nexpill would refuse the file as having an unknown schedule type, rather than saying it needs updating. A version 4 file is read as version 5 unchanged. |
 | 6 | Adds the medication's optional `refills`. Without the version change, an older Nexpill would drop them and restore less supply than there is. A version 5 file is read as version 6 with no refills. |
 | 7 | Adds the dose's optional `countsFor`. Without the version change, an older Nexpill would drop it and count a late dose for the wrong time, skipping the reminder after it. A version 6 file is read as version 7 with no dose saying which time it was for. |
+| 8 | Adds the `taperByDoses` schedule type, a taper whose steps are numbers of doses. Without the version change, an older Nexpill would refuse the file as having an unknown schedule type, rather than saying it needs updating. A version 7 file is read as version 8 unchanged. |
 
 ## Example
 
@@ -121,10 +122,34 @@ the whole file; Nexpill writes random UUIDs.
 | `interval` | `everyMinutes` | Due that long after the last dose. |
 | `fixedTimes` | `times`: array of `"HH:mm"` | Due at those times on the phone's clock every day. |
 | `asNeeded` | `minimumMinutes` | Can be given once that long has passed since the last dose; never due or overdue. |
-| `taper` | `steps`: array of `{from, until?, everyMinutes}` | An interval that changes by date. `from` and `until` are `YYYY-MM-DD` calendar days; a step applies from local midnight on `from` until local midnight on `until` (so not on `until` itself). The last step may be open-ended. |
+| `taper` | `steps`: array of `{from, until?, everyMinutes}` | An interval that changes by date. `from` and `until` are `YYYY-MM-DD` calendar days; a step applies from local midnight on `from` until local midnight on `until` (so not on `until` itself). The last step may be open-ended. After a dose, the next is due by the step it falls in: see below. |
+| `taperByDoses` | `steps`: array of `{doses?, everyMinutes}`; `dosesBefore`, optional | An interval that changes after a number of doses, with no dates. See below. |
 | `once` | `at`: instant | A single dose, due at that moment. Finished once a dose of it is given or skipped, whenever that was logged for; nothing more is due after that. |
 
 All minute values are positive integers.
+
+**A `taper`, after a dose.** The next dose is that dose plus the
+`everyMinutes` of the step the next dose falls in, which is the same answer
+whenever it's asked. Start with the step the dose was given in; if its
+interval carries the next dose to or past that step's `until`, the following
+step sets it instead, and so on. A step never makes a dose due before its
+own `from`: if its interval alone would, the dose is due at local midnight
+as `from` begins. With nothing given yet, a dose is due on the rhythm of the
+step in force, counted from its `from`.
+
+**A `taperByDoses`.** Steps run in the order listed. Each lasts for its
+`doses`, a positive integer, and the next begins with the dose after; only
+the last step may leave `doses` out, and then carries on until the
+medication is stopped. A dose is due the `everyMinutes` of the step it
+belongs to after the dose before it, so with `[{doses: 5, everyMinutes:
+1440}, {everyMinutes: 2160}]` the sixth dose is due 36 hours after the
+fifth. Doses count as for a course: a dose another one `corrects` doesn't
+count, nor does a skipped one. `dosesBefore`, a whole number, default 0, is
+how many of the medication's doses, oldest first, were given before the
+taper was set and aren't part of it; the first dose of the taper is still
+counted from the last of those. With nothing given at all, a dose can be
+given straight away. When every step has `doses`, the taper is finished at
+the dose that completes the last step.
 
 ### Reminders
 
@@ -168,7 +193,7 @@ Exactly one of:
 
 Once finished, nothing more is due and nothing is reminded; the medication
 and its history stay. A taper's own steps end it, so Nexpill doesn't write
-a course for a taper, nor for a `once` schedule, which its one dose ends; if
+a course for a taper of either kind, nor for a `once` schedule, which its one dose ends; if
 one is there, whichever ends first applies.
 
 ### Dose
@@ -185,13 +210,13 @@ one is there, whichever ends first applies.
 | `countsFor` | instant, optional | For a `fixedTimes` medication, the time this dose was for, where that was said: by the reminder it was marked given from, or by whoever logged it between two times. The medication is next due at its first time after this instant. Absent, the dose counts for the time nearest to `givenAt`, halfway going to the later one. Other schedule types ignore it. |
 
 A skipped dose moves the medication on as if it had been given on time:
-a `fixedTimes` one to its next time, an `interval` or `taper` one to an
-interval after the skipped dose was due. A skip only counts for a dose the
+a `fixedTimes` one to its next time, an `interval`, `taper` or
+`taperByDoses` one to an interval after the skipped dose was due. A skip only counts for a dose the
 last given one hasn't already covered: if the dose was given after all,
 even before the time it was skipped for, the next is counted from the dose
 given. A skip is never counted as given: it
-uses no supply, doesn't count towards a course of `doses`, and isn't the
-"last given" dose. `asNeeded` medications ignore it, and Nexpill never
+uses no supply, doesn't count towards a course of `doses` or a step of a
+`taperByDoses`, and isn't the "last given" dose. `asNeeded` medications ignore it, and Nexpill never
 writes one for them.
 
 An **instant** is an ISO 8601 date and time with its offset, such as

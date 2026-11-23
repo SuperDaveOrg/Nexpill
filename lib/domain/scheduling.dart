@@ -41,7 +41,8 @@ class ScheduleResult {
   /// or the due time itself without one — or null when reminders are off.
   final DateTime? reminderAt;
 
-  /// A course that has ended, a taper whose last step has, or a single dose
+  /// A course that has ended, a taper whose last step has (by date, or with
+  /// its last dose given), or a single dose
   /// that's been given or skipped: nothing more is due, so nothing is overdue and there's no reminder. [nextEligibleAt]
   /// is when it finished. See [finishesAt].
   final bool finished;
@@ -89,8 +90,8 @@ ScheduleResult calculateSchedule(
 }
 
 /// When [medication] finishes by itself: at the end of its course's last
-/// day, at the dose that completes its course, when a taper's last step
-/// ends, or at a single dose's first entry, given or skipped — whichever
+/// day, at the dose that completes its course or its taper by doses, when a
+/// taper by dates' last step ends, or at a single dose's first entry, given or skipped — whichever
 /// comes first. Null if none of those applies, or the
 /// doses that would complete the course haven't all been given.
 ///
@@ -98,6 +99,9 @@ ScheduleResult calculateSchedule(
 DateTime? finishesAt(Medication medication, Iterable<DoseEvent> doseEvents) {
   final ends = [
     if (medication.schedule case TaperSchedule(:final rules)) ?taperEndsAt(rules),
+    if (medication.schedule case final DoseTaperSchedule taper)
+      if (taper.totalDoses case final total?)
+        ?_doseGivenAt(medication.id, doseEvents, taper.dosesBefore + total),
     if (medication.schedule is OnceSchedule) ?_firstEntryAt(medication.id, doseEvents),
     if (medication.course case final course?) ?_courseEndsAt(course, medication.id, doseEvents),
   ];
@@ -115,13 +119,20 @@ DateTime? _courseEndsAt(
     case EndsAfterDay(:final lastDay):
       return DateTime(lastDay.year, lastDay.month, lastDay.day + 1);
     case EndsAfterDoses(:final doses):
-      final given = effectiveDoses(medicationId, doseEvents)
-        ..sort((a, b) {
-          final byTime = a.givenAt.compareTo(b.givenAt);
-          return byTime != 0 ? byTime : a.id.compareTo(b.id);
-        });
-      return doses >= 1 && given.length >= doses ? given[doses - 1].givenAt : null;
+      return _doseGivenAt(medicationId, doseEvents, doses);
   }
+}
+
+/// When the [number]th dose of [medicationId] that counts was given, in
+/// order of time, the first being 1; null if there haven't been that many.
+DateTime? _doseGivenAt(
+    String medicationId, Iterable<DoseEvent> doseEvents, int number) {
+  final given = effectiveDoses(medicationId, doseEvents)
+    ..sort((a, b) {
+      final byTime = a.givenAt.compareTo(b.givenAt);
+      return byTime != 0 ? byTime : a.id.compareTo(b.id);
+    });
+  return number >= 1 && given.length >= number ? given[number - 1].givenAt : null;
 }
 
 /// When [medication] is next due, counting a skipped dose as if it had been
@@ -132,16 +143,17 @@ DateTime? _courseEndsAt(
 DateTime _dueAfterSkips(Medication medication, Iterable<DoseEvent> doseEvents,
     DoseEvent? latest, DateTime now) {
   final schedule = medication.schedule;
-  final fromGiven = _nextEligibleAt(schedule, latest, now);
+  final fromGiven = _nextEligibleAt(medication, doseEvents, latest, now);
   if (schedule is PrnSchedule) return fromGiven;
   final skip = latestSkip(medication.id, doseEvents);
   if (skip == null) return fromGiven;
   if (latest != null && skip.givenAt.isBefore(fromGiven)) return fromGiven;
-  return _nextEligibleAt(schedule, skip, now);
+  return _nextEligibleAt(medication, doseEvents, skip, now);
 }
 
-DateTime _nextEligibleAt(
-    MedicationSchedule schedule, DoseEvent? latest, DateTime now) {
+DateTime _nextEligibleAt(Medication medication, Iterable<DoseEvent> doseEvents,
+    DoseEvent? latest, DateTime now) {
+  final schedule = medication.schedule;
   return switch (schedule) {
     // With nothing given yet, a dose can be given straight away.
     IntervalSchedule(:final intervalMinutes) =>
@@ -150,6 +162,15 @@ DateTime _nextEligibleAt(
       latest?.givenAt.add(Duration(minutes: minimumIntervalMinutes)) ?? now,
     FixedTimesSchedule(:final times) => _fixedDue(times, latest, now),
     TaperSchedule(:final rules) => _taperDue(rules, latest, now),
+    // Like an interval, with the interval of the step the next dose is in.
+    // The last dose may be from before the taper; with none at all, a dose
+    // can be given straight away.
+    DoseTaperSchedule() => latest?.givenAt.add(Duration(
+            minutes: doseTaperPosition(schedule, medication.id, doseEvents)
+                .step
+                ?.intervalMinutes ??
+                0)) ??
+        now,
     OnceSchedule(:final at) => at,
   };
 }
@@ -271,18 +292,78 @@ List<DateTime> _slotsAround(List<ClockTime> times, DateTime at) {
   ];
 }
 
+/// When a taper is next due.
+///
+/// After a dose, it's that dose plus the interval of the step the next one
+/// falls in, which doesn't depend on [now]: start with the step the dose was
+/// given in, and if its interval carries the next dose to or past that
+/// step's end, the following step sets it instead, and so on. So from a
+/// daily step into a 36-hour one, a 10:00 dose on the daily step's last day
+/// is followed by one 36 hours on, and that is the answer before the new
+/// step starts as well as after.
+///
+/// A step never makes a dose due before the step's own first day: going
+/// into a shorter interval, or with a dose from before the taper began, the
+/// dose is due as that day begins if the interval alone would say sooner.
 DateTime _taperDue(List<TaperRule> rules, DoseEvent? latest, DateTime now) {
-  final rule = activeTaperRule(rules, now);
-  if (rule == null) return now;
-  final start = _ruleBoundary(rule.startDate);
-  final interval = Duration(minutes: rule.intervalMinutes);
+  if (rules.isEmpty) return now;
 
-  // Nothing given yet: due on the step's own rhythm, counted from its start.
-  if (latest == null) return _latestBeat(start, interval, now);
+  // Nothing given yet: due on the rhythm of the step in force, counted from
+  // its start.
+  if (latest == null) {
+    final rule = activeTaperRule(rules, now)!;
+    return _latestBeat(_ruleBoundary(rule.startDate),
+        Duration(minutes: rule.intervalMinutes), now);
+  }
 
-  // A dose from before this step started doesn't hold the new step back.
-  final from = latest.givenAt.isAfter(start) ? latest.givenAt : start;
-  return from.add(interval);
+  final given = latest.givenAt;
+  final ordered = orderedTaperRules(rules);
+  for (var i = ordered.indexOf(activeTaperRule(rules, given)!);; i++) {
+    final step = ordered[i];
+    final start = _ruleBoundary(step.startDate);
+    final counted = given.add(Duration(minutes: step.intervalMinutes));
+    final due = counted.isBefore(start) ? start : counted;
+    final end = step.endDate;
+    if (end == null ||
+        due.isBefore(_ruleBoundary(end)) ||
+        i == ordered.length - 1) {
+      return due;
+    }
+  }
+}
+
+/// Where a taper by doses has got to: the step the next dose belongs to,
+/// which sets how long after the last dose it's due.
+class DoseTaperPosition {
+  const DoseTaperPosition(this.index, this.step, this.left);
+
+  /// The step the next dose is in, counting from 0; null with [step] once
+  /// every dose of the taper has been given, or if it has no steps.
+  final int? index;
+  final DoseTaperStep? step;
+
+  /// Doses of that step still to give, the next one included; null for an
+  /// open-ended step.
+  final int? left;
+}
+
+/// Where [taper] has got to, from the doses of [medicationId] that count.
+///
+/// The interval before a dose is that of the step the dose is in. So in
+/// "every 24 hours for 5 doses, then every 36 hours" the sixth dose is the
+/// new step's first and is due 36 hours after the fifth.
+DoseTaperPosition doseTaperPosition(DoseTaperSchedule taper,
+    String medicationId, Iterable<DoseEvent> doseEvents) {
+  var given =
+      effectiveDoses(medicationId, doseEvents).length - taper.dosesBefore;
+  if (given < 0) given = 0;
+  for (final (i, step) in taper.steps.indexed) {
+    final doses = step.doses;
+    if (doses == null) return DoseTaperPosition(i, step, null);
+    if (given < doses) return DoseTaperPosition(i, step, doses - given);
+    given -= doses;
+  }
+  return const DoseTaperPosition(null, null, null);
 }
 
 /// A taper's steps in the order they run: by start date, and of two steps

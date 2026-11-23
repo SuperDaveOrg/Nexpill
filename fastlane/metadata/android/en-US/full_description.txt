@@ -7,7 +7,7 @@ Each medication says where it stands right now: due in 8 minutes, overdue by 25,
 • Every few hours, including odd intervals like 4 h 45 min
 • At set times of day
 • As needed, with a minimum gap between doses
-• Tapers whose interval changes by date
+• Tapers whose interval changes by date or after a number of doses
 • A single dose at a set date and time
 
 <b>See what's coming up</b>

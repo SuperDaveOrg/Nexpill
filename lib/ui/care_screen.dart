@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:nexpill/domain/dose_history.dart';
 import 'package:nexpill/domain/inventory.dart';
+import 'package:nexpill/domain/scheduling.dart';
 import 'package:nexpill/domain/status.dart';
 import 'package:nexpill/domain/wording.dart';
 import 'package:nexpill/models/medication.dart';
@@ -412,6 +413,11 @@ class _CareScreenState extends State<CareScreen> with WidgetsBindingObserver {
                 status: status,
                 inventory: computeInventoryStatus(m, care.doses, care.refills),
                 course: courseShortText(m, care.doses),
+                taper: switch (m.schedule) {
+                  final DoseTaperSchedule t =>
+                    doseTaperPosition(t, m.id, care.doses),
+                  _ => null,
+                },
                 now: now,
                 forSelf: patient.isSelf,
                 lastGivenBy: latestDose(m.id, care.doses)?.givenBy,

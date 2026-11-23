@@ -176,10 +176,27 @@ MedicationSchedule _decodeSchedule(_Reader s) {
             intervalMinutes: step.minutes('everyMinutes'),
           ),
       ]),
+    'taperByDoses' => _decodeDoseTaper(s),
     'once' => OnceSchedule(s.instant('at')),
     final type => throw BackupFormatException(
         strings.backupUnknownSchedule(s.where, type)),
   };
+}
+
+DoseTaperSchedule _decodeDoseTaper(_Reader s) {
+  final steps = s.nonEmpty(s.list('steps'), 'steps');
+  return DoseTaperSchedule(
+    [
+      for (final (i, step) in steps.indexed)
+        DoseTaperStep(
+          // Only the last step may be open-ended.
+          doses: step.optionalCount('doses') ??
+              (i < steps.length - 1 ? step.value<int>('doses') : null),
+          intervalMinutes: step.minutes('everyMinutes'),
+        ),
+    ],
+    dosesBefore: s.optionalCountFromZero('dosesBefore') ?? 0,
+  );
 }
 
 /// Typed access to one JSON object, with errors that say where the problem
@@ -244,6 +261,16 @@ class _Reader {
     if (_json[key] == null) return null;
     final v = value<int>(key);
     if (v < 1 || v > 100000) {
+      throw BackupFormatException(strings.backupImpossible(where, key, '$v'));
+    }
+    return v;
+  }
+
+  /// A whole number of things that may be none.
+  int? optionalCountFromZero(String key) {
+    if (_json[key] == null) return null;
+    final v = value<int>(key);
+    if (v < 0 || v > 100000) {
       throw BackupFormatException(strings.backupImpossible(where, key, '$v'));
     }
     return v;

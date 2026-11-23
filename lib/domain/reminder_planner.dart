@@ -26,8 +26,8 @@ import 'package:nexpill/models/patient.dart';
 /// - As-needed medications get only "can be given again", once per dose.
 /// - A course stops reminding when it ends, a taper when its last step
 ///   does, and a single dose once it's given or skipped.
-/// - An interval or as-needed medication never given has no reminders:
-///   there's nothing to count from.
+/// - An interval or as-needed medication never given, or a taper by doses,
+///   has no reminders: there's nothing to count from.
 /// - Everything due for one patient at the same minute is one notification.
 class ReminderPlanner {
   const ReminderPlanner({
@@ -131,7 +131,9 @@ class ReminderPlanner {
       final s = calculateSchedule(m, doses, start);
       if (s.finished ||
           (latestEntry(m.id, doses) == null &&
-              (m.schedule is IntervalSchedule || prn))) {
+              (m.schedule is IntervalSchedule ||
+                  m.schedule is DoseTaperSchedule ||
+                  prn))) {
         continue;
       }
       final due = s.nextEligibleAt;
@@ -205,7 +207,11 @@ class ReminderPlanner {
             }
           }
         }
-      case IntervalSchedule() || PrnSchedule() || OnceSchedule():
+      // A taper by doses changes step only when a dose is logged.
+      case IntervalSchedule() ||
+            PrnSchedule() ||
+            OnceSchedule() ||
+            DoseTaperSchedule():
         break;
     }
     // A course running out on its last day. (One that ends on a dose ends

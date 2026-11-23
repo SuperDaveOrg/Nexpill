@@ -457,5 +457,12 @@
   "doseDueLate": "Prevista {when}, in ritardo",
   "doseDueEarly": "Prevista {when}, in anticipo",
   "doseWhichError": "Scegli quale dose è questa.",
-  "historyDoseFor": "la dose delle {time}"
+  "historyDoseFor": "la dose delle {time}",
+  "taperByDates": "Per date",
+  "taperByDoses": "Per dosi",
+  "taperDosesHint": "Ogni fase dura il numero di dosi indicato, poi inizia la successiva. Lascia vuoto il numero dell'ultima fase perché continui fino all'interruzione.",
+  "errorStepDoses": "Ogni fase, tranne l'ultima, ha bisogno di un numero di dosi.",
+  "taperDoseStep": "{count, plural, =1{1 dose} other{{count} dosi}}: ogni {duration}",
+  "taperDoseStepOpen": "poi ogni {duration}",
+  "taperShortDosesLeft": "{text} per {count, plural, =1{un'altra dose} other{altre {count} dosi}}"
 }

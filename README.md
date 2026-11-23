@@ -55,7 +55,7 @@ keeps a dose from being late.
 
 - Schedules every few hours (including odd intervals like 4 h 45 m), at set
   times of day, as needed with a minimum gap, tapers that change
-  interval by date, and a single dose at a set date and time.
+  interval by date or after a number of doses, and a single dose at a set date and time.
 - Several patients, each with their own medications.
 - Corrections that replace a mistaken entry without erasing it.
 - Remaining supply, with a low-supply warning.

@@ -1928,4 +1928,49 @@ class AppLocalizationsRu extends AppLocalizations {
   String historyDoseFor(String time) {
     return 'доза на $time';
   }
+
+  @override
+  String get taperByDates => 'По датам';
+
+  @override
+  String get taperByDoses => 'По дозам';
+
+  @override
+  String get taperDosesHint =>
+      'Каждый этап длится указанное число доз, затем начинается следующий. Оставьте число для последнего этапа пустым, чтобы он продолжался до отмены.';
+
+  @override
+  String get errorStepDoses =>
+      'Для каждого этапа, кроме последнего, нужно число доз.';
+
+  @override
+  String taperDoseStep(int count, String duration) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count дозы',
+      many: '$count доз',
+      few: '$count дозы',
+      one: '$count доза',
+    );
+    return '$_temp0: раз в $duration';
+  }
+
+  @override
+  String taperDoseStepOpen(String duration) {
+    return 'затем раз в $duration';
+  }
+
+  @override
+  String taperShortDosesLeft(String text, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count дозы',
+      many: '$count доз',
+      few: '$count дозы',
+      one: '$count доза',
+    );
+    return '$text, ещё $_temp0';
+  }
 }

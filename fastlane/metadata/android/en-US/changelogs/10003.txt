@@ -1,0 +1,2 @@
+• Fixed: a taper could leave too long between doses when it moved to its next step, 50 hours where a step asked for 36. The next dose now counts from the last one, and the card shows that time from the start. On a taper? Check "Coming up" after updating.
+• New: set a taper by number of doses instead of dates, such as every 24 hours for 5 doses, then every 36 hours. Choose "By doses" under Taper.

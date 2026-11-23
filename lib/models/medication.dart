@@ -86,8 +86,8 @@ class Medication {
         course: course,
       );
 
-  /// The `medications` row. Taper steps live in their own table; see
-  /// [TaperRule.toRow].
+  /// The `medications` row. A taper by dates keeps its steps in their own
+  /// table; see [TaperRule.toRow].
   Map<String, Object?> toRow() => {
         'id': id,
         'patient_id': patientId,
@@ -105,6 +105,14 @@ class Medication {
         },
         'times_of_day': switch (schedule) {
           FixedTimesSchedule(:final times) => times.join(','),
+          _ => null,
+        },
+        'dose_taper_steps': switch (schedule) {
+          DoseTaperSchedule(:final steps) => steps.join(','),
+          _ => null,
+        },
+        'dose_taper_doses_before': switch (schedule) {
+          DoseTaperSchedule(:final dosesBefore) => dosesBefore,
           _ => null,
         },
         'once_at': switch (schedule) {
@@ -153,6 +161,13 @@ class Medication {
               if (t.isNotEmpty) ClockTime.tryParse(t)!,
           ]),
         TaperSchedule.name => TaperSchedule(taperRules),
+        DoseTaperSchedule.name => DoseTaperSchedule(
+            [
+              for (final s in (row['dose_taper_steps'] as String).split(','))
+                if (s.isNotEmpty) DoseTaperStep.parse(s),
+            ],
+            dosesBefore: row['dose_taper_doses_before'] as int? ?? 0,
+          ),
         OnceSchedule.name => OnceSchedule(DateTime.fromMillisecondsSinceEpoch(
             row['once_at'] as int,
             isUtc: true)),
@@ -292,6 +307,61 @@ class TaperSchedule extends MedicationSchedule {
   static const name = 'taper';
   @override
   String get typeName => name;
+}
+
+/// An interval that changes after a number of doses, as when a dose is
+/// stepped down "every 24 hours for 5 doses, then every 36 hours". No dates:
+/// a step ends with the dose that completes it, whenever that's given.
+///
+/// Doses count as for a course: those given and still standing, so a
+/// correction counts in place of what it replaced and a skipped dose
+/// doesn't count. The first [dosesBefore] of the medication's doses, in
+/// order of time, came before the taper and aren't part of it.
+class DoseTaperSchedule extends MedicationSchedule {
+  const DoseTaperSchedule(this.steps, {this.dosesBefore = 0});
+
+  /// In the order they run. Only the last may be open-ended.
+  final List<DoseTaperStep> steps;
+
+  /// How many doses the medication had been given when the taper was set,
+  /// which it doesn't count.
+  final int dosesBefore;
+
+  /// Doses in the whole taper, or null if its last step is open-ended (or
+  /// it has no steps) and it carries on until stopped.
+  int? get totalDoses {
+    if (steps.isEmpty) return null;
+    var total = 0;
+    for (final s in steps) {
+      if (s.doses == null) return null;
+      total += s.doses!;
+    }
+    return total;
+  }
+
+  static const name = 'taper_doses';
+  @override
+  String get typeName => name;
+}
+
+/// One step of a taper by doses: [doses] of them, each [intervalMinutes]
+/// after the dose before. Without [doses] it's open-ended.
+class DoseTaperStep {
+  const DoseTaperStep({this.doses, required this.intervalMinutes});
+
+  final int? doses;
+  final int intervalMinutes;
+
+  /// As stored in the `medications` row: "5:1440", or ":2880" open-ended.
+  @override
+  String toString() => '${doses ?? ''}:$intervalMinutes';
+
+  factory DoseTaperStep.parse(String stored) {
+    final [doses, minutes] = stored.split(':');
+    return DoseTaperStep(
+        doses: doses.isEmpty ? null : int.parse(doses),
+        intervalMinutes: int.parse(minutes));
+  }
 }
 
 /// A single dose at [at], an instant, and then nothing more: finished once

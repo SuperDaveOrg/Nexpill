@@ -49,6 +49,12 @@ void main() {
     await repo.saveMedication(med('c', const PrnSchedule(360)));
     await repo.saveMedication(med('d', taper));
     await repo.saveMedication(med('e', OnceSchedule(DateTime(2026, 6, 11, 15))));
+    await repo.saveMedication(med(
+        'f',
+        const DoseTaperSchedule([
+          DoseTaperStep(doses: 5, intervalMinutes: 1440),
+          DoseTaperStep(intervalMinutes: 2160),
+        ], dosesBefore: 3)));
 
     final meds = {for (final m in await repo.medications()) m.id: m.schedule};
     expect((meds['a'] as IntervalSchedule).intervalMinutes, 285);
@@ -59,6 +65,10 @@ void main() {
     expect(rules.first.endDate, DateTime(2026, 6, 5));
     expect(rules.last.endDate, isNull);
     expect((meds['e'] as OnceSchedule).at, DateTime(2026, 6, 11, 15).toUtc());
+    final byDoses = meds['f'] as DoseTaperSchedule;
+    expect([for (final s in byDoses.steps) (s.doses, s.intervalMinutes)],
+        [(5, 1440), (null, 2160)]);
+    expect(byDoses.dosesBefore, 3);
   });
 
   test('reminder settings are stored as set, including the PRN default', () async {
@@ -122,6 +132,8 @@ void main() {
             version: 1, onCreate: (d, _) => NexpillDatabase.createVersion1(d)));
     await old.insert('patients', sam.toRow()..remove('is_self'));
     final row = med('a', const IntervalSchedule(480)).toRow()
+          ..remove('dose_taper_steps')
+          ..remove('dose_taper_doses_before')
       ..remove('course_last_day')
       ..remove('course_doses')
       ..remove('purpose')
@@ -153,6 +165,8 @@ void main() {
     await old.insert('patients', sam.toRow()..remove('is_self'));
     await old.insert('medications',
         med('a', const IntervalSchedule(480)).toRow()
+          ..remove('dose_taper_steps')
+          ..remove('dose_taper_doses_before')
           ..remove('purpose')
           ..remove('once_at'));
     await old.insert('dose_events', {
@@ -181,6 +195,9 @@ void main() {
     await db.execute('ALTER TABLE medications DROP COLUMN once_at');
     await db.execute('DROP TABLE refills');
     await db.execute('ALTER TABLE dose_events DROP COLUMN counts_for');
+    await db.execute('ALTER TABLE medications DROP COLUMN dose_taper_steps');
+    await db.execute(
+        'ALTER TABLE medications DROP COLUMN dose_taper_doses_before');
     await db.insert('patients', sam.toRow()..remove('is_self'));
     await db.setVersion(4);
     await v4.close();
@@ -208,9 +225,14 @@ void main() {
     await db.execute('ALTER TABLE medications DROP COLUMN once_at');
     await db.execute('DROP TABLE refills');
     await db.execute('ALTER TABLE dose_events DROP COLUMN counts_for');
+    await db.execute('ALTER TABLE medications DROP COLUMN dose_taper_steps');
+    await db.execute(
+        'ALTER TABLE medications DROP COLUMN dose_taper_doses_before');
     await db.insert('patients', sam.toRow());
     await db.insert('medications',
-        med('a', const IntervalSchedule(480)).toRow()..remove('once_at'));
+        med('a', const IntervalSchedule(480)).toRow()
+          ..remove('dose_taper_steps')
+          ..remove('dose_taper_doses_before')..remove('once_at'));
     await db.setVersion(5);
     await v5.close();
 
@@ -230,8 +252,13 @@ void main() {
     // Back to version 6, which had no refills.
     await db.execute('DROP TABLE refills');
     await db.execute('ALTER TABLE dose_events DROP COLUMN counts_for');
+    await db.execute('ALTER TABLE medications DROP COLUMN dose_taper_steps');
+    await db.execute(
+        'ALTER TABLE medications DROP COLUMN dose_taper_doses_before');
     await db.insert('patients', sam.toRow());
-    await db.insert('medications', med('a', const IntervalSchedule(480)).toRow());
+    await db.insert('medications', med('a', const IntervalSchedule(480)).toRow()
+          ..remove('dose_taper_steps')
+          ..remove('dose_taper_doses_before'));
     await db.setVersion(6);
     await v6.close();
 
@@ -250,8 +277,13 @@ void main() {
     final db = await v7.database;
     // Back to version 7's doses table.
     await db.execute('ALTER TABLE dose_events DROP COLUMN counts_for');
+    await db.execute('ALTER TABLE medications DROP COLUMN dose_taper_steps');
+    await db.execute(
+        'ALTER TABLE medications DROP COLUMN dose_taper_doses_before');
     await db.insert('patients', sam.toRow());
-    await db.insert('medications', med('a', const IntervalSchedule(480)).toRow());
+    await db.insert('medications', med('a', const IntervalSchedule(480)).toRow()
+          ..remove('dose_taper_steps')
+          ..remove('dose_taper_doses_before'));
     await db.setVersion(7);
     await v7.close();
 
@@ -267,6 +299,41 @@ void main() {
     expect(doses[dose.id]!.countsFor, eight);
     expect(doses[fix.id]!.countsFor, eight);
     expect(doses.values.where((d) => d.countsFor == null), hasLength(1));
+    await upgraded.close();
+  });
+
+  test('a version 8 database upgrades, and then stores a taper by doses',
+      () async {
+    final path = '${dir.path}/v8.db';
+    final v8 = NexpillDatabase(path: path, factory: databaseFactoryFfi);
+    final db = await v8.database;
+    // Back to version 8's medications table.
+    await db.execute('ALTER TABLE medications DROP COLUMN dose_taper_steps');
+    await db.execute(
+        'ALTER TABLE medications DROP COLUMN dose_taper_doses_before');
+    await db.insert('patients', sam.toRow());
+    await db.insert(
+        'medications',
+        med('a', const IntervalSchedule(480)).toRow()
+          ..remove('dose_taper_steps')
+          ..remove('dose_taper_doses_before'));
+    await db.setVersion(8);
+    await v8.close();
+
+    final upgraded = NexpillDatabase(path: path, factory: databaseFactoryFfi);
+    final upgradedRepo = CareRepository(db: upgraded);
+    expect((await upgradedRepo.medications()).single.schedule,
+        isA<IntervalSchedule>());
+    await upgradedRepo.saveMedication(med(
+        'a',
+        const DoseTaperSchedule([
+          DoseTaperStep(doses: 2, intervalMinutes: 1440),
+          DoseTaperStep(doses: 2, intervalMinutes: 2160),
+        ])));
+    final back =
+        (await upgradedRepo.medications()).single.schedule as DoseTaperSchedule;
+    expect(back.totalDoses, 4);
+    expect(back.dosesBefore, 0);
     await upgraded.close();
   });
 

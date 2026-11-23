@@ -1773,7 +1773,7 @@
   },
   "kindTaper": "Taper",
   "@kindTaper": {
-    "description": "Schedule-kind chip in the editor: a taper, steps with dates and a different interval each."
+    "description": "Schedule-kind chip in the editor: a taper, steps with a different interval each, set by dates or by number of doses."
   },
   "kindOnce": "Once",
   "@kindOnce": {
@@ -1947,7 +1947,7 @@
   },
   "taperHint": "Each step runs from midnight on its first day until midnight on its end day. The last step can be open-ended.",
   "@taperHint": {
-    "description": "Hint under the taper steps."
+    "description": "Hint under the steps of a taper set by dates (taperByDates)."
   },
   "remindMe": "Remind me",
   "@remindMe": {
@@ -2759,6 +2759,55 @@
     "placeholders": {
       "time": {
         "type": "String"
+      }
+    }
+  },
+  "taperByDates": "By dates",
+  "@taperByDates": {
+    "description": "Choice at the top of the taper editor: each step runs between two calendar dates. The other choice is taperByDoses."
+  },
+  "taperByDoses": "By doses",
+  "@taperByDoses": {
+    "description": "Choice at the top of the taper editor: each step lasts for a number of doses, with no dates. The other choice is taperByDates."
+  },
+  "taperDosesHint": "Each step lasts for its number of doses, then the next one begins. Leave the last step's number empty to carry on until stopped.",
+  "@taperDosesHint": {
+    "description": "Hint under the steps of a taper set by doses (taperByDoses)."
+  },
+  "errorStepDoses": "Every step but the last needs a number of doses.",
+  "@errorStepDoses": {
+    "description": "Validation error in the taper editor, for a taper set by doses: a step's number of doses is missing or not a whole number above zero. Only the last step may leave it empty."
+  },
+  "taperDoseStep": "{count, plural, =1{1 dose} other{{count} doses}}: every {duration}",
+  "@taperDoseStep": {
+    "description": "One step in the summary of a taper set by doses: {count} doses, each {duration} after the one before, e.g. '5 doses: every 24 hours'. Steps are joined with semicolons.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "taperDoseStepOpen": "then every {duration}",
+  "@taperDoseStepOpen": {
+    "description": "The last step in the summary of a taper set by doses, when it has no number of doses and carries on until stopped. Follows the taperDoseStep steps after a semicolon, e.g. '5 doses: every 24 hours; then every 36 hours'.",
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "taperShortDosesLeft": "{text} for {count, plural, =1{1 more dose} other{{count} more doses}}",
+  "@taperShortDosesLeft": {
+    "description": "Card schedule line for a taper set by doses: {text} is taperShortEvery, {count} how many doses of the current step are still to give, e.g. 'Taper: every 24 hours for 3 more doses'. taperShortThen may wrap it: '…, then every 36 hours'.",
+    "placeholders": {
+      "text": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
       }
     }
   }

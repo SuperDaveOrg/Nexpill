@@ -457,5 +457,12 @@
   "doseDueLate": "Tocaba {when}, con retraso",
   "doseDueEarly": "Toca {when}, antes de tiempo",
   "doseWhichError": "Elige qué dosis es esta.",
-  "historyDoseFor": "la dosis de las {time}"
+  "historyDoseFor": "la dosis de las {time}",
+  "taperByDates": "Por fechas",
+  "taperByDoses": "Por dosis",
+  "taperDosesHint": "Cada paso dura el número de dosis indicado y luego empieza el siguiente. Deja vacío el número del último paso para que siga hasta que se detenga.",
+  "errorStepDoses": "Cada paso, salvo el último, necesita un número de dosis.",
+  "taperDoseStep": "{count, plural, =1{1 dosis} other{{count} dosis}}: cada {duration}",
+  "taperDoseStepOpen": "luego cada {duration}",
+  "taperShortDosesLeft": "{text} durante {count, plural, =1{1 dosis más} other{{count} dosis más}}"
 }

@@ -89,6 +89,8 @@ MedicationStatus computeMedicationStatus(
   final interval = switch (schedule) {
     IntervalSchedule(:final intervalMinutes) => intervalMinutes,
     TaperSchedule(:final rules) => activeTaperRule(rules, now)?.intervalMinutes,
+    DoseTaperSchedule() =>
+      doseTaperPosition(schedule, medication.id, doseEvents).step?.intervalMinutes,
     _ => null,
   };
 

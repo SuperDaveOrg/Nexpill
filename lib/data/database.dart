@@ -15,7 +15,7 @@ class NexpillDatabase {
   static final NexpillDatabase instance = NexpillDatabase();
 
   static const _fileName = 'nexpill.db';
-  static const version = 8;
+  static const version = 9;
 
   final String? _path;
   final DatabaseFactory? _factory;
@@ -166,6 +166,15 @@ class NexpillDatabase {
       // The set time a dose was for, where that was said, as UTC
       // milliseconds; null leaves it to the timing engine.
       await db.execute('ALTER TABLE dose_events ADD COLUMN counts_for INTEGER');
+    }
+    if (oldVersion < 9) {
+      // A taper by number of doses (schedule_type taper_doses): its steps
+      // in order as "doses:minutes" joined by commas, "5:1440,5:2160,:2880",
+      // the doses left out for an open-ended last step; and how many doses
+      // the medication had already been given when the taper was set.
+      await db.execute('ALTER TABLE medications ADD COLUMN dose_taper_steps TEXT');
+      await db.execute(
+          'ALTER TABLE medications ADD COLUMN dose_taper_doses_before INTEGER');
     }
   }
 

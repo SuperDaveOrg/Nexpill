@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:nexpill/domain/inventory.dart';
+import 'package:nexpill/domain/scheduling.dart';
 import 'package:nexpill/domain/status.dart';
 import 'package:nexpill/domain/wording.dart';
 import 'package:nexpill/models/medication.dart';
@@ -25,6 +26,7 @@ class MedicationCard extends StatelessWidget {
     this.onSkip,
     this.lastGivenBy,
     this.course,
+    this.taper,
   });
 
   final Medication medication;
@@ -36,6 +38,10 @@ class MedicationCard extends StatelessWidget {
 
   /// How much of a course is left, e.g. "3 doses left"; null if none.
   final String? course;
+
+  /// Where a taper by doses has got to, for its schedule line; null for
+  /// any other schedule.
+  final DoseTaperPosition? taper;
   final VoidCallback onGive;
 
   /// Skips the dose due now, or the next one; null for as-needed. A button
@@ -125,7 +131,7 @@ class MedicationCard extends StatelessWidget {
                   child: Text(m.purpose!, style: theme.textTheme.bodyMedium),
                 ),
               Text(
-                [m.defaultDoseText, scheduleShortText(m.schedule, now), ?course]
+                [m.defaultDoseText, scheduleShortText(m.schedule, now, position: taper), ?course]
                     .join(' · '),
                 style: theme.textTheme.bodySmall,
               ),

@@ -394,7 +394,21 @@ class _MedicationEditorState extends State<MedicationEditor> {
           firstDate: now.subtract(const Duration(days: 365)),
           lastDate: now.add(const Duration(days: 365 * 2)),
         );
+    final choice = Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: SegmentedButton<bool>(
+        showSelectedIcon: false,
+        segments: [
+          ButtonSegment(value: false, label: Text(l.taperByDates)),
+          ButtonSegment(value: true, label: Text(l.taperByDoses)),
+        ],
+        selected: {_d.taperByDoses},
+        onSelectionChanged: (s) => _update(() => _d.taperByDoses = s.single),
+      ),
+    );
+    if (_d.taperByDoses) return [choice, ..._doseSteps(theme)];
     return [
+      choice,
       for (final (i, step) in _d.taperSteps.indexed)
         Padding(
           padding: const EdgeInsets.only(bottom: 12),
@@ -466,6 +480,65 @@ class _MedicationEditorState extends State<MedicationEditor> {
         }),
       ),
       _hint(theme, l.taperHint),
+    ];
+  }
+
+  /// The steps of a taper by doses: a number of doses and an interval each.
+  List<Widget> _doseSteps(ThemeData theme) {
+    final l = context.l;
+    return [
+      for (final (i, step) in _d.doseSteps.indexed)
+        Padding(
+          // Each step keeps its own fields when one above it is removed.
+          key: ObjectKey(step),
+          padding: const EdgeInsets.only(bottom: 12),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              border: Border.all(color: theme.colorScheme.outlineVariant),
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(12, 4, 4, 12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(children: [
+                    Expanded(
+                        child: Text(l.taperStepNumber(i + 1),
+                            style: theme.textTheme.titleSmall)),
+                    if (_d.doseSteps.length > 1)
+                      IconButton(
+                        tooltip: l.removeStep,
+                        icon: const Icon(Icons.close),
+                        onPressed: () => _update(() => _d.doseSteps.removeAt(i)),
+                      )
+                    else
+                      const SizedBox(height: 48),
+                  ]),
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: Column(children: [
+                      _text(l.numberOfDoses, step.doses, (v) => step.doses = v,
+                          hint: l.dosesHint, keyboard: TextInputType.number),
+                      const SizedBox(height: 12),
+                      DurationField(
+                        minutes: step.minutes,
+                        onChanged: (v) => _update(() => step.minutes = v),
+                      ),
+                    ]),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      OutlinedButton.icon(
+        icon: const Icon(Icons.add),
+        label: Text(l.addStep),
+        onPressed: () => _update(() => _d.doseSteps
+            .add(DoseStepDraft(minutes: _d.doseSteps.lastOrNull?.minutes ?? 480))),
+      ),
+      _hint(theme, l.taperDosesHint),
     ];
   }
 
