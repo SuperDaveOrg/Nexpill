@@ -391,6 +391,92 @@ void main() {
     });
   });
 
+  group('superseded', () {
+    /// When each notification is replaced, as "HH:mm>HH:mm", or "HH:mm" alone
+    /// for one that stays.
+    List<String> replaced(ReminderPlan plan) => [
+          for (final n in plan.notifications)
+            n.supersededAt == null
+                ? _hm(n.at)
+                : '${_hm(n.at)}>${_hm(n.supersededAt!)}',
+        ];
+
+    test('each reminder by the next for its medication; the last one stays', () {
+      final m = med('amox', const IntervalSchedule(8 * 60),
+          reminders: const ReminderSettings(enabled: true, earlyMinutes: 10));
+      final plan = planner.plan(
+          care([m], [given('amox', DateTime(2026, 6, 10, 6))]),
+          from: from);
+      expect(replaced(plan), [
+        '10/13:50>10/14:00',
+        '10/14:00>10/14:30',
+        '10/14:30>10/15:00',
+        '10/15:00>10/15:30',
+        '10/15:30>10/16:00',
+        '10/16:00>10/16:30',
+        '10/16:30>10/17:00',
+        '10/17:00',
+      ]);
+    });
+
+    test('one listing several only once each has a later reminder', () {
+      const every = ReminderSettings(enabled: true, overdueRepeatMinutes: 20);
+      const once = ReminderSettings(enabled: true, overdueRepeatMinutes: 45);
+      final plan = const ReminderPlanner(
+              horizon: Duration(hours: 24), maxOverdueRepeats: 2)
+          .plan(
+        care([
+          med('a', const IntervalSchedule(120), reminders: every),
+          med('b', const IntervalSchedule(120), reminders: once),
+        ], [
+          given('a', DateTime(2026, 6, 10, 8)),
+          given('b', DateTime(2026, 6, 10, 8)),
+        ]),
+        from: from,
+      );
+      expect(summary(plan), [
+        '10/10:00 dueNow:a+dueNow:b',
+        '10/10:20 overdue:a',
+        '10/10:40 overdue:a',
+        '10/10:45 overdue:b',
+        '10/11:30 overdue:b',
+      ]);
+      expect(replaced(plan), [
+        // Not at 10:20, when only a has been repeated.
+        '10/10:00>10/10:45',
+        '10/10:20>10/10:40',
+        '10/10:40',
+        '10/10:45>10/11:30',
+        '10/11:30',
+      ]);
+    });
+
+    test('never by a reminder for someone else', () {
+      const alex = Patient(id: 'alex', displayName: 'Alex');
+      final plan = const ReminderPlanner(
+              horizon: Duration(hours: 24), maxOverdueRepeats: 0)
+          .plan(
+        care([
+          med('a', const IntervalSchedule(120)),
+          med('b', const IntervalSchedule(180), patientId: 'alex'),
+        ], [
+          given('a', DateTime(2026, 6, 10, 8)),
+          given('b', DateTime(2026, 6, 10, 8)),
+        ], patients: const [sam, alex]),
+        from: from,
+      );
+      expect(replaced(plan), ['10/10:00', '10/11:00']);
+    });
+
+    test('not by a reminder left out of a capped plan', () {
+      final m = med('amox', const IntervalSchedule(8 * 60));
+      final plan = const ReminderPlanner(
+              horizon: Duration(hours: 24), maxNotifications: 2)
+          .plan(care([m], [given('amox', DateTime(2026, 6, 10, 6))]), from: from);
+      expect(replaced(plan), ['10/14:00>10/14:30', '10/14:30']);
+    });
+  });
+
   test('snoozed notification describes things as they are now', () {
     final m = med('amox', const IntervalSchedule(120));
     final now = DateTime(2026, 6, 10, 9);

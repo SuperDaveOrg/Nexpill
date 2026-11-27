@@ -29,6 +29,8 @@ import 'package:nexpill/models/patient.dart';
 /// - An interval or as-needed medication never given, or a taper by doses,
 ///   has no reminders: there's nothing to count from.
 /// - Everything due for one patient at the same minute is one notification.
+/// - A reminder is taken down once every medication on it has a later one,
+///   so only the latest word on each is ever showing.
 class ReminderPlanner {
   const ReminderPlanner({
     this.horizon = const Duration(days: 7),
@@ -96,7 +98,7 @@ class ReminderPlanner {
       });
 
     final inHorizon = [for (final n in all) if (!n.at.isAfter(until)) n];
-    final kept = inHorizon.take(maxNotifications).toList();
+    final kept = _superseding(inHorizon.take(maxNotifications).toList());
     final truncated = kept.length < all.length;
 
     return ReminderPlan(
@@ -109,6 +111,33 @@ class ReminderPlanner {
               ? kept.last.at
               : until.subtract(const Duration(hours: 12)),
     );
+  }
+
+  /// [notifications], in time order, each told when the ones after it will
+  /// have replaced it. Worked out only from what's kept, since a reminder
+  /// that isn't scheduled can't replace anything.
+  static List<PlannedNotification> _superseding(
+      List<PlannedNotification> notifications) {
+    final next = <String, DateTime>{};
+    final result = <PlannedNotification>[];
+    for (final n in notifications.reversed) {
+      DateTime? supersededAt;
+      for (final id in n.medicationIds) {
+        final later = next[id];
+        if (later == null) {
+          supersededAt = null;
+          break;
+        }
+        if (supersededAt == null || later.isAfter(supersededAt)) {
+          supersededAt = later;
+        }
+      }
+      result.add(n.supersededFrom(supersededAt));
+      for (final id in n.medicationIds) {
+        next[id] = n.at;
+      }
+    }
+    return result.reversed.toList();
   }
 
   Iterable<ReminderItem> _medicationReminders(
@@ -297,11 +326,19 @@ class PlannedNotification {
     required this.at,
     required this.patient,
     required this.items,
+    this.supersededAt,
   });
 
   final DateTime at;
   final Patient patient;
   final List<ReminderItem> items;
+
+  /// When every medication on this has had a later reminder, and so this
+  /// one has nothing left to say; null if any of them has none to come.
+  final DateTime? supersededAt;
+
+  PlannedNotification supersededFrom(DateTime? at) => PlannedNotification(
+      at: this.at, patient: patient, items: items, supersededAt: at);
 
   bool get rings => items.any((i) => i.rings);
 

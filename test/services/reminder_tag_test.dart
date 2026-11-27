@@ -101,6 +101,24 @@ void main() {
     });
   });
 
+  group('showFor', () {
+    final at = DateTime.utc(2026, 6, 10, 9);
+
+    test('until the reminder that replaces it has arrived', () {
+      expect(showFor(at, DateTime.utc(2026, 6, 10, 9, 30)),
+          const Duration(minutes: 30, seconds: 5));
+    });
+
+    test('until dealt with, when nothing replaces it', () {
+      expect(showFor(at, null), isNull);
+    });
+
+    test('only a moment, shown after its replacement was due', () {
+      expect(showFor(at, DateTime.utc(2026, 6, 10, 8, 59)),
+          const Duration(seconds: 5));
+    });
+  });
+
   group('alarmTime', () {
     final now = DateTime.utc(2026, 6, 10, 8, 59, 3);
 

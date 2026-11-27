@@ -9,6 +9,11 @@ turns that section into the release's own when it's cut.
 
 ## [Unreleased]
 
+### Changed
+- Reminders no longer pile up. A reminder is taken down when the next one
+  about the same medication arrives, so an ignored dose leaves one
+  notification showing its latest state instead of one for every repeat.
+
 ## [0.10.0] - 2026-11-23
 
 ### Added

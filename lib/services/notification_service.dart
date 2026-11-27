@@ -37,6 +37,7 @@ class NotificationService {
     bool canSkip = false,
     int snoozeMinutes = defaultSnoozeMinutes,
     DoseWords words = const DoseWords(self: false),
+    Duration? showFor,
   }) {
     final style = multiline ? const BigTextStyleInformation('') : null;
     final actions = withActions
@@ -60,6 +61,7 @@ class NotificationService {
         additionalFlags: Int32List.fromList([4]),
         styleInformation: style,
         tag: tag,
+        timeoutAfter: showFor?.inMilliseconds,
       );
     }
     return AndroidNotificationDetails(
@@ -73,6 +75,7 @@ class NotificationService {
       actions: actions,
       styleInformation: style,
       tag: tag,
+      timeoutAfter: showFor?.inMilliseconds,
     );
   }
 
@@ -212,12 +215,13 @@ class NotificationService {
   }
 
   Future<void> _schedule(int id, PlannedNotification n, ReminderTag tag) async {
+    final at = alarmTime(n.at, DateTime.now());
     await _plugin.zonedSchedule(
       id: id,
       title: n.title,
       body: n.body,
       payload: tag.encode(),
-      scheduledDate: tz.TZDateTime.from(alarmTime(n.at, DateTime.now()), tz.UTC),
+      scheduledDate: tz.TZDateTime.from(at, tz.UTC),
       notificationDetails: NotificationDetails(
         android: _details(
             rings: n.rings,
@@ -225,7 +229,8 @@ class NotificationService {
             multiline: n.items.length > 1,
             canSkip: n.canSkip,
             snoozeMinutes: tag.snoozeMinutes,
-            words: DoseWords.of(n.patient)),
+            words: DoseWords.of(n.patient),
+            showFor: showFor(at, n.supersededAt)),
       ),
       androidScheduleMode: n.rings
           ? AndroidScheduleMode.alarmClock
@@ -384,6 +389,23 @@ DateTime alarmTime(DateTime at, DateTime now) {
   final soonest = now.add(const Duration(seconds: 1));
   return at.isAfter(soonest) ? at : soonest;
 }
+
+/// How long a reminder shown at [at] stays in the shade: until the one that
+/// replaces it, at [supersededAt], has arrived. Null to stay until dealt
+/// with, when nothing replaces it.
+///
+/// Android takes it down by itself, which is the only way to: nothing of
+/// Nexpill's runs when a reminder fires. It counts from when the reminder
+/// is shown, so one shown late stays as long and may overlap the next.
+Duration? showFor(DateTime at, DateTime? supersededAt) {
+  if (supersededAt == null) return null;
+  final gap = supersededAt.difference(at);
+  return (gap.isNegative ? Duration.zero : gap) + _replacementSlack;
+}
+
+/// Leaves the old reminder up a moment longer than the new one needs to
+/// arrive, so there's never a gap with neither showing.
+const _replacementSlack = Duration(seconds: 5);
 
 /// When each medication's snooze ends, from [snoozes], the tags of those
 /// still pending. A medication whose dose has been given or skipped since
