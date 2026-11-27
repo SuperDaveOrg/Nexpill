@@ -61,6 +61,43 @@ class MedicationCard extends StatelessWidget {
     final due = status.schedule.eligibleNow;
     final next = status.schedule.nextEligibleAt;
 
+    final statusText = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          headline,
+          style: NexpillTheme.font(
+            NexpillTheme.serif,
+            24,
+            600,
+            height: 1.15,
+            color: accent,
+          ),
+        ),
+        const SizedBox(height: 2),
+        Text(detail, style: theme.textTheme.bodyMedium),
+        if (last != null)
+          Text(
+            // Their own doses don't say who gave them.
+            lastGivenBy == null || forSelf
+                ? words.lastGiven(whenText(last, now))
+                : context.l.lastGivenBy(whenText(last, now), lastGivenBy!),
+            style: theme.textTheme.bodySmall,
+          ),
+        if (inventory.configured)
+          Text(
+            _supplyText(context, inventory, m.doseUnit),
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: switch (inventory.level) {
+                InventoryLevel.out => colors.late,
+                InventoryLevel.low => colors.soon,
+                _ => null,
+              },
+            ),
+          ),
+      ],
+    );
+
     return Card(
       clipBehavior: Clip.antiAlias,
       child: InkWell(
@@ -131,8 +168,11 @@ class MedicationCard extends StatelessWidget {
                   child: Text(m.purpose!, style: theme.textTheme.bodyMedium),
                 ),
               Text(
-                [m.defaultDoseText, scheduleShortText(m.schedule, now, position: taper), ?course]
-                    .join(' · '),
+                [
+                  m.defaultDoseText,
+                  scheduleShortText(m.schedule, now, position: taper),
+                  ?course,
+                ].join(' · '),
                 style: theme.textTheme.bodySmall,
               ),
               if (m.instructions != null) ...[
@@ -142,54 +182,30 @@ class MedicationCard extends StatelessWidget {
               const SizedBox(height: 14),
               Padding(
                 padding: const EdgeInsets.only(right: 10),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
+                // The buttons get a line of their own. Beside the status
+                // they left it too little room: in German, with Skip
+                // showing, it broke mid-word.
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            headline,
-                            style: NexpillTheme.font(
-                              NexpillTheme.serif,
-                              24,
-                              600,
-                              height: 1.15,
-                              color: accent,
-                            ),
+                    statusText,
+                    const SizedBox(height: 10),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        if (onSkip != null && due) ...[
+                          TextButton(
+                            onPressed: onSkip,
+                            child: Text(context.l.skip),
                           ),
-                          const SizedBox(height: 2),
-                          Text(detail, style: theme.textTheme.bodyMedium),
-                          if (last != null)
-                            Text(
-                              // Their own doses don't say who gave them.
-                              lastGivenBy == null || forSelf
-                                  ? words.lastGiven(whenText(last, now))
-                                  : context.l.lastGivenBy(
-                                      whenText(last, now), lastGivenBy!),
-                              style: theme.textTheme.bodySmall,
-                            ),
-                          if (inventory.configured)
-                            Text(
-                              _supplyText(context, inventory, m.doseUnit),
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                color: switch (inventory.level) {
-                                  InventoryLevel.out => colors.late,
-                                  InventoryLevel.low => colors.soon,
-                                  _ => null,
-                                },
-                              ),
-                            ),
+                          const SizedBox(width: 4),
                         ],
-                      ),
+                        FilledButton(
+                          onPressed: onGive,
+                          child: Text(words.give),
+                        ),
+                      ],
                     ),
-                    const SizedBox(width: 12),
-                    if (onSkip != null && due) ...[
-                      TextButton(onPressed: onSkip, child: Text(context.l.skip)),
-                      const SizedBox(width: 4),
-                    ],
-                    FilledButton(onPressed: onGive, child: Text(words.give)),
                   ],
                 ),
               ),
@@ -201,11 +217,17 @@ class MedicationCard extends StatelessWidget {
   }
 
   /// "12 tablets left", never below none.
-  static String leftText(BuildContext context, double remaining, String? unit) =>
-      context.l.supplyLeft(amountText(remaining < 0 ? 0 : remaining, unit));
+  static String leftText(
+    BuildContext context,
+    double remaining,
+    String? unit,
+  ) => context.l.supplyLeft(amountText(remaining < 0 ? 0 : remaining, unit));
 
   static String _supplyText(
-      BuildContext context, InventoryStatus i, String? unit) {
+    BuildContext context,
+    InventoryStatus i,
+    String? unit,
+  ) {
     final left = leftText(context, i.remaining!, unit);
     return switch (i.level) {
       InventoryLevel.out => context.l.supplyNoneLeft,
