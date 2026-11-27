@@ -9,6 +9,13 @@ turns that section into the release's own when it's cut.
 
 ## [Unreleased]
 
+### Fixed
+- A medication's status no longer breaks in the middle of a word. With
+  Skip showing, the buttons left the text beside them too little room in
+  languages with longer words: in German "Noch nicht eingenommen" ran to
+  five lines. The buttons now sit on a line of their own under the status,
+  on every card.
+
 ## [0.10.0] - 2026-11-23
 
 ### Added
